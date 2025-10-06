@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resort Booking – Trang chủ</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* Cơ bản cho layout */
+    body { margin:0; font-family: Arial, sans-serif; }
+    header { background:#fff; border-bottom:1px solid #ddd; padding:0.5rem 1rem; display:flex; align-items:center; justify-content:space-between; }
+    header h1 { margin:0; font-size:1.5rem; color:#0066cc; }
+    header nav a { margin-left:1rem; text-decoration:none; color:#0066cc; padding:0.5rem; border-radius:4px; }
+    header nav a:hover { background:#f0f8ff; }
+    .search-form { background:#0066cc; color:#fff; padding:1rem; display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; }
+    .search-form label { display:flex; flex-direction:column; font-size:0.9rem; }
+    .search-form input, .search-form select { padding:0.5rem; border:none; border-radius:4px; }
+    .search-form button { background:#ff8c00; color:#fff; border:none; padding:0.75rem 1.5rem; font-size:1rem; cursor:pointer; border-radius:4px; }
+    .search-form button:hover { background:#e67e00; }
+    .resorts { padding:1rem; display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:1rem; }
+    .resort-card { border:1px solid #ddd; border-radius:4px; overflow:hidden; background:#fff; transition:box-shadow .2s; }
+    .resort-card:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    .resort-card img { width:100%; height:160px; object-fit:cover; }
+    .resort-info { padding:0.75rem; }
+    .resort-info h3 { margin:0 0 0.5rem; font-size:1.1rem; color:#333; }
+    .resort-info p { margin:0.25rem 0; font-size:0.9rem; color:#555; }
+    .resort-info .price { color:#e74c3c; font-weight:bold; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Resort Booking</h1>
+    <nav>
+      <a href="login.html">Đăng nhập</a>
+      <a href="register.html">Đăng ký</a>
+    </nav>
+  </header>
+
+  <section class="search-form">
+    <label>
+      Địa điểm
+      <input type="text" id="location" placeholder="Nhập thành phố hoặc resort" />
+    </label>
+    <label>
+      Ngày nhận
+      <input type="date" id="checkin" />
+    </label>
+    <label>
+      Ngày trả
+      <input type="date" id="checkout" />
+    </label>
+    <label>
+      Khách
+      <select id="guests">
+        <option value="1">1 khách</option>
+        <option value="2" selected>2 khách</option>
+        <option value="3">3 khách</option>
+        <option value="4">4 khách</option>
+      </select>
+    </label>
+    <button id="searchBtn">Tìm kiếm</button>
+  </section>
+
+  <section class="resorts" id="resortList">
+    <!-- Danh sách resort sẽ render ở đây -->
+  </section>
+
+  <script src="home.js"></script>
+</body>
+</html>
