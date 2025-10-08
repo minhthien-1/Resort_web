@@ -1,0 +1,635 @@
+/* ====== Thanh Navbar ====== */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.navbar {
+  background-color: #00aaff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo h1 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  cursor: pointer;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.navbar-menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navbar-menu a:hover {
+  color: #ffe082;
+}
+
+.navbar-menu .btn-login {
+  background-color: #4cc3ff;
+  color: black;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.navbar-menu .btn-register {
+  background-color: white;
+  color: #009fe3;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.navbar-menu .btn-register:hover {
+  background-color: #e0f7ff;
+}
+
+/* ====== Phần Form Tìm Kiếm ====== */
+#dateRange {
+  width: 250px;
+}
+
+.search-container {
+  background-image: url('Assets/Icon Images/background.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  padding-top: 200px;
+  padding-bottom: 60px;
+  text-align: center;
+}
+
+.resort_type {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0 25px;
+}
+
+.type-btn {
+ padding: 10px 22px;
+  font-size: 15px;
+  font-weight: bolder;
+  border: 1.5px solid #007bff;
+  border-radius: 25px;
+  background-color: transparent; /* Thay đổi từ white sang transparent */
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+}
+
+.type-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.type-btn.active {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+
+.search-header {
+  margin-bottom: 30px;
+}
+
+.search-header h2 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.search-header p {
+  margin-top: 0;
+  font-size: 16px;
+  color: #dce9ff;
+}
+
+.resorts{
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.search-form label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.search-form input,
+.search-form select {
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  width: 220px;
+}
+
+.search-form button {
+  background-color: #ff8c00;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  height: 52px;
+  margin-top: 26px;
+  align-self: center;
+}
+
+.search-form button:hover {
+  background-color: #ff9f33;
+}
+
+@media (max-width: 768px) {
+  .search-form {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .search-form label {
+    align-items: center;
+  }
+
+  .search-form input,
+  .search-form select {
+    width: 100%;
+  }
+}
+
+/* --- MÃ ƯU ĐÃI --- */
+.promo-codes {
+  position: relative;
+  overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px 40px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.promo-codes h2 {
+  font-size: 24px;
+  color: #004a99;
+  font-weight: 700;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.promo-grid {
+  display: flex;
+  gap: 20px;
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+.promo-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 20px;
+  flex: 0 0 340px;
+  min-width: 340px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s;
+}
+
+.promo-card:hover {
+  transform: translateY(-5px);
+}
+
+.promo-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.promo-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.promo-desc {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.promo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.promo-code {
+  background: #eef6ff;
+  color: #004a99;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.copy-btn {
+  background: #0071eb;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.copy-btn:hover {
+  background: #005fcc;
+}
+
+/* --- Nút mũi tên trái phải --- */
+.promo-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.promo-arrow:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.promo-arrow.left {
+  left: -10px;
+}
+
+.promo-arrow.right {
+  right: -10px;
+}
+
+.promo-arrow i {
+  font-size: 18px;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.promo-arrow:hover i {
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .promo-arrow {
+    display: none;
+  }
+}
+
+/* --- ƯU ĐÃI NỔI BẬT --- */
+.deals-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  background: #f9f9f9;
+  text-align: center;
+  box-sizing: border-box;
+}
+/* --- Nút mũi tên trái phải (cho Ưu đãi nổi bật) --- */
+.deals-wrapper {
+  position: relative;
+}
+
+.deals-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.deals-arrow:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.deals-arrow.left {
+  left: -10px;
+}
+
+.deals-arrow.right {
+  right: -10px;
+}
+
+.deals-arrow i {
+  font-size: 18px;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.deals-arrow:hover i {
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .deals-arrow {
+    display: none;
+  }
+}
+
+/* Cuộn ngang đẹp mắt */
+.resort-grid {
+  display: flex;
+  gap: 25px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding: 10px 0;
+}
+
+.resort-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.resort-card {
+  flex: 0 0 270px;
+}
+
+
+
+.deals-section h2 {
+  font-size: 26px;
+  margin-bottom: 30px;
+}
+
+.resort-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.resort-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: left;
+  transition: transform 0.2s;
+}
+
+.resort-card:hover {
+  transform: translateY(-5px);
+}
+
+.resort-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.resort-info {
+  padding: 15px;
+}
+
+.resort-info h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.resort-info .price span {
+  color: #0071eb;
+  font-weight: bold;
+}
+
+/* --- ĐIỂM ĐẾN PHỔ BIẾN --- */
+.popular-destinations {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.destination-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.destination-card {
+  width: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.destination-card:hover {
+  transform: scale(1.05);
+}
+
+.destination-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+/* --- WHY CHOOSE US --- */
+.why-choose-us {
+  background: #eef6ff;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.why-choose-us .reasons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.reason {
+  max-width: 250px;
+  text-align: center;
+}
+
+.reason img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+/* --- FOOTER --- */
+footer {
+  background-color: #003d91;
+  color: #ffffff;
+  text-align: center;
+  padding: 30px 10px;
+  font-size: 15px;
+  border-top: 2px solid #007bff;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+footer p {
+  margin: 0;
+  font-weight: 400;
+  color: #e0ecff;
+}
+
+footer p span {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.footer-links {
+  margin-top: 10px;
+}
+
+.footer-links a {
+  color: #e0ecff;
+  text-decoration: none;
+  margin: 0 5px;
+  transition: color 0.3s;
+  font-size: 14px;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+}
+
+.footer-links span {
+  color: #88b7ff;
+}
+
+/* Phần mạng xã hội */
+.footer-social {
+  margin-top: 20px;
+}
+
+.footer-social p {
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.social-icons a {
+  display: inline-block;
+  margin: 0 8px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.social-icons img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0) invert(1);
+}
+
+.social-icons a:hover {
+  transform: scale(1.15);
+  opacity: 0.85;
+}
+
+/* Hiệu ứng hover nhẹ toàn footer */
+footer:hover {
+  background-color: #0049b0;
+  transition: background-color 0.3s ease;
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  footer {
+    font-size: 13px;
+    padding: 20px 5px;
+  }
+  .footer-links {
+    font-size: 12px;
+  }
+  .social-icons img {
+    width: 24px;
+    height: 24px;
+  }
+}
