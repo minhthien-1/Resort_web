@@ -53,16 +53,55 @@ async function renderResorts(filter = {}) {
 
 // Xử lý sự kiện search
 document.getElementById('searchBtn').addEventListener('click', () => {
-  const filter = {
-    location: document.getElementById('location').value,
-    checkin: document.getElementById('checkin').value,
-    checkout: document.getElementById('checkout').value,
-    guests: document.getElementById('guests').value
-  };
+  const location = document.getElementById('location').value;
+  const dateRange = document.getElementById('dateRange').value;
+  const guests = document.getElementById('guests').value;
+
+  // Tách ngày nhận / trả từ "dd/mm/yyyy - dd/mm/yyyy"
+  let checkin = '', checkout = '';
+  if (dateRange.includes(' - ')) {
+    const [start, end] = dateRange.split(' - ');
+    checkin = start.trim();
+    checkout = end.trim();
+  }
+
+  const filter = { location, checkin, checkout, guests };
   renderResorts(filter);
 });
 
 // Khi load trang, hiển thị mặc định
 document.addEventListener('DOMContentLoaded', () => {
   renderResorts();
+
+  // === Khởi tạo Flatpickr tiếng Việt ===
+  if (window.flatpickr) {
+    flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "d/m/Y",
+      locale: "vn"  
+    });
+  }
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+  const grid = document.getElementById("dealsGrid");
+  const btnLeft = document.querySelector(".deals-arrow.left");
+  const btnRight = document.querySelector(".deals-arrow.right");
+
+  function scrollByOneCard(direction) {
+    const card = grid.querySelector(".resort-card");
+    if (!card) return;
+
+    const cardStyle = window.getComputedStyle(card);
+    const cardWidth = card.offsetWidth + parseFloat(cardStyle.marginRight);
+
+    grid.scrollBy({
+      left: direction === "right" ? cardWidth : -cardWidth,
+      behavior: "smooth"
+    });
+  }
+
+  btnLeft.addEventListener("click", () => scrollByOneCard("left"));
+  btnRight.addEventListener("click", () => scrollByOneCard("right"));
+});
+
