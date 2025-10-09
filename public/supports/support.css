@@ -1,0 +1,87 @@
+
+
+.support-main {
+  width : 700px;
+  margin-top : 100px;
+  margin: 40px auto 60px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 32px 28px;
+  font-size: 1.1rem;
+}
+
+.support-main h2 {
+  color: #00aaff;
+  margin-bottom: 18px;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.support-main ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 28px;
+}
+
+.support-main ul li {
+  margin-bottom: 12px;
+  padding-left: 28px;
+  position: relative;
+}
+
+.support-main ul li::before {
+  content: "📞";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 1.2em;
+}
+
+.support-main ul li:nth-child(2)::before {
+  content: "✉️";
+}
+.support-main ul li:nth-child(3)::before {
+  content: "💬";
+}
+
+.faq {
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-top: 10px;
+}
+
+.faq p {
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+.faq strong {
+  color: #1976d2;
+}
+
+@media (max-width: 600px) {
+  .support-main {
+    padding: 16px 8px;
+  }
+}
+
+.faq-question {
+  cursor: pointer;
+  margin-bottom: 0;
+  padding: 8px;
+  background: #f0f4fa;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.faq-question:hover {
+  background: #e3eaf5;
+}
+.faq-answer {
+  padding: 10px 16px;
+  background: #f9fbfd;
+  border-left: 3px solid #1976d2;
+  margin-bottom: 12px;
+  border-radius: 0 6px 6px 6px;
+}
