@@ -1,18 +1,54 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Login – Resort Admin</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Note: You still need to ensure style.css contains the necessary CSS for aesthetic appeal -->
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-  <h1>Đăng nhập</h1>
-  <form id="loginForm">
-    <label>Email: <input type="email" name="email" required /></label><br/>
-    <label>Password: <input type="password" name="password" required /></label><br/>
-    <button type="submit">Login</button>
-  </form>
-  <p>Chưa có tài khoản? <a href="register.html">Đăng ký</a></p>
-  <div id="error" style="color:blue; display:none;"></div>
-  <script src="auth.js"></script>
+
+    <section>
+        
+    <div class="login-box">
+        
+        <form action="">
+            <h2>Đăng Nhập</h2>
+            <div class="input-box">
+                <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
+                <input type="email" required>
+                <label>Email</label>
+            </div>
+            <div class="input-box">
+                <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+                <input type="password" required>
+                <label>Password</label>
+            </div>
+            <div class="remember-forgot">
+                <label><input type="checkbox">Không nhớ tài khoản?</label>
+                <a href="#">Quên mật khẩu</a>
+            </div>
+            <button type="submit">Đăng Nhập</button>
+            
+            <!-- ĐÃ CẬP NHẬT: Thêm style="margin-top: 15px;" để tạo khoảng cách -->
+            <button type="button" class="back-button" style="margin-top: 15px;" onclick="window.location.href = 'home.html'">
+                &lt; Quay lại
+            </button>
+            
+            <div class="register-link">
+                <p>Không có tài khoản?<a href="register.html"> Đăng ký ngay</a></p>
+            </div>
+        </form>
+
+        </div>
+    </section>  
+    
+    <!-- Script for Ionicons icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <!-- Script for login logic (login.js) -->
+    <script src="login.js"></script>
 </body>
 </html>
