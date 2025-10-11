@@ -24,7 +24,7 @@
     </div>
     <nav class="navbar-menu">
       <a href="">Khuyến mãi</a>
-      <a href="supports/support.html">Hỗ trợ</a>
+      <a href="">Hỗ trợ</a>
       <a href="">Hợp tác với chúng tôi</a>
       <a href="">Đặt chỗ của tôi</a>
       <a href="login.html" class="btn-login">Đăng nhập</a>
@@ -190,6 +190,39 @@
 
   <script src="home.js"></script>
 </body>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const navbarMenu = document.querySelector(".navbar-menu");
+
+  // Lấy thông tin từ localStorage
+  const username = localStorage.getItem("username");
+  const full_name = localStorage.getItem("full_name");
+
+  // Nếu người dùng đã đăng nhập
+  if (username || full_name) {
+    navbarMenu.innerHTML = `
+      <a href="">Khuyến mãi</a>
+      <a href="supports/support.html">Hỗ trợ</a>
+      <a href="">Hợp tác với chúng tôi</a>
+      <a href="">Đặt chỗ của tôi</a>
+      <div class="user-menu">
+        <span class="user-name">👤 ${full_name || username}</span>
+        <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
+      </div>
+    `;
+
+    // Khi bấm đăng xuất
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("full_name");
+      localStorage.removeItem("role");
+      window.location.href = "login.html";
+    });
+  }
+});
+</script>
+
 </html>
 <script>
   const typeButtons = document.querySelectorAll('.type-btn');

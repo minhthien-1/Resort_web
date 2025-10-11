@@ -55,42 +55,78 @@ app.get("/health", async (req, res) => {
 // ===== AUTH APIs =====
 // Đăng ký
 app.post("/auth/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { fullName, username, email, phone, password } = req.body;
+
+  if (!fullName || !username || !email || !phone || !password) {
+    return res.status(400).json({ error: "Thiếu thông tin đăng ký" });
+  }
+
   try {
-    const hash = await bcrypt.hash(password, 10);
-    const { rows } = await pool.query(
-      "INSERT INTO users(email, password_hash) VALUES($1, $2) RETURNING id, role",
-      [email, hash]
+    // Hash mật khẩu
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Thực hiện INSERT vào PostgreSQL
+    await pool.query(
+      `INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active)
+       VALUES ($1, $2, $3, $4, $5, 'customer', true)`,
+      [username, email, hashedPassword, fullName, phone]
     );
-    res.status(201).json(rows[0]);
+
+    res.status(201).json({ message: "Đăng ký thành công" });
   } catch (err) {
-    res.status(400).json({ error: err.detail || err.message });
+    console.error("Lỗi khi đăng ký:", err);
+    if (err.code === "23505") {
+      res.status(400).json({ error: "Email hoặc Username đã tồn tại" });
+    } else {
+      res.status(500).json({ error: "Lỗi server khi đăng ký" });
+    }
   }
 });
+
 
 // Đăng nhập
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
-  const { rows } = await pool.query(
-    "SELECT id, password_hash, role FROM users WHERE email=$1",
-    [email]
-  );
+  console.log("📩 Login request:", email);
 
-  if (
-    rows.length === 0 ||
-    !(await bcrypt.compare(password, rows[0].password_hash))
-  ) {
-    return res.status(401).json({ error: "Invalid credentials" });
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, email, username, password_hash, role, full_name FROM users WHERE email=$1 AND is_active=true",
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ error: "Tài khoản không tồn tại hoặc bị khóa" });
+    }
+
+    const user = rows[0];
+
+    // ✅ So sánh mật khẩu thực sự với bcrypt
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+
+    if (!validPassword) {
+      return res.status(401).json({ error: "Sai mật khẩu" });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET || "defaultsecret",
+      { expiresIn: "8h" }
+    );
+
+    res.json({
+      message: "Đăng nhập thành công",
+      token,
+      username: user.username,
+      full_name: user.full_name,
+      role: user.role,
+    });
+  } catch (err) {
+    console.error("❌ Lỗi đăng nhập chi tiết:", err);
+    res.status(500).json({ error: "Lỗi server khi đăng nhập" });
   }
-
-  const token = jwt.sign(
-    { userId: rows[0].id, role: rows[0].role },
-    process.env.JWT_SECRET || "defaultsecret",
-    { expiresIn: "8h" }
-  );
-
-  res.json({ token });
 });
+
 
 // ===== HOTEL MANAGEMENT APIs =====
 // API 1: Tổng số booking
