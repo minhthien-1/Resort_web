@@ -1,18 +1,58 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Register – Resort Admin</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Đăng ký</h1>
-  <form id="registerForm">
-    <label>Email: <input type="email" name="email" required /></label><br/>
-    <label>Password: <input type="password" name="password" required /></label><br/>
-    <button type="submit">Register</button>
-  </form>
-  <p>Đã có tài khoản? <a href="login.html">Login</a></p>
-  <div id="error" style="color:red; display:none;"></div>
-  <script src="auth.js"></script>
-</body>
+
+  <section>
+  <div class="register-box">
+    <form action="">
+      <h2>Đăng Ký</h2>
+     <div class="name-row">
+  <div class="input-box">
+    <input type="text" required>
+    <label>Họ</label>
+  </div>
+
+  <div class="input-box">
+    <input type="text" required>
+    <label>Tên</label>
+  </div>
+</div>
+
+      <div class="input-box">
+        <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
+        <input type="email" required>
+        <label>Email</label>
+      </div>
+      <div class="input-box">
+        <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+        <input type="password" required>
+        <label>Password</label>
+      </div>
+      <div class="input-box">
+        <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+        <input type="password" required>
+        <label>Confirm Password</label>
+      </div>
+      <button type="submit">Đăng Ký</button>
+      <button type="button" class="back-button" style="margin-top: 15px;" onclick="window.location.href = 'home.html'">
+                &lt; Quay lại
+            </button>
+      <div class="register-link">
+        <p>Đã có tài khoản?<a href="login.html"> Đăng nhập đây</a></p>
+      </div>
+    </form>
+
+    </div>
+  </section>  
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="login.js"></script>
+ </body>
 </html>

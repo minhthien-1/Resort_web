@@ -1,56 +1,85 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resort Admin Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/base.css">
-    <link rel="stylesheet" href="../assets/css/layout.css">
-    <link rel="stylesheet" href="../assets/css/components.css">
-    <link rel="stylesheet" href="../assets/css/pages.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="theme-blue">
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar">
         <div class="sidebar__brand">
-            <div class="brand__logo">🏨</div>
-            <span class="brand__name">Resort Admin</span>
+            <span class="logo">🏖️</span>
+            <h2>Resort</h2>
         </div>
         <nav class="nav">
-            <a class="nav__item nav__item--active" href="./index.html">
-                <span class="nav__icon">📊</span>
-                Dashboard
-            </a>
-            <a class="nav__item" href="./rooms.html">
-                <span class="nav__icon">🏠</span>
-                Quản lý phòng
-            </a>
-            <a class="nav__item" href="./bookings.html">
-                <span class="nav__icon">📋</span>
-                Booking
-            </a>
-            <a class="nav__item" href="./customers.html">
-                <span class="nav__icon">👥</span>
-                Khách hàng
-            </a>
-            <a class="nav__item" href="./reports.html">
-                <span class="nav__icon">📈</span>
-                Báo cáo
-            </a>
+            <a class="nav__item active" href="./index.html">📊 Bảng điều khiển</a>
+            <a class="nav__item" href="./bookings.html">📋 Đặt phòng</a>
+            <a class="nav__item" href="./rooms.html">🏠 Phòng nghỉ</a>
+            <a class="nav__item" href="./customers.html">👥 Khách hàng</a>
+            <a class="nav__item" href="./reports.html">📈 Báo cáo</a>
         </nav>
-        <div class="sidebar__footer">
-            <a class="nav__item nav__item--logout" href="./login.html">
-                <span class="nav__icon">🚪</span>
-                Đăng xuất
-            </a>
-        </div>
     </aside>
 
-    <!-- Main Layout -->
-    <div class="layout">
-        <!-- Header -->
+    <!-- Main content -->
+    <main class="main">
         <header class="header">
-            <div class="header__left">
-                <button class="btn btn--ghost btn--icon" id="btnSidebarToggle" aria-label="Toggle sidebar">
-                    ☰
-                </b
+            <h1>Resort Management</h1>
+            <div class="header__icons">
+                <button title="Thông báo">🔔</button>
+                <button title="Cài đặt">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="cards">
+            <!-- Ô 1: Tổng booking -->
+            <div class="card blue" id="card-bookings">
+                <h3>Tổng lượt đặt phòng</h3>
+                <p class="value" id="total-bookings">--</p>
+                <p class="desc">Số lượng booking hiện có</p>
+            </div>
+
+            <!-- Ô 2: Tổng doanh thu (màu xanh lá) -->
+            <div class="card green" id="card-occupancy">
+                <h3>Tổng doanh thu</h3>
+                <p class="value" id="occupancy-rate">0 VND</p>
+                <p class="desc">Tổng doanh thu toàn hệ thống</p>
+            </div>
+
+            <!-- Ô 3: Doanh thu tháng hiện tại (màu cam) -->
+            <div class="card orange" id="card-revenue">
+                <h3>Doanh thu tháng 10</h3>
+                <p class="value" id="total-revenue">0 VND</p>
+                <p class="desc">Doanh thu tháng hiện tại</p>
+            </div>
+
+            <!-- Ô 4: Khách mới -->
+            <div class="card purple" id="card-guests">
+                <h3>Khách mới</h3>
+                <p class="value" id="new-guests">--</p>
+                <p class="desc">Trong 30 ngày gần nhất</p>
+            </div>
+        </section>
+
+        <!-- Chart -->
+        <section class="chart-section">
+            <h2>📈 Xu hướng doanh thu theo tháng</h2>
+            <canvas id="revenueChart"></canvas>
+        </section>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/assets/js/dashboard.js"></script>
+    <script src="/assets/js/chart.js"></script>
+
+</body>
+
+</html>
