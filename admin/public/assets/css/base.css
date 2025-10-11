@@ -1,0 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    display: flex;
+    background: #f4f7fb;
+    color: #333;
+    height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 600;
+}
+
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
