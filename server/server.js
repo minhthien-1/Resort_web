@@ -18,11 +18,27 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve frontend (thư mục public)
-app.use(express.static(path.join(__dirname, "../admin/public")));
+// ===== SERVE STATIC =====
+// Serve frontend User (thư mục public)
+app.use(
+  "/",
+  express.static(path.join(__dirname, "../public"))
+);
 
-// Route gốc (index)
+// Serve frontend Admin (thư mục admin/public)
+app.use(
+  "/admin",
+  express.static(path.join(__dirname, "../admin/public"))
+);
+
+// ===== ROUTES GỐC =====
+// User home page
 app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/home.html"));
+});
+
+// Admin home page
+app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "../admin/public/home.html"));
 });
 
@@ -37,7 +53,6 @@ app.get("/health", async (req, res) => {
 });
 
 // ===== AUTH APIs =====
-
 // Đăng ký
 app.post("/auth/register", async (req, res) => {
   const { email, password } = req.body;
@@ -78,7 +93,6 @@ app.post("/auth/login", async (req, res) => {
 });
 
 // ===== HOTEL MANAGEMENT APIs =====
-
 // API 1: Tổng số booking
 app.get("/api/bookings/total", async (req, res) => {
   try {
@@ -98,7 +112,6 @@ app.get("/api/revenue/total", async (req, res) => {
       FROM bookings
       WHERE status = 'confirmed';
     `);
-
     console.log("🟢 API /api/revenue/total:", result.rows[0]);
     res.json({ total_revenue: Number(result.rows[0].total_revenue) });
   } catch (err) {
@@ -117,7 +130,6 @@ app.get("/api/revenue/current-month", async (req, res) => {
         AND EXTRACT(MONTH FROM check_in) = EXTRACT(MONTH FROM CURRENT_DATE)
         AND EXTRACT(YEAR FROM check_in) = EXTRACT(YEAR FROM CURRENT_DATE);
     `);
-
     console.log("🟠 API /api/revenue/current-month:", rows[0]);
     res.json({ monthly_revenue: Number(rows[0].monthly_revenue) });
   } catch (err) {
