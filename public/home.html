@@ -1,210 +1,238 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Resort Booking – Trang chủ</title>
   <link rel="stylesheet" href="home.css" />
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
-
-
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
- <header class="navbar">
-  <div class="navbar-container">
-    <div class="navbar-logo">
-      <h1>Resort Booking</h1>
+  <header class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-logo">
+        <h1>Resort Booking</h1>
+      </div>
+      <nav class="navbar-menu">
+        <a href="">Khuyến mãi</a>
+        <a href="supports/support.html">Hỗ trợ</a>
+        <a href="">Hợp tác với chúng tôi</a>
+        <a href="">Đặt chỗ của tôi</a>
+        <a href="login.html" class="btn-login">Đăng nhập</a>
+        <a href="register.html" class="btn-register">Đăng ký</a>
+      </nav>
     </div>
-    <nav class="navbar-menu">
-      <a href="">Khuyến mãi</a>
-      <a href="supports/support.html">Hỗ trợ</a>
-      <a href="">Hợp tác với chúng tôi</a>
-      <a href="">Đặt chỗ của tôi</a>
-      <a href="login.html" class="btn-login">Đăng nhập</a>
-      <a href="register.html" class="btn-register">Đăng ký</a>
-    </nav>
-  </div>
-</header>
+  </header>
 
-<div class="search-container">
-  <div class="search-header">
-    <h2>Tìm resort hoàn hảo cho kỳ nghỉ của bạn</h2>
-    <p>Tận hưởng những ưu đãi tốt nhất cho kỳ nghỉ trong mơ của bạn</p>
+  <div class="search-container">
+    <div class="search-header">
+      <h2>Tìm resort hoàn hảo cho kỳ nghỉ của bạn</h2>
+      <p>Tận hưởng những ưu đãi tốt nhất cho kỳ nghỉ trong mơ của bạn</p>
+    </div>
+    <div class="resort_type">
+      <button class="type-btn active" data-type="resort">Khách sạn</button>
+      <button class="type-btn" data-type="villa">Biệt thự</button>
+      <button class="type-btn" data-type="apartment">Căn hộ</button>
+    </div>
+    <div class="search-instructions"></div>
+    <section class="search-form">
+      <label>
+        Địa điểm
+        <input type="text" id="location" placeholder="Nhập thành phố hoặc resort" />
+      </label>
+      <label>
+        Ngày nhận & trả
+        <input type="text" id="dateRange" placeholder="Chọn khoảng ngày" readonly />
+      </label>
+      <label>
+        Khách
+        <select id="guests">
+          <option value="1">1 khách</option>
+          <option value="2" selected>2 khách</option>
+          <option value="3">3 khách</option>
+          <option value="4">4 khách</option>
+        </select>
+      </label>
+      <button id="searchBtn">Tìm kiếm</button>
+    </section>
   </div>
-  <div class="resort_type">
-    <button class="type-btn active" data-type="resort">Khách sạn</button>
-    <button class="type-btn" data-type="villa">Biệt thự</button>
-    <button class="type-btn" data-type="apartment">Căn hộ</button>
-    
-  </div>
-  <div class="search-instructions">
-  </div>
-  <section class="search-form">
-    <label>
-      Địa điểm
-      <input type="text" id="location" placeholder="Nhập thành phố hoặc resort" />
-    </label>
-    <label>
-      Ngày nhận & trả
-      <input type="text" id="dateRange" placeholder="Chọn khoảng ngày" readonly />
-    </label>
-    <label>
-      Khách
-      <select id="guests">
-        <option value="1">1 khách</option>
-        <option value="2" selected>2 khách</option>
-        <option value="3">3 khách</option>
-        <option value="4">4 khách</option>
-      </select>
-    </label>
-    <button id="searchBtn">Tìm kiếm</button>
-  </section>
-</div>
 
   <section class="resorts" id="resortList">
     <!-- Danh sách resort sẽ render ở đây -->
   </section>
-<section class="promo-codes">
-  <h2><span class="icon">🎁</span> Mã Ưu Đãi Tặng Bạn Mới</h2>
 
-  <button class="promo-arrow left" id="prevBtn"><i>&#10094;</i></button>
-  <div class="promo-grid" id="promoGrid"></div>
-  <button class="promo-arrow right" id="nextBtn"><i>&#10095;</i></button>
-</section>
+  <section class="promo-codes">
+    <h2><span class="icon">🎁</span> Mã Ưu Đãi Tặng Bạn Mới</h2>
+    <button class="promo-arrow left" id="prevBtn"><i>&#10094;</i></button>
+    <div class="promo-grid" id="promoGrid"></div>
+    <button class="promo-arrow right" id="nextBtn"><i>&#10095;</i></button>
+  </section>
 
-<script src="voucher.js"></script>
-<script>
-  const grid = document.getElementById('promoGrid');
-  document.getElementById('nextBtn').onclick = () => grid.scrollBy({ left: 360, behavior: 'smooth' });
-  document.getElementById('prevBtn').onclick = () => grid.scrollBy({ left: -360, behavior: 'smooth' });
-</script>
-  <!-- ƯU ĐÃI NỔI BẬT -->
-<section class="deals-section">
-  <h2>Ưu đãi nổi bật</h2>
-  <div class="resort-grid" id="dealsGrid"></div>
-</section>
-<!-- Nối file dữ liệu -->
-<script src="deals.js"></script>
-<script>
-  const dealsGrid = document.getElementById('dealsGrid');
+  <!-- ƯU ĐÃI NỔI BẬT - Phần được sửa -->
+  <section class="deals-section">
+    <h2>Ưu đãi nổi bật</h2>
+    <div class="resort-grid" id="dealsGrid">
+      <!-- Dữ liệu sẽ được render từ API -->
+    </div>
+  </section>
 
-  // Render dữ liệu từ deals.js
-  deals.forEach(deal => {
-    const card = document.createElement('div');
-    card.className = 'resort-card';
-    card.innerHTML = `
-      <img src="${deal.image}" alt="${deal.name}">
-      <div class="resort-info">
-        <h3>${deal.name}</h3>
-        <p>${deal.location}</p>
-        <p class="price">Từ <span>${deal.price}</span></p>
+  <!-- ĐIỂM ĐẾN PHỔ BIẾN -->
+  <section class="popular-destinations">
+    <h2>Điểm đến phổ biến</h2>
+    <div class="destination-grid" id="destinationGrid"></div>
+  </section>
+
+  <!-- VÌ SAO NÊN CHỌN CHÚNG TÔI -->
+  <section class="why-choose-us">
+    <h2>Vì sao nên chọn Resort Booking?</h2>
+    <div class="reasons">
+      <div class="reason">
+        <img src="Assets/Icon Images/thumbs-up.png" alt="Đặt phòng dễ dàng">
+        <h4>Đặt chỗ dễ dàng</h4>
+        <p>Chỉ vài bước đơn giản để hoàn tất đặt phòng của bạn.</p>
       </div>
-    `;
-    dealsGrid.appendChild(card);
-  });
-</script>
-
-<!-- Thư viện icon -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-
-<!-- ĐIỂM ĐẾN PHỔ BIẾN -->
-<section class="popular-destinations">
-  <h2>Điểm đến phổ biến</h2>
-  <div class="destination-grid" id="destinationGrid"></div>
-</section>
-
-<script src="destinations.js"></script>
-
-<script>
-  const destinationGrid = document.getElementById('destinationGrid');
-
-  destinations.forEach(place => {
-    const card = document.createElement('div');
-    card.className = 'destination-card';
-    card.innerHTML = `
-      <img src="${place.image}" alt="${place.name}">
-      <p>${place.name}</p>
-    `;
-    destinationGrid.appendChild(card);
-  });
-</script>
-
-
-<!-- VÌ SAO NÊN CHỌN CHÚNG TÔI -->
-<section class="why-choose-us">
-  <h2>Vì sao nên chọn Resort Booking?</h2>
-  <div class="reasons">
-    <div class="reason">
-      <img src="Assets/Icon Images/thumbs-up.png" alt="Đặt phòng dễ dàng">
-      <h4>Đặt chỗ dễ dàng</h4>
-      <p>Chỉ vài bước đơn giản để hoàn tất đặt phòng của bạn.</p>
-    </div>
-    <div class="reason">
-      <img src="Assets/Icon Images/voucher.png" alt="Ưu đãi hấp dẫn">
-      <h4>Ưu đãi hấp dẫn</h4>
-      <p>Giá tốt nhất mỗi ngày dành cho khách hàng thân thiết.</p>
-    </div>
-    <div class="reason">
-      <img src="Assets/Icon Images/customer-service.png" alt="Hỗ trợ 24/7">
-      <h4>Hỗ trợ 24/7</h4>
-      <p>Đội ngũ CSKH sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-container">
-
-    <div class="footer-links">
-      <a href="#">Chính sách bảo mật</a>
-      <span>|</span>
-      <a href="#">Điều khoản sử dụng</a>
-      <span>|</span>
-      <a href="#">Liên hệ</a>
-    </div>
-
-    <div class="footer-social">
-      <p>Theo dõi chúng tôi</p>
-      <div class="social-icons">
-        <a href="#"><img src="Assets/Icon Images/facebook.png" alt="Facebook"></a>
-        <a href="#"><img src="Assets/Icon Images/instagram.png" alt="Instagram"></a>
-        <a href="#"><img src="Assets/Icon Images/communication.png" alt="Telegram"></a>
-        <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046126.png" alt="TikTok"></a>
+      <div class="reason">
+        <img src="Assets/Icon Images/voucher.png" alt="Ưu đãi hấp dẫn">
+        <h4>Ưu đãi hấp dẫn</h4>
+        <p>Giá tốt nhất mỗi ngày dành cho khách hàng thân thiết.</p>
+      </div>
+      <div class="reason">
+        <img src="Assets/Icon Images/customer-service.png" alt="Hỗ trợ 24/7">
+        <h4>Hỗ trợ 24/7</h4>
+        <p>Đội ngũ CSKH sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi.</p>
       </div>
     </div>
-    <br/>
-    <p>© 2025 <span>Resort Booking</span>. All rights reserved.</p>
-  </div>
-</footer>
+  </section>
 
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="#">Chính sách bảo mật</a>
+        <span>|</span>
+        <a href="#">Điều khoản sử dụng</a>
+        <span>|</span>
+        <a href="#">Liên hệ</a>
+      </div>
 
+      <div class="footer-social">
+        <p>Theo dõi chúng tôi</p>
+        <div class="social-icons">
+          <a href="#"><img src="Assets/Icon Images/facebook.png" alt="Facebook"></a>
+          <a href="#"><img src="Assets/Icon Images/instagram.png" alt="Instagram"></a>
+          <a href="#"><img src="Assets/Icon Images/communication.png" alt="Telegram"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046126.png" alt="TikTok"></a>
+        </div>
+      </div>
+      <br/>
+      <p>© 2025 <span>Resort Booking</span>. All rights reserved.</p>
+    </div>
+  </footer>
 
-  <script src="home.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+  <script src="voucher.js"></script>
+  <script src="destinations.js"></script>
+
+  <!-- Script xử lý hiển thị phòng -->
+ <script>
+    // Fetch dữ liệu phòng từ API
+    async function fetchRooms() {
+      try {
+        // Đảm bảo URL này là chính xác
+        const response = await fetch('http://localhost:5500/api/rooms'); 
+        const rooms = await response.json();
+        return rooms;
+      } catch (error) {
+        console.error('Lỗi khi lấy dữ liệu phòng:', error);
+        return [];
+      }
+    }
+
+    // Hàm render phòng vào một container (grid) cụ thể
+    function renderRooms(rooms, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) {
+        console.error(`Không tìm thấy container với ID: ${containerId}`);
+        return;
+      }
+      container.innerHTML = ''; // Xóa nội dung cũ
+
+      // Thêm class 'resort-grid' vào #resortList để áp dụng CSS tương tự
+      if (containerId === 'resortList') {
+        container.classList.add('resort-grid');
+      }
+
+      rooms.forEach(room => {
+        const card = document.createElement('div');
+        card.className = 'resort-card';
+        
+        // Format giá tiền VND
+        const formattedPrice = new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND'
+        }).format(room.price_per_night);
+
+        card.innerHTML = `
+          <img src="${room.images?.[0] || 'Assets/placeholder.jpg'}" alt="${room.room_type}">
+          <div class="resort-info">
+            <h3>${room.room_type}</h3>
+            <p><i class="fas fa-map-marker-alt"></i> ${room.location || 'Hà Nội'}</p>
+            <p class="price">Từ <span>${formattedPrice}/đêm</span></p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Load và render dữ liệu khi trang được load
+    document.addEventListener('DOMContentLoaded', async () => {
+      const rooms = await fetchRooms();
+      
+      // 1. Render vào phần ƯU ĐÃI NỔI BẬT
+      renderRooms(rooms, 'dealsGrid'); 
+
+      // 2. Render vào phần DANH SÁCH RESORT (ngay dưới thanh tìm kiếm)
+      renderRooms(rooms, 'resortList');
+    });
+
+    // Xử lý nút chọn loại phòng
+    const typeButtons = document.querySelectorAll('.type-btn');
+    typeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        typeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const selectedType = btn.dataset.type;
+        console.log('Loại chỗ ở được chọn:', selectedType);
+        // Thêm logic lọc resort theo loại ở đây nếu cần
+      });
+    });
+
+    // Xử lý nút prev/next của promo
+    const grid = document.getElementById('promoGrid');
+    document.getElementById('nextBtn').onclick = () => grid.scrollBy({ left: 360, behavior: 'smooth' });
+    document.getElementById('prevBtn').onclick = () => grid.scrollBy({ left: -360, behavior: 'smooth' });
+
+    // Xử lý destinations
+    const destinationGrid = document.getElementById('destinationGrid');
+    // Giả định mảng `destinations` được định nghĩa trong destinations.js
+    if (typeof destinations !== 'undefined') {
+      destinations.forEach(place => {
+        const card = document.createElement('div');
+        card.className = 'destination-card';
+        card.innerHTML = `
+          <img src="${place.image}" alt="${place.name}">
+          <p>${place.name}</p>
+        `;
+        destinationGrid.appendChild(card);
+      });
+    } else {
+      console.warn('Không tìm thấy mảng "destinations". Đảm bảo destinations.js đã được tải.');
+    }
+  </script>
 </body>
 </html>
-<script>
-  const typeButtons = document.querySelectorAll('.type-btn');
-
-  typeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // bỏ active cũ
-      typeButtons.forEach(b => b.classList.remove('active'));
-      // gán active mới
-      btn.classList.add('active');
-      const selectedType = btn.dataset.type;
-
-      console.log('Loại chỗ ở được chọn:', selectedType);
-      // 👉 sau này bạn có thể dùng selectedType để lọc resort hoặc thay nội dung form
-    });
-  });
-</script>
 
