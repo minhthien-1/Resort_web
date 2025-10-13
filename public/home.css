@@ -413,6 +413,7 @@ body {
 
 /* Cuộn ngang đẹp mắt */
 .resort-grid {
+  margin-top: 50px;
   display: flex;
   gap: 25px;
   overflow-x: auto;
@@ -632,4 +633,54 @@ footer:hover {
     width: 24px;
     height: 24px;
   }
+}
+/* Thêm vào cuối file */
+
+/* Style cho resort cards */
+.resort-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.resort-card:hover {
+  transform: translateY(-5px);
+}
+
+.resort-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.resort-info {
+  padding: 15px;
+}
+
+.resort-info h3 {
+  margin: 0 0 10px;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.resort-info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.resort-info .price {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.resort-info .price span {
+  color: #e44d26;
+  font-size: 1.1em;
+}
+
+.fa-map-marker-alt {
+  color: #e44d26;
+  margin-right: 5px;
 }
