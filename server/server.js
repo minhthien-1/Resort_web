@@ -1,5 +1,4 @@
 // server.js
-
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -7,6 +6,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+dotenv.config();
 import multer from "multer";
 import fs from "fs";
 import { pool } from "./db.js";
@@ -16,7 +16,11 @@ import { pool } from "./db.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5500",
+  credentials: true,
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
 app.use(express.json());
 
 // __dirname setup for ESM

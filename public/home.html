@@ -24,16 +24,7 @@
         <a href="register.html" class="btn-register">Đăng ký</a>
       </nav>
     </div>
-    <nav class="navbar-menu">
-      <a href="">Khuyến mãi</a>
-      <a href="">Hỗ trợ</a>
-      <a href="">Hợp tác với chúng tôi</a>
-      <a href="">Đặt chỗ của tôi</a>
-      <a href="login.html" class="btn-login">Đăng nhập</a>
-      <a href="register.html" class="btn-register">Đăng ký</a>
-    </nav>
-  </div>
-</header>
+  </header>
 
   <div class="search-container">
     <div class="search-header">
@@ -79,7 +70,6 @@
     <button class="promo-arrow right" id="nextBtn"><i>&#10095;</i></button>
   </section>
 
-  <!-- ƯU ĐÃI NỔI BẬT - Phần được sửa -->
   <section class="deals-section">
     <h2>Ưu đãi nổi bật</h2>
     <div class="resort-grid" id="dealsGrid">
@@ -87,13 +77,11 @@
     </div>
   </section>
 
-  <!-- ĐIỂM ĐẾN PHỔ BIẾN -->
   <section class="popular-destinations">
     <h2>Điểm đến phổ biến</h2>
     <div class="destination-grid" id="destinationGrid"></div>
   </section>
 
-  <!-- VÌ SAO NÊN CHỌN CHÚNG TÔI -->
   <section class="why-choose-us">
     <h2>Vì sao nên chọn Resort Booking?</h2>
     <div class="reasons">
@@ -115,7 +103,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-container">
       <div class="footer-links">
@@ -146,135 +133,109 @@
   <script src="voucher.js"></script>
   <script src="destinations.js"></script>
 
-  <!-- Script xử lý hiển thị phòng -->
- <script>
-    // Fetch dữ liệu phòng từ API
-    async function fetchRooms() {
-      try {
-        // Đảm bảo URL này là chính xác
-        const response = await fetch('http://localhost:5500/api/rooms'); 
-        const rooms = await response.json();
-        return rooms;
-      } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu phòng:', error);
-        return [];
-      }
-    }
-
-    // Hàm render phòng vào một container (grid) cụ thể
-    function renderRooms(rooms, containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) {
-        console.error(`Không tìm thấy container với ID: ${containerId}`);
+  <!-- Script xử lý hiển thị phòng và redirect admin -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Kiểm tra nếu đã login
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      if (token && (role === 'admin' || role === 'staff')) {
+        // Nếu là admin hoặc staff, chuyển sang trang admin
+        window.location.href = '/admin/index.html';
         return;
       }
-      container.innerHTML = ''; // Xóa nội dung cũ
 
-      // Thêm class 'resort-grid' vào #resortList để áp dụng CSS tương tự
-      if (containerId === 'resortList') {
-        container.classList.add('resort-grid');
+      // Nếu guest hoặc không login, fetch & render resort
+      async function fetchRooms() {
+        try {
+          const response = await fetch('http://localhost:5500/api/rooms');
+          return await response.json();
+        } catch (error) {
+          console.error('Lỗi khi lấy dữ liệu phòng:', error);
+          return [];
+        }
       }
 
-      rooms.forEach(room => {
-        const card = document.createElement('div');
-        card.className = 'resort-card';
-        
-        // Format giá tiền VND
-        const formattedPrice = new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND'
-        }).format(room.price_per_night);
+      function renderRooms(rooms, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        if (containerId === 'resortList') container.classList.add('resort-grid');
+        rooms.forEach(room => {
+          const card = document.createElement('div');
+          card.className = 'resort-card';
+          const formattedPrice = new Intl.NumberFormat('vi-VN', {
+            style: 'currency', currency: 'VND'
+          }).format(room.price_per_night);
+          card.innerHTML = `
+            <img src="${room.images?.[0]||'Assets/placeholder.jpg'}" alt="${room.room_type}">
+            <div class="resort-info">
+              <h3>${room.room_type}</h3>
+              <p><i class="fas fa-map-marker-alt"></i> ${room.location||'Hà Nội'}</p>
+              <p class="price">Từ <span>${formattedPrice}/đêm</span></p>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
 
-        card.innerHTML = `
-          <img src="${room.images?.[0] || 'Assets/placeholder.jpg'}" alt="${room.room_type}">
-          <div class="resort-info">
-            <h3>${room.room_type}</h3>
-            <p><i class="fas fa-map-marker-alt"></i> ${room.location || 'Hà Nội'}</p>
-            <p class="price">Từ <span>${formattedPrice}/đêm</span></p>
+      const rooms = await fetchRooms();
+      renderRooms(rooms, 'dealsGrid');
+      renderRooms(rooms, 'resortList');
+
+      // Các xử lý khác như type-btn, promo, destinations...
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+      document.getElementById('nextBtn').onclick = () => 
+        document.getElementById('promoGrid').scrollBy({ left:360, behavior:'smooth' });
+      document.getElementById('prevBtn').onclick = () => 
+        document.getElementById('promoGrid').scrollBy({ left:-360, behavior:'smooth' });
+
+      if (typeof destinations !== 'undefined') {
+        destinations.forEach(place => {
+          const card = document.createElement('div');
+          card.className = 'destination-card';
+          card.innerHTML = `
+            <img src="${place.image}" alt="${place.name}">
+            <p>${place.name}</p>
+          `;
+          document.getElementById('destinationGrid').appendChild(card);
+        });
+      }
+    });
+  </script>
+
+  <!-- Script cập nhật navbar và logout -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const navbarMenu = document.querySelector(".navbar-menu");
+      const username = localStorage.getItem("username");
+      const full_name = localStorage.getItem("full_name");
+
+      if (username || full_name) {
+        navbarMenu.innerHTML = `
+          <a href="">Khuyến mãi</a>
+          <a href="supports/support.html">Hỗ trợ</a>
+          <a href="">Hợp tác với chúng tôi</a>
+          <a href="">Đặt chỗ của tôi</a>
+          <div class="user-menu">
+            <span class="user-name">👤 ${full_name||username}</span>
+            <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
           </div>
         `;
-        container.appendChild(card);
-      });
-    }
-
-    // Load và render dữ liệu khi trang được load
-    document.addEventListener('DOMContentLoaded', async () => {
-      const rooms = await fetchRooms();
-      
-      // 1. Render vào phần ƯU ĐÃI NỔI BẬT
-      renderRooms(rooms, 'dealsGrid'); 
-
-      // 2. Render vào phần DANH SÁCH RESORT (ngay dưới thanh tìm kiếm)
-      renderRooms(rooms, 'resortList');
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("username");
+          localStorage.removeItem("full_name");
+          localStorage.removeItem("role");
+          window.location.href = "login.html";
+        });
+      }
     });
-
-    // Xử lý nút chọn loại phòng
-    const typeButtons = document.querySelectorAll('.type-btn');
-    typeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        typeButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const selectedType = btn.dataset.type;
-        console.log('Loại chỗ ở được chọn:', selectedType);
-        // Thêm logic lọc resort theo loại ở đây nếu cần
-      });
-    });
-
-    // Xử lý nút prev/next của promo
-    const grid = document.getElementById('promoGrid');
-    document.getElementById('nextBtn').onclick = () => grid.scrollBy({ left: 360, behavior: 'smooth' });
-    document.getElementById('prevBtn').onclick = () => grid.scrollBy({ left: -360, behavior: 'smooth' });
-
-    // Xử lý destinations
-    const destinationGrid = document.getElementById('destinationGrid');
-    // Giả định mảng `destinations` được định nghĩa trong destinations.js
-    if (typeof destinations !== 'undefined') {
-      destinations.forEach(place => {
-        const card = document.createElement('div');
-        card.className = 'destination-card';
-        card.innerHTML = `
-          <img src="${place.image}" alt="${place.name}">
-          <p>${place.name}</p>
-        `;
-        destinationGrid.appendChild(card);
-      });
-    } else {
-      console.warn('Không tìm thấy mảng "destinations". Đảm bảo destinations.js đã được tải.');
-    }
   </script>
 </body>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const navbarMenu = document.querySelector(".navbar-menu");
-
-  // Lấy thông tin từ localStorage
-  const username = localStorage.getItem("username");
-  const full_name = localStorage.getItem("full_name");
-
-  // Nếu người dùng đã đăng nhập
-  if (username || full_name) {
-    navbarMenu.innerHTML = `
-      <a href="">Khuyến mãi</a>
-      <a href="supports/support.html">Hỗ trợ</a>
-      <a href="">Hợp tác với chúng tôi</a>
-      <a href="">Đặt chỗ của tôi</a>
-      <div class="user-menu">
-        <span class="user-name">👤 ${full_name || username}</span>
-        <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
-      </div>
-    `;
-
-    // Khi bấm đăng xuất
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-      localStorage.removeItem("full_name");
-      localStorage.removeItem("role");
-      window.location.href = "login.html";
-    });
-  }
-});
-</script>
-
 </html>
-

@@ -141,13 +141,22 @@
       if (el) { el.textContent = isError ? msg : ''; }
     }
 
-    async function apiFetch(url, opts = {}){
-      const res = await fetch(API_BASE + url, opts);
+    async function apiFetch(url, opts = {}) {
+      const token = localStorage.getItem("token");
+      const headers = {
+        ...(opts.headers || {}),
+        "Authorization": `Bearer ${token}`
+      };
+      const res = await fetch(API_BASE + url, {
+        ...opts,
+        headers
+      });
       if (res.status === 204) return null;
-      const data = await res.json().catch(()=>{ throw new Error('Invalid JSON'); });
-      if (!res.ok) throw new Error(data.message || data.error || ('HTTP ' + res.status));
+      const data = await res.json().catch(() => { throw new Error("Invalid JSON"); });
+      if (!res.ok) throw new Error(data.message || data.error || ("HTTP " + res.status));
       return data;
-    }
+   }
+
 
     async function fetchRoomTypes(){
       const sel = document.getElementById('room-type-id');
