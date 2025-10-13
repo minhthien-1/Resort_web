@@ -1,12 +1,18 @@
 import dotenv from "dotenv";
 import pkg from "pg";
+import path from 'path';                              
+import { fileURLToPath } from 'url';                 
 dotenv.config();
 const { Pool } = pkg;
+
+// Tạo __dirname trong ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 // Load biến môi trường từ file .env ở GỐC project
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const { Pool } = pkg;
 
 // ===== KẾT NỐI DATABASE =====
 export const pool = new Pool({
@@ -18,6 +24,7 @@ pool.on('error', (err) => {
   console.error('❌ Unexpected database error:', err.message);
   process.exit(-1);
 });
+
 
 // ===== HÀM TRUY VẤN TIỆN DỤNG =====
 export const query = (text, params) => pool.query(text, params);
