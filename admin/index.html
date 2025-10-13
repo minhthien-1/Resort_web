@@ -39,12 +39,38 @@
             </a>
         </nav>
         <div class="sidebar__footer">
-            <a class="nav__item nav__item--logout" href="./login.html">
+            <a class="nav__item nav__item--logout" id="logoutBtn" href="./login.html">
                 <span class="nav__icon">🚪</span>
                 Đăng xuất
             </a>
         </div>
     </aside>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        const logoutBtn = document.getElementById("logoutBtn");
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        // Nếu chưa login hoặc không phải admin/staff, hide sidebar hoàn toàn
+        if (!token || (role !== "admin" && role !== "staff")) {
+            // redirect về trang login khách chung
+            return window.location.href = "/login.html";
+        }
+        // Ngược lại, show nút logout
+        logoutBtn.style.display = "flex";
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            // Xóa token và role
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("username");
+            localStorage.removeItem("full_name");
+            // Redirect về home
+            window.location.href = "/home.html";
+        });
+    });
+  
+</script>
+
 
     <!-- Main Layout -->
     <div class="layout">

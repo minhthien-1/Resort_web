@@ -23,3 +23,6 @@ button {
     background: none;
     cursor: pointer;
 }
+.nav__item--logout {
+  display: none;
+}

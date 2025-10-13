@@ -25,9 +25,9 @@
             <a class="nav__item" href="./rooms.html">🏠 Chỉnh sửa phòng</a>
             <a class="nav__item" href="./customers.html">👥 Khách hàng</a>
             <a class="nav__item" href="./reports.html">📈 Báo cáo</a>
+            <a class="nav__item" id="logoutBtn" href="javascript:void(0)">🚪Đăng xuất</a>
         </nav>
     </aside>
-
     <!-- Main content -->
     <main class="main">
         <header class="header">
@@ -80,6 +80,27 @@
     <script src="/assets/js/dashboard.js"></script>
     <script src="/assets/js/chart.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const logoutBtn = document.getElementById("logoutBtn");
+            const token = localStorage.getItem("token");
+            const role = localStorage.getItem("role");
+            // Nếu chưa login hoặc không phải admin/staff, redirect
+            if (!token || (role !== "admin" && role !== "staff")) {
+            return window.location.href = "/login.html";
+            }
+            // Hiển thị nút logout
+            logoutBtn.style.display = "";
+            logoutBtn.addEventListener("click", e => {
+            e.preventDefault();
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("username");
+            localStorage.removeItem("full_name");
+            window.location.href = "/home.html";
+            });
+        });
+    </script>
 </body>
 
 </html>

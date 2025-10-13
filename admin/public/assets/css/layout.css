@@ -34,6 +34,7 @@
     transition: background 0.2s;
 }
 
+
 .nav__item:hover,
 .nav__item.active {
     background: #334155;
@@ -123,4 +124,7 @@
 .chart-section canvas {
     width: 100% !important;
     height: 100% !important;
+}
+.nav__item--logout {
+  display: none;
 }
