@@ -1,58 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Đăng ký tài khoản</title>
 </head>
+
 <body>
-
   <section>
-  <div class="register-box">
-    <form action="">
-      <h2>Đăng Ký</h2>
-     <div class="name-row">
-  <div class="input-box">
-    <input type="text" required>
-    <label>Họ</label>
-  </div>
+    <div class="register-box">
+      <form id="registerForm">
+        <h2>Đăng Ký</h2>
 
-  <div class="input-box">
-    <input type="text" required>
-    <label>Tên</label>
-  </div>
-</div>
+        <!-- Họ và tên -->
+        <div class="input-box">
+          <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+          <input type="text" id="fullName" required />
+          <label>Họ và Tên</label>
+        </div>
 
-      <div class="input-box">
-        <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
-        <input type="email" required>
-        <label>Email</label>
-      </div>
-      <div class="input-box">
-        <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
-        <input type="password" required>
-        <label>Password</label>
-      </div>
-      <div class="input-box">
-        <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
-        <input type="password" required>
-        <label>Confirm Password</label>
-      </div>
-      <button type="submit">Đăng Ký</button>
-      <button type="button" class="back-button" style="margin-top: 15px;" onclick="window.location.href = 'home.html'">
-                &lt; Quay lại
-            </button>
-      <div class="register-link">
-        <p>Đã có tài khoản?<a href="login.html"> Đăng nhập đây</a></p>
-      </div>
-    </form>
+        <!-- Username -->
+        <div class="input-box">
+          <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+          <input type="text" id="Uname" required />
+          <label>Tên đăng nhập</label>
+        </div>
 
+        <!-- Email -->
+        <div class="input-box">
+          <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
+          <input type="email" id="email" required />
+          <label>Email</label>
+        </div>
+
+        <!-- Số điện thoại -->
+        <div class="input-box">
+          <span class="icon"><ion-icon name="call-outline"></ion-icon></span>
+          <input type="tel" id="phone" required pattern="[0-9]{9,11}" />
+          <label>Số điện thoại</label>
+        </div>
+
+        <!-- Mật khẩu -->
+        <div class="input-box">
+          <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+          <input type="password" id="password" required />
+          <label>Mật khẩu</label>
+        </div>
+
+        <!-- Nhập lại mật khẩu -->
+        <div class="input-box">
+          <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+          <input type="password" id="confirmPassword" required />
+          <label>Nhập lại mật khẩu</label>
+        </div>
+
+        <button type="submit">Đăng Ký</button>
+
+        <button
+          type="button"
+          class="back-button"
+          style="margin-top: 15px"
+          onclick="window.location.href = 'home.html'"
+        >
+          &lt; Quay lại
+        </button>
+
+        <div class="register-link">
+          <p>Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+        </div>
+      </form>
     </div>
-  </section>  
+  </section>
+
+  <!-- ICONS -->
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-  <script src="login.js"></script>
- </body>
+
+  <!-- Script xử lý -->
+  <script src="register.js"></script>
+</body>
 </html>

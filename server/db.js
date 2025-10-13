@@ -1,12 +1,7 @@
-// server/db.js
-import dotenv from 'dotenv';
-import pkg from 'pg';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// ===== XÁC ĐỊNH ĐƯỜNG DẪN .env =====
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import dotenv from "dotenv";
+import pkg from "pg";
+dotenv.config();
+const { Pool } = pkg;
 
 // Load biến môi trường từ file .env ở GỐC project
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -16,14 +11,7 @@ const { Pool } = pkg;
 // ===== KẾT NỐI DATABASE =====
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // Bắt buộc cho Neon
-  },
-});
-
-// ===== LOG TRẠNG THÁI KẾT NỐI =====
-pool.on('connect', () => {
-  console.log('✅ Connected to Neon PostgreSQL database');
+  ssl: { rejectUnauthorized: false } // bắt buộc với Neon
 });
 
 pool.on('error', (err) => {

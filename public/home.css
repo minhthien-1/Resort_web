@@ -13,6 +13,30 @@ body {
   left: 0;
   z-index: 1000;
 }
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-logout {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background-color: #e43d3f;
+}
 
 .navbar-container {
   max-width: 1200px;
