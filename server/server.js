@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,14 +15,15 @@ import { pool } from "./db.js";
 dotenv.config();
 
 const app = express();
-app.use(cors({
-  origin: "http://localhost:5500",
-  credentials: true,
-  allowedHeaders: ["Content-Type","Authorization"]
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5500",
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 
-// __dirname setup for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -39,7 +39,9 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}${ext}`;
+    const name = `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 9)}${ext}`;
     cb(null, name);
   },
 });
@@ -81,17 +83,6 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "../admin/public/home.html"));
 });
 
-// ===== HEALTH CHECK =====
-
-app.get("/health", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    res.json({ status: "ok", time: result.rows[0].now });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // ===== AUTH MIDDLEWARE =====
 
 function authorize(allowedRoles) {
@@ -100,7 +91,10 @@ function authorize(allowedRoles) {
     const token = authHeader.split(" ")[1];
     if (!token) return res.status(401).json({ error: "Unauthorized" });
     try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET || "defaultsecret");
+      const payload = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "defaultsecret"
+      );
       if (!allowedRoles.includes(payload.role)) {
         return res.status(403).json({ error: "Forbidden" });
       }
@@ -112,9 +106,7 @@ function authorize(allowedRoles) {
   };
 }
 
-// ===== AUTH ROUTES =====
-
-// Register (default role = guest)
+// ===== AUTH ROUTES (No changes here) =====
 app.post("/auth/register", async (req, res) => {
   const { fullName, username, email, phone, password, role } = req.body;
   if (!fullName || !username || !email || !phone || !password) {
@@ -124,7 +116,7 @@ app.post("/auth/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(
       `INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active)
-         VALUES ($1,$2,$3,$4,$5, $6, true)`,
+          VALUES ($1,$2,$3,$4,$5, $6, true)`,
       [username, email, hashedPassword, fullName, phone, role || "guest"]
     );
     res.status(201).json({ message: "Đăng ký thành công" });
@@ -137,8 +129,6 @@ app.post("/auth/register", async (req, res) => {
     }
   }
 });
-
-// Login
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -147,7 +137,9 @@ app.post("/auth/login", async (req, res) => {
       [email]
     );
     if (rows.length === 0) {
-      return res.status(401).json({ error: "Tài khoản không tồn tại hoặc bị khóa" });
+      return res
+        .status(401)
+        .json({ error: "Tài khoản không tồn tại hoặc bị khóa" });
     }
     const user = rows[0];
     const validPassword = await bcrypt.compare(password, user.password_hash);
@@ -178,13 +170,13 @@ app.post("/auth/login", async (req, res) => {
 app.get("/api/rooms", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT r.id, r.room_number, r.room_type_id, rt.name AS room_type,
+      `SELECT r.id, r.resort_name, r.room_type_id, rt.name AS room_type,
               rt.price_per_night, rt.capacity, rd.images_url AS images,
-              rd.description, rd.features
+              r.location, rd.description, rd.features
        FROM rooms r
        JOIN room_types rt ON r.room_type_id = rt.id
        LEFT JOIN room_details rd ON rd.room_id = r.id
-       ORDER BY r.room_number`
+       ORDER BY r.created_at DESC`
     );
     res.json(result.rows);
   } catch (error) {
@@ -213,13 +205,10 @@ app.get(
 );
 
 // Admin: list rooms
-app.get(
-  "/api/admin/rooms",
-  authorize(["admin", "staff"]),
-  async (req, res) => {
-    try {
-      const result = await pool.query(
-        `SELECT r.id, r.room_number, rt.name AS room_type,
+app.get("/api/admin/rooms", authorize(["admin", "staff"]), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT r.id, r.resort_name, rt.name AS room_type,
                 rt.price_per_night, rd.description, rd.features,
                 rd.images_url AS images, r.status, r.category,
                 r.location, r.address
@@ -227,14 +216,13 @@ app.get(
          JOIN room_types rt ON r.room_type_id = rt.id
          LEFT JOIN room_details rd ON rd.room_id = r.id
          ORDER BY r.created_at DESC`
-      );
-      res.json(result.rows);
-    } catch (error) {
-      console.error("❌ Lỗi khi lấy danh sách phòng admin:", error);
-      res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
-    }
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy danh sách phòng admin:", error);
+    res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
   }
-);
+});
 
 // Admin: add room
 app.post(
@@ -244,7 +232,7 @@ app.post(
     const client = await pool.connect();
     try {
       const {
-        room_number,
+        resort_name,
         room_type_id,
         category,
         status,
@@ -263,15 +251,15 @@ app.post(
       await client.query("BEGIN");
       const roomResult = await client.query(
         `INSERT INTO rooms
-           (room_number, room_type_id, category, status, location, address)
-         VALUES ($1,$2,$3,$4,$5,$6)
+           (resort_name, room_type_id, category, status, location, address)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING *`,
         [
-          room_number || null,
+          resort_name || null,
           room_type_id,
-          category || "standard",
-          status || "available",
-          location || "ha-noi",
+          category,
+          status,
+          location,
           address || null,
         ]
       );
@@ -289,7 +277,7 @@ app.post(
       await client.query(
         `INSERT INTO room_details
            (room_id, description, features, images_url)
-         VALUES ($1,$2,$3,$4)`,
+         VALUES ($1, $2, $3, $4)`,
         [roomResult.rows[0].id, description || null, featuresArray, images]
       );
 
@@ -319,7 +307,7 @@ app.put(
     try {
       const { id } = req.params;
       const {
-        room_number,
+        resort_name,
         room_type_id,
         category,
         status,
@@ -350,16 +338,16 @@ app.put(
 
       const roomResult = await client.query(
         `UPDATE rooms
-           SET room_number=$1, room_type_id=$2, category=$3,
+           SET resort_name=$1, room_type_id=$2, category=$3,
                status=$4, location=$5, address=$6, updated_at=NOW()
            WHERE id=$7
            RETURNING *`,
         [
-          room_number,
+          resort_name,
           room_type_id,
-          category || "standard",
-          status || "available",
-          location || "ha-noi",
+          category,
+          status,
+          location,
           address || null,
           id,
         ]
@@ -371,7 +359,7 @@ app.put(
       await client.query(
         `INSERT INTO room_details
            (room_id, description, features, images_url)
-         VALUES ($1,$2,$3,$4)
+         VALUES ($1, $2, $3, $4)
          ON CONFLICT (room_id)
          DO UPDATE SET description=$2, features=$3, images_url=$4`,
         [id, description || null, featuresArray, finalImages]
@@ -387,7 +375,9 @@ app.put(
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("❌ Lỗi khi cập nhật phòng:", error);
-      res.status(500).json({ error: "Lỗi khi cập nhật phòng: " + error.message });
+      res
+        .status(500)
+        .json({ error: "Lỗi khi cập nhật phòng: " + error.message });
     } finally {
       client.release();
     }
