@@ -12,8 +12,6 @@ import { pool } from "./db.js";
 
 // ===== INITIAL SETUP =====
 
-dotenv.config();
-
 const app = express();
 app.use(
   cors({
@@ -106,7 +104,8 @@ function authorize(allowedRoles) {
   };
 }
 
-// ===== AUTH ROUTES (No changes here) =====
+// ===== AUTH ROUTES =====
+
 app.post("/auth/register", async (req, res) => {
   const { fullName, username, email, phone, password, role } = req.body;
   if (!fullName || !username || !email || !phone || !password) {
@@ -116,7 +115,7 @@ app.post("/auth/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(
       `INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active)
-          VALUES ($1,$2,$3,$4,$5, $6, true)`,
+       VALUES ($1,$2,$3,$4,$5, $6, true)`,
       [username, email, hashedPassword, fullName, phone, role || "guest"]
     );
     res.status(201).json({ message: "Đăng ký thành công" });
@@ -129,6 +128,7 @@ app.post("/auth/register", async (req, res) => {
     }
   }
 });
+
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -166,22 +166,48 @@ app.post("/auth/login", async (req, res) => {
 
 // ===== HOTEL MANAGEMENT & ROOM APIS =====
 
-// List rooms (public)
+// Public: list rooms with optional filters
 app.get("/api/rooms", async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT r.id, r.resort_name, r.room_type_id, rt.name AS room_type,
-              rt.price_per_night, rt.capacity, rd.images_url AS images,
-              r.location, rd.description, rd.features
-       FROM rooms r
-       JOIN room_types rt ON r.room_type_id = rt.id
-       LEFT JOIN room_details rd ON rd.room_id = r.id
-       ORDER BY r.created_at DESC`
-    );
-    res.json(result.rows);
+    const { location, room_type } = req.query;
+    let sql = `
+      SELECT r.id, r.resort_name, r.room_type_id, rt.name AS room_type,
+             rt.price_per_night, rt.capacity, rd.images_url AS images,
+             r.location, rd.description, rd.features
+      FROM rooms r
+      JOIN room_types rt ON r.room_type_id = rt.id
+      LEFT JOIN room_details rd ON rd.room_id = r.id
+      WHERE 1=1
+    `;
+    const params = [];
+    if (location) {
+      params.push(`%${location}%`);
+      sql += ` AND LOWER(r.location) LIKE LOWER($${params.length})`;
+    }
+    if (room_type) {
+      params.push(room_type);
+      sql += ` AND rt.name = $${params.length}`;
+    }
+    sql += " ORDER BY r.created_at DESC";
+    const roomsResult = await pool.query(sql, params);
+    res.json(roomsResult.rows);
   } catch (error) {
     console.error("❌ Lỗi khi lấy danh sách phòng:", error);
     res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
+  }
+});
+
+// Public: list distinct room types
+app.get("/api/room-types", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT DISTINCT name FROM room_types WHERE is_active = true ORDER BY name"
+    );
+    const types = result.rows.map(r => r.name);
+    res.json(types);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy loại phòng:", error);
+    res.status(500).json({ error: "Lỗi khi lấy loại phòng" });
   }
 });
 
@@ -209,18 +235,19 @@ app.get("/api/admin/rooms", authorize(["admin", "staff"]), async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT r.id, r.resort_name, rt.name AS room_type,
-                rt.price_per_night, rd.description, rd.features,
-                rd.images_url AS images, r.status, r.category,
-                r.location, r.address
-         FROM rooms r
-         JOIN room_types rt ON r.room_type_id = rt.id
-         LEFT JOIN room_details rd ON rd.room_id = r.id
-         ORDER BY r.created_at DESC`
+             rt.price_per_night, rd.description, rd.features,
+             rd.images_url AS images, r.status, r.category,
+             r.location, r.address
+       FROM rooms r
+       JOIN room_types rt ON r.room_type_id = rt.id
+       LEFT JOIN room_details rd ON rd.room_id = r.id
+       ORDER BY r.created_at DESC`
     );
     res.json(result.rows);
   } catch (error) {
     console.error("❌ Lỗi khi lấy danh sách phòng admin:", error);
-    res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
+    res.status(500).
+json({ error: "Lỗi khi lấy danh sách phòng" });
   }
 });
 
@@ -375,9 +402,7 @@ app.put(
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("❌ Lỗi khi cập nhật phòng:", error);
-      res
-        .status(500)
-        .json({ error: "Lỗi khi cập nhật phòng: " + error.message });
+      res.status(500).json({ error: "Lỗi khi cập nhật phòng: " + error.message });
     } finally {
       client.release();
     }
@@ -424,6 +449,44 @@ app.delete(
     }
   }
 );
+// Admin: lấy chi tiết một guest theo id
+app.get('/api/admin/customers/:id', authorize(['admin','staff']), async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT 
+         id,
+         full_name,
+         username,
+         email,
+         phone,
+         created_at
+       FROM users 
+       WHERE id = $1 AND role = $2`,
+      [id, 'guest']
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy khách hàng' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Lỗi lấy chi tiết khách hàng:', err);
+    res.status(500).json({ error: 'Lỗi lấy chi tiết khách hàng' });
+  }
+});
+
+app.get('/api/admin/guests', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, full_name, email FROM users WHERE role = $1',
+      ['guest']
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi lấy danh sách guest' });
+  }
+});
 
 // ===== START SERVER =====
 
