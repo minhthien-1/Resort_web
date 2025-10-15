@@ -129,17 +129,18 @@ app.get("/api/revenue/current-month", async (req, res) => {
 // API 4: Số khách mới trong 30 ngày gần nhất
 app.get("/api/guests/new", async (req, res) => {
   try {
-    const r = await pool.query(`
+    const result = await pool.query(`
       SELECT COUNT(*) AS new_guests
-      FROM guests
-      WHERE created_at > NOW() - INTERVAL '30 days';
+      FROM users
+      WHERE created_at >= NOW() - INTERVAL '30 days';
     `);
-    res.json({ new_guests: Number(r.rows[0].new_guests) });
+    res.json(result.rows[0]);
   } catch (err) {
-    console.error("❌ Lỗi khi lấy khách mới:", err);
-    res.status(500).json({ error: "Lỗi server" });
+    console.error("❌ Error loading new guests:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // API 5: Xu hướng doanh thu theo tháng
 app.get("/api/revenue/monthly", async (req, res) => {
@@ -181,3 +182,4 @@ const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`✅ Server đang chạy tại http://localhost:${PORT}`);
 });
+

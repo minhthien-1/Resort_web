@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Voucher</title>
+    <link rel="stylesheet" href="assets/css/layout.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                🏨 Resort
+            </div>
+            <ul class="sidebar-menu" id="sidebarMenu">
+                <li data-page="index.html">📊 Bảng điều khiển</li>
+                <li data-page="rooms.html">🏠 Đặt phòng</li>
+                <li data-page="maintenance.html">🔧 Chính sửa phòng</li>
+                <li data-page="voucher.html" class="active">🎟️ Voucher</li>
+                <li data-page="customers.html">👥 Khách hàng</li>
+                <li data-page="reports.html">📋 Báo cáo</li>
+                <li onclick="logout()">📤 Đăng xuất</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title">Quản Lý Voucher</div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">🔍 Tìm kiếm</button>
+                    <button class="btn btn-primary" onclick="openAddModal()">+ Thêm Voucher</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <div class="search-bar">
+                    <input type="text" placeholder="Tìm kiếm voucher..." id="searchInput">
+                    <select style="padding: 10px 15px; border: 1px solid #d0d7e0; border-radius: 6px; font-size: 14px;">
+                        <option>Tất cả</option>
+                        <option>Đang hoạt động</option>
+                        <option>Không hoạt động</option>
+                    </select>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="voucherTable">
+                        <thead>
+                            <tr>
+                                <th>Mã Voucher</th>
+                                <th>Tên Voucher</th>
+                                <th>Giảm Giá</th>
+                                <th>Lượt Dùng</th>
+                                <th>Ngày Hết Hạn</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination">
+                    <!-- Pagination buttons sẽ được tạo bằng JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thêm/Sửa Voucher -->
+    <div class="modal" id="voucherModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Thêm Voucher Mới</div>
+
+            <form>
+                <div class="form-group">
+                    <label>Mã Voucher *</label>
+                    <input type="text" id="voucherCode" placeholder="VD: SUMMER2024" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tên Voucher *</label>
+                    <input type="text" id="voucherName" placeholder="Tên khuyến mãi" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Giảm Giá (%) *</label>
+                    <input type="number" id="discountPercent" placeholder="20" min="0" max="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Lượt Dùng Tối Đa *</label>
+                    <input type="number" id="maxUses" placeholder="100" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Ngày Hết Hạn *</label>
+                    <input type="date" id="expiryDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Mô Tả</label>
+                    <textarea id="description" placeholder="Mô tả chi tiết về voucher..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Trạng Thái</label>
+                    <select id="status">
+                        <option value="active">Đang hoạt động</option>
+                        <option value="inactive">Không hoạt động</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu Voucher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let vouchers = [
+            { id: 1, code: 'SUMMER2024', name: 'Khuyến Mãi Hè', discount: 20, maxUses: 100, usedCount: 45, expiryDate: '31/12/2024', status: 'active', description: 'Khuyến mãi hè 2024' },
+            { id: 2, code: 'WELCOME', name: 'Chào Mừng Khách Mới', discount: 15, maxUses: 500, usedCount: 320, expiryDate: '28/02/2025', status: 'active', description: 'Voucher chào mừng' },
+            { id: 3, code: 'SPRING25', name: 'Khuyến Mãi Xuân', discount: 30, maxUses: 200, usedCount: 0, expiryDate: '15/03/2025', status: 'inactive', description: 'Khuyến mãi mùa xuân' },
+            { id: 4, code: 'FALL2024', name: 'Khuyến Mãi Thu', discount: 25, maxUses: 150, usedCount: 80, expiryDate: '30/09/2024', status: 'active', description: 'Khuyến mãi mùa thu' },
+            { id: 5, code: 'WINTER25', name: 'Khuyến Mãi Đông', discount: 35, maxUses: 200, usedCount: 120, expiryDate: '31/01/2025', status: 'active', description: 'Khuyến mãi mùa đông' },
+            { id: 6, code: 'NEWYEAR', name: 'Năm Mới', discount: 40, maxUses: 300, usedCount: 0, expiryDate: '15/01/2025', status: 'inactive', description: 'Khuyến mãi năm mới' }
+        ];
+
+        let currentEditId = null;
+        let currentPage = 1;
+        const itemsPerPage = 3;
+
+        function openAddModal() {
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = 'Thêm Voucher Mới';
+            document.getElementById('voucherModal').classList.add('active');
+            resetForm();
+        }
+
+        function openEditModal(id) {
+            currentEditId = id;
+            const voucher = vouchers.find(v => v.id === id);
+            if (voucher) {
+                document.getElementById('modalTitle').textContent = 'Chỉnh Sửa Voucher';
+                document.getElementById('voucherCode').value = voucher.code;
+                document.getElementById('voucherName').value = voucher.name;
+                document.getElementById('discountPercent').value = voucher.discount;
+                document.getElementById('maxUses').value = voucher.maxUses;
+                document.getElementById('expiryDate').value = convertDateFormat(voucher.expiryDate);
+                document.getElementById('description').value = voucher.description;
+                document.getElementById('status').value = voucher.status;
+                document.getElementById('voucherModal').classList.add('active');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('voucherModal').classList.remove('active');
+            resetForm();
+            currentEditId = null;
+        }
+
+        function resetForm() {
+            document.querySelector('form').reset();
+        }
+
+        function convertDateFormat(dateStr) {
+            const [day, month, year] = dateStr.split('/');
+            return `${year}-${month}-${day}`;
+        }
+
+        function convertDateFormatBack(dateStr) {
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function saveVoucher(e) {
+            e.preventDefault();
+
+            const code = document.getElementById('voucherCode').value;
+            const name = document.getElementById('voucherName').value;
+            const discount = parseInt(document.getElementById('discountPercent').value);
+            const maxUses = parseInt(document.getElementById('maxUses').value);
+            const expiryDate = convertDateFormatBack(document.getElementById('expiryDate').value);
+            const description = document.getElementById('description').value;
+            const status = document.getElementById('status').value;
+
+            if (currentEditId) {
+                const index = vouchers.findIndex(v => v.id === currentEditId);
+                if (index !== -1) {
+                    vouchers[index] = {
+                        ...vouchers[index],
+                        code,
+                        name,
+                        discount,
+                        maxUses,
+                        expiryDate,
+                        description,
+                        status
+                    };
+                    alert('Voucher đã được cập nhật thành công!');
+                }
+            } else {
+                const newVoucher = {
+                    id: Math.max(...vouchers.map(v => v.id), 0) + 1,
+                    code,
+                    name,
+                    discount,
+                    maxUses,
+                    usedCount: 0,
+                    expiryDate,
+                    description,
+                    status
+                };
+                vouchers.push(newVoucher);
+                alert('Voucher đã được thêm thành công!');
+            }
+
+            closeModal();
+            renderTable();
+        }
+
+        function deleteVoucher(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+                vouchers = vouchers.filter(v => v.id !== id);
+                alert('Voucher đã được xóa thành công!');
+                renderTable();
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.querySelector('#voucherTable tbody');
+            tbody.innerHTML = '';
+
+            // Tính toán phần trang hiển thị
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedVouchers = vouchers.slice(startIndex, endIndex);
+
+            paginatedVouchers.forEach(voucher => {
+                const row = document.createElement('tr');
+                const statusBadge = voucher.status === 'active'
+                    ? '<span class="status-badge status-active">Đang hoạt động</span>'
+                    : '<span class="status-badge status-inactive">Không hoạt động</span>';
+
+                row.innerHTML = `
+                    <td><strong>${voucher.code}</strong></td>
+                    <td>${voucher.name}</td>
+                    <td>${voucher.discount}%</td>
+                    <td>${voucher.usedCount}/${voucher.maxUses}</td>
+                    <td>${voucher.expiryDate}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit btn-sm" onclick="openEditModal(${voucher.id})">✏️</button>
+                            <button class="btn btn-delete btn-sm" onclick="deleteVoucher(${voucher.id})">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.innerHTML = '';
+
+            const totalPages = Math.ceil(vouchers.length / itemsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = i === currentPage ? 'active' : '';
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderTable();
+                });
+                paginationDiv.appendChild(btn);
+            }
+        }
+
+        // Navigation
+        document.querySelectorAll('.sidebar-menu li[data-page]').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.getAttribute('data-page');
+                window.location.href = page;
+            });
+        });
+
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Events
+        document.querySelector('form').addEventListener('submit', saveVoucher);
+        document.getElementById('voucherModal').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+        document.getElementById('searchInput').addEventListener('keyup', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#voucherTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Load table on page load
+        renderTable();
+    </script>
+</body>
+
+</html>

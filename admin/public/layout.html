@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resort Management</title>
+    <link rel="stylesheet" href="assets/css/layout.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                🏨 Resort
+            </div>
+            <ul class="sidebar-menu" id="sidebarMenu">
+                <li data-page="index.html">📊 Bảng điều khiển</li>
+                <li data-page="rooms.html">🏠 Đặt phòng</li>
+                <li data-page="maintenance.html">🔧 Chính sửa phòng</li>
+                <li data-page="voucher.html">🎟️ Voucher</li>
+                <li data-page="customers.html">👥 Khách hàng</li>
+                <li data-page="reports.html">📋 Báo cáo</li>
+                <li onclick="logout()">📤 Đăng xuất</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title" id="pageTitle">Resort Management</div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+
+            <!-- Page Content (sẽ được load bằng AJAX) -->
+            <div class="content" id="pageContent">
+                <!-- Nội dung sẽ được load ở đây -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Đánh dấu menu item hiện tại
+        function setActiveMenu() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const menuItems = document.querySelectorAll('.sidebar-menu li[data-page]');
+
+            menuItems.forEach(item => {
+                if (item.getAttribute('data-page') === currentPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Chuyển trang
+        document.querySelectorAll('.sidebar-menu li[data-page]').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.getAttribute('data-page');
+                window.location.href = page;
+            });
+        });
+
+        // Logout
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Chạy khi trang load
+        window.addEventListener('load', setActiveMenu);
+    </script>
+</body>
+
+</html>
