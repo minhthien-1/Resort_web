@@ -116,9 +116,8 @@ function authorize(allowedRoles) {
   };
 }
 
-// ===== AUTH APIs =====
+// ===== AUTH ROUTES =====
 
-// Đăng ký
 app.post("/auth/register", async (req, res) => {
   const { fullName, username, email, phone, password, role } = req.body;
   if (!fullName || !username || !email || !phone || !password) {
@@ -128,7 +127,7 @@ app.post("/auth/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(
       `INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active)
-       VALUES ($1,$2,$3,$4,$5,$6,true)`,
+       VALUES ($1,$2,$3,$4,$5, $6, true)`,
       [username, email, hashedPassword, fullName, phone, role || "guest"]
     );
     res.status(201).json({ message: "Đăng ký thành công" });
@@ -141,7 +140,6 @@ app.post("/auth/register", async (req, res) => {
   }
 });
 
-// Đăng nhập
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -253,16 +251,34 @@ app.get("/api/revenue/monthly", async (req, res) => {
 // Public rooms
 app.get("/api/rooms", async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT r.id, r.resort_name, r.room_type_id, rt.name AS room_type,
-             rt.price_per_night, rt.capacity, rd.images_url AS images,
-             r.location, rd.description, rd.features
-      FROM rooms r
-      JOIN room_types rt ON r.room_type_id = rt.id
-      LEFT JOIN room_details rd ON rd.room_id = r.id
-      ORDER BY r.created_at DESC
-    `);
+    const result = pool.query(`
+// Public: list rooms with optional filters
+app.get("/api/rooms", async (req, res) => {
+  try {
+    const { location, room_type } = req.query;
+    let sql = `,
+      SELECT, r.id, r.resort_name, r.room_type_id, rt.name, AS, room_type,
+      rt.price_per_night, rt.capacity, rd.images_url, AS, images,
+      r.location, rd.description, rd.features,
+      FROM, rooms, r,
+      JOIN, room_types, rt, ON, r.room_type_id = rt.id,
+      LEFT, JOIN, room_details, rd, ON, rd.room_id = r.id,
+      ORDER, BY, r.created_at, DESC`);
     res.json(result.rows);
+      WHERE 1=1
+    `);
+    const params = [];
+    if (location) {
+      params.push(`%${location}%`);
+      sql += ` AND LOWER(r.location) LIKE LOWER($${params.length})`;
+    }
+    if (room_type) {
+      params.push(room_type);
+      sql += ` AND rt.name = $${params.length}`;
+    }
+    sql += " ORDER BY r.created_at DESC";
+    const roomsResult = await pool.query(sql, params);
+    res.json(roomsResult.rows);
   } catch (error) {
     res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
   }
@@ -280,6 +296,39 @@ app.get("/api/admin/room-types", authorize(["admin", "staff"]), async (req, res)
     res.status(500).json({ error: "Lỗi khi lấy loại phòng" });
   }
 });
+
+// Public: list distinct room types
+app.get("/api/room-types", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT DISTINCT name FROM room_types WHERE is_active = true ORDER BY name"
+    );
+    const types = result.rows.map(r => r.name);
+    res.json(types);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy loại phòng:", error);
+    res.status(500).json({ error: "Lỗi khi lấy loại phòng" });
+  }
+});
+
+// Admin: list room types
+app.get(
+  "/api/admin/room-types",
+  authorize(["admin", "staff"]),
+  async (req, res) => {
+    try {
+      const result = await pool.query(
+        `SELECT id, name, price_per_night, capacity
+         FROM room_types WHERE is_active = true
+         ORDER BY price_per_night`
+      );
+      res.json(result.rows);
+    } catch (error) {
+      console.error("❌ Lỗi khi lấy loại phòng:", error);
+      res.status(500).json({ error: "Lỗi khi lấy loại phòng" });
+    }
+  }
+);
 
 // Admin: rooms
 app.get("/api/admin/rooms", authorize(["admin", "staff"]), async (req, res) => {
