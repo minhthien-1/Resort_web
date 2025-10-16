@@ -79,11 +79,11 @@ async function loadRevenueChart() {
                     },
                     y: {
                         beginAtZero: true,
-                        suggestedMax: 50000000, // ✅ Trục Y giới hạn đến 50 triệu
+                        suggestedMax: 200000000, // ✅ Trục Y giới hạn đến 50 triệu
                         ticks: {
                             color: "#666",
                             font: { size: 13 },
-                            stepSize: 10000000,
+                            stepSize: 50000000,
                             callback: val => val.toLocaleString(),
                         },
                         grid: { color: "rgba(0, 0, 0, 0.05)" },

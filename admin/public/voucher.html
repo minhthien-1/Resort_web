@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Voucher</title>
+    <link rel="stylesheet" href="assets/css/layout.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar__brand">
+                <span class="logo">🏖️</span>
+                <h2>Resort</h2>
+            </div>
+            <nav class="nav">
+                <a class="nav__item" href="./index.html">📊 Thống kê</a>
+                <a class="nav__item" href="./bookings.html">📋 Đặt phòng</a>
+                <a class="nav__item" href="./rooms.html">🏠 Phòng nghỉ</a>
+                <a class="nav__item active" href="./voucher.html">🎟️ Voucher</a>
+                <a class="nav__item" href="./customers.html">👥 Khách hàng</a>
+                <a class="nav__item" href="./reports.html">📈 Báo cáo</a>
+            </nav>
+<div class="logout-container">
+    <button id="logoutBtn" class="btn-logout">🚪 Đăng xuất</button>
+</div>
+        </aside>
+
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-title">Quản Lý Voucher</div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openAddModal()">+ Thêm Voucher</button>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="search-bar">
+                    <input type="text" placeholder="Tìm kiếm voucher..." id="searchInput">
+                    <select id="statusFilter"
+                        style="padding: 10px 15px; border: 1px solid #d0d7e0; border-radius: 6px; font-size: 14px;">
+                        <option value="all">Tất cả</option>
+                        <option value="active">Đang hoạt động</option>
+                        <option value="inactive">Không hoạt động</option>
+                    </select>
+
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="voucherTable">
+                        <thead>
+                            <tr>
+                                <th>Mã Voucher</th>
+                                <th>Tên Voucher</th>
+                                <th>Giảm Giá</th>
+                                <th>Lượt Dùng</th>
+                                <th>Ngày Hết Hạn</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voucherTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thêm/Sửa Voucher -->
+    <div class="modal" id="voucherModal">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" id="modalTitle" style="position: sticky; top: 0; background: white; z-index: 10;">
+                Thêm Voucher Mới</div>
+
+            <form style="padding: 20px;">
+                <div class="form-group">
+                    <label>Mã Voucher *</label>
+                    <input type="text" id="voucherCode" placeholder="VD: SUMMER2024" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tên Voucher *</label>
+                    <input type="text" id="voucherName" placeholder="Tên khuyến mãi" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Loại Giảm Giá *</label>
+                    <select id="discountType" required>
+                        <option value="percentage">Phần trăm (%)</option>
+                        <option value="fixed">Số tiền cố định (VNĐ)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Giá Trị Giảm *</label>
+                    <input type="number" id="discountValue" placeholder="VD: 20" min="0" required>
+                    <small id="discountHint">Nhập phần trăm giảm giá (0-100)</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Lượt Dùng Tối Đa *</label>
+                    <input type="number" id="maxUses" placeholder="100" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Ngày Hết Hạn *</label>
+                    <input type="date" id="expiryDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Mô Tả</label>
+                    <textarea id="description" placeholder="Mô tả chi tiết về voucher..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Trạng Thái</label>
+                    <select id="status">
+                        <option value="active">Đang hoạt động</option>
+                        <option value="inactive">Không hoạt động</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer"
+                    style="position: sticky; bottom: 0; background: white; padding: 15px; border-top: 1px solid #eee; margin: 0;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu Voucher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d0d7e0;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            position: sticky;
+            bottom: 0;
+            background: white;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5558e3;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+
+    <script src="./assets/js/voucher.js"></script> >
+
+
+    </script>
+</body>
+
+</html>
