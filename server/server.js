@@ -215,6 +215,36 @@ app.get("/api/revenue/current-month", async (req, res) => {
     res.status(500).json({ error: "Lỗi khi lấy doanh thu tháng hiện tại" });
   }
 });
+// ===== GUESTS ADMIN API =====
+app.get(
+  "/api/admin/guests",
+  authorize(["admin","staff"]),
+  async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        "SELECT id, username, full_name, email, created_at FROM users WHERE role='guest' ORDER BY created_at DESC"
+      );
+      res.json(rows);
+    } catch (error) {
+      console.error("❌ Lỗi khi lấy danh sách guests admin:", error);
+      res.status(500).json({ error: "Lỗi server khi lấy khách" });
+    }
+  }
+);
+
+
+// Số khách mới 30 ngày
+app.get("/api/guests/new", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT COUNT(*) AS new_guests
+      FROM users WHERE created_at >= NOW() - INTERVAL '30 days';
+    `);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: "Lỗi khi lấy khách mới" });
+  }
+});
 // Danh sách khách (role = guest)
 app.get(
   "/api/admin/customers",
