@@ -215,19 +215,43 @@ app.get("/api/revenue/current-month", async (req, res) => {
     res.status(500).json({ error: "Lỗi khi lấy doanh thu tháng hiện tại" });
   }
 });
-
-// Số khách mới 30 ngày
-app.get("/api/guests/new", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT COUNT(*) AS new_guests
-      FROM users WHERE created_at >= NOW() - INTERVAL '30 days';
-    `);
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: "Lỗi khi lấy khách mới" });
+// Danh sách khách (role = guest)
+app.get(
+  "/api/admin/customers",
+  authorize(["admin","staff"]),
+  async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        "SELECT id, username, full_name, email, created_at FROM users WHERE role='guest' ORDER BY created_at DESC"
+      );
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Lỗi server khi lấy danh sách customers" });
+    }
   }
-});
+);
+
+// Chi tiết khách theo id
+app.get(
+  "/api/admin/customers/:id",
+  authorize(["admin","staff"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { rows } = await pool.query(
+        "SELECT id, username, full_name, email, phone, created_at FROM users WHERE id=$1 AND role='guest'",
+        [id]
+      );
+      if (rows.length === 0) return res.status(404).json({ error: "Không tìm thấy customer" });
+      res.json(rows[0]);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Lỗi server khi lấy chi tiết customer" });
+    }
+  }
+);
+
 
 // Doanh thu theo tháng
 app.get("/api/revenue/monthly", async (req, res) => {

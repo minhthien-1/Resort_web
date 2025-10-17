@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadGuests() {
   try {
-    const res = await fetch('/api/admin/guests', {
+    const res = await fetch('/api/admin/customers', {
       headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
     });
     if (!res.ok) throw new Error('Fetch lỗi');
@@ -72,7 +72,7 @@ async function viewDetail(id) {
     document.getElementById('detailUsername').textContent = u.username || '—';
     document.getElementById('detailEmail').textContent = u.email;
     document.getElementById('detailPhone').textContent = u.phone || '—';
-    document.getElementById('detailAddress').textContent = u.address || '—';
+    //document.getElementById('detailAddress').textContent = u.address || '—';
 
     document.getElementById('detailModal').style.display = 'flex';
   } catch (err) {
