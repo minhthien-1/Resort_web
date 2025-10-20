@@ -10,6 +10,154 @@
     <link rel="stylesheet" href="./assets/css/base.css" />
     <link rel="stylesheet" href="./assets/css/layout.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-section select,
+        .filter-section button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-section select {
+            min-width: 150px;
+            background: white;
+        }
+
+        .filter-section button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .filter-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+            margin-left: auto;
+        }
+
+        .top-rooms-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-rooms-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rooms-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .room-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .room-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .room-rank {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .room-details h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .room-details p {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .room-stats {
+            text-align: right;
+        }
+
+        .room-stats .bookings {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 0;
+        }
+
+        .room-stats .revenue {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0 0 0;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        @media print {
+
+            .filter-section,
+            .sidebar,
+            .header__icons,
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="theme-blue">
@@ -25,7 +173,6 @@
             <a class="nav__item" href="/admin/rooms.html">🏠 Chỉnh sửa phòng</a>
             <a class="nav__item" href="./voucher.html">🎟️ Voucher</a>
             <a class="nav__item" href="/admin/customer.html">👥 Khách hàng</a>
-            <a class="nav__item" href="/admin/reports.html">📈 Báo cáo</a>
             <a class="nav__item" id="logoutBtn" href="javascript:void(0)">🚪 Đăng xuất</a>
         </nav>
     </aside>
@@ -40,8 +187,38 @@
             </div>
         </header>
 
+        <!-- Filter Section -->
+        <section class="filter-section">
+            <span class="filter-label">🔍 Lọc dữ liệu:</span>
+            <select id="monthFilter">
+                <option value="">Tất cả thời gian</option>
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4">Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+            </select>
+
+            <select id="yearFilter">
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+            </select>
+
+            <button onclick="applyFilter()">Áp dụng</button>
+            <button onclick="resetFilter()">Đặt lại</button>
+            <button class="export-btn" onclick="exportToPDF()">📄 Xuất PDF</button>
+        </section>
+
         <!-- Stats Cards -->
-        <section class="cards">
+        <section class="cards" id="statsCards">
             <!-- Ô 1: Tổng booking -->
             <div class="card blue" id="card-bookings">
                 <h3>Tổng lượt đặt phòng</h3>
@@ -58,9 +235,9 @@
 
             <!-- Ô 3: Doanh thu tháng hiện tại (màu cam) -->
             <div class="card orange" id="card-revenue">
-                <h3>Doanh thu tháng 10</h3>
+                <h3 id="revenue-title">Doanh thu tháng 10</h3>
                 <p class="value" id="total-revenue">0 VND</p>
-                <p class="desc">Doanh thu tháng hiện tại</p>
+                <p class="desc">Doanh thu theo từng tháng</p>
             </div>
 
             <!-- Ô 4: Khách mới -->
@@ -72,24 +249,39 @@
         </section>
 
         <!-- Chart -->
-        <section class="chart-section">
+        <section class="chart-section" id="chartSection">
             <h2>📈 Xu hướng doanh thu theo tháng</h2>
             <canvas id="revenueChart"></canvas>
+        </section>
+
+        <!-- Top 5 Rooms -->
+        <section class="top-rooms-section" id="topRoomsSection">
+            <h2>🏆 Top 5 phòng được đặt nhiều nhất</h2>
+            <div class="rooms-grid" id="topRoomsList">
+                <p>Đang tải...</p>
+            </div>
         </section>
     </main>
 
     <!-- JavaScript -->
     <script src="./assets/js/chart.js"></script>
     <script src="./assets/js/dashboard.js"></script>
-    <script>document.getElementById("logoutBtn").addEventListener("click", () => {
+    <script>
+        // Logout handler
+        document.getElementById("logoutBtn").addEventListener("click", () => {
             if (confirm("Bạn có chắc muốn đăng xuất không?")) {
                 localStorage.removeItem("token");
                 alert("Đã đăng xuất!");
                 window.location.href = "http://localhost:5500/login.html";
             }
-        });</script> >
+        });
+
+        // Set current month as default
+        const currentMonth = new Date().getMonth() + 1;
+        document.getElementById('monthFilter').value = currentMonth;
 
 
+    </script>
 </body>
 
 </html>
