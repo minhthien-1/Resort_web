@@ -569,6 +569,79 @@ app.delete("/api/discounts/:id", authorize(["admin", "staff"]), async (req, res)
   }
 });
 
+// ===== TOP 5 PHÒNG ĐƯỢC ĐẶT NHIỀU NHẤT =====
+app.get("/api/rooms/top-booked", async (req, res) => {
+  try {
+    const { limit = 5 } = req.query;
+    const result = await pool.query(`
+      SELECT 
+        r.id,
+        r.category,
+        r.location,
+        COUNT(b.id) AS booking_count,
+        COALESCE(SUM(b.total_amount), 0)::BIGINT AS total_revenue
+      FROM rooms r
+      LEFT JOIN bookings b ON b.room_id = r.id AND b.status = 'confirmed'
+      GROUP BY r.id, r.category, r.location
+      ORDER BY booking_count DESC
+      LIMIT $1
+    `, [limit]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ Lỗi khi lấy top phòng:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy top phòng" });
+  }
+});
+
+// ===== LỌC DOANH THU THEO THÁNG =====
+app.get("/api/revenue/filter", async (req, res) => {
+  try {
+    const { month, year } = req.query;
+
+    let query = `
+      SELECT COALESCE(SUM(total_amount), 0)::BIGINT AS total_revenue
+      FROM bookings
+      WHERE status = 'confirmed'
+    `;
+
+    const params = [];
+
+    if (month && year) {
+      query += ` AND EXTRACT(MONTH FROM check_in) = $1 
+                 AND EXTRACT(YEAR FROM check_in) = $2`;
+      params.push(parseInt(month), parseInt(year));
+    }
+
+    const result = await pool.query(query, params);
+    res.json({ total_revenue: Number(result.rows[0].total_revenue) });
+  } catch (err) {
+    console.error("❌ Lỗi khi lọc doanh thu:", err);
+    res.status(500).json({ error: "Lỗi server khi lọc doanh thu" });
+  }
+});
+
+// ===== TỔNG BOOKING THEO THÁNG =====
+app.get("/api/bookings/filter", async (req, res) => {
+  try {
+    const { month, year } = req.query;
+
+    let query = `SELECT COUNT(*) AS total FROM bookings WHERE 1=1`;
+    const params = [];
+
+    if (month && year) {
+      query += ` AND EXTRACT(MONTH FROM check_in) = $1 
+                 AND EXTRACT(YEAR FROM check_in) = $2`;
+      params.push(parseInt(month), parseInt(year));
+    }
+
+    const result = await pool.query(query, params);
+    res.json({ total: Number(result.rows[0].total) });
+  } catch (err) {
+    console.error("❌ Lỗi khi lọc booking:", err);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+});
 
 // ===== KHỞI CHẠY SERVER =====
 const PORT = process.env.PORT || 5500;
