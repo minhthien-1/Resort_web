@@ -11,13 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Xử lý logout
-  logoutBtn.addEventListener("click", e => {
-    e.preventDefault();
-    localStorage.clear();
-    window.location.href = "/home.html";
-  });
-
   // Tải danh sách guest
   loadGuests();
 });
@@ -31,7 +24,7 @@ async function loadGuests() {
     const guests = await res.json();
 
     const ul = document.getElementById('guestList');
-    ul.innerHTML = ''; 
+    ul.innerHTML = '';
 
     guests.forEach(g => {
       const li = document.createElement('li');
@@ -85,8 +78,12 @@ function closeModal() {
   document.getElementById('detailModal').style.display = 'none';
 }
 
-// Đóng modal khi click ngoài nội dung
-window.addEventListener('click', e => {
-  const modal = document.getElementById('detailModal');
-  if (e.target === modal) closeModal();
+
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("Bạn có chắc muốn đăng xuất không?")) {
+    localStorage.removeItem("token");
+    alert("Đã đăng xuất!");
+    window.location.href = "http://localhost:5500/login.html";
+  }
 });
