@@ -484,25 +484,16 @@ tbody tr:hover {
 
 
 
-.logout-container {
-    padding: 10px 0;
-    text-align: center;
-    margin-top: auto;
-}
+
 
 .btn-logout {
-    background: #ef4444;
+
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
+    border-radius: 8px;;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     width: 80%;
     transition: background 0.2s;
-}
-
-.btn-logout:hover {
-    background: #dc2626;
 }
