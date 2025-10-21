@@ -15,40 +15,6 @@ section {
     height: 100vh;
     /* Có thể bỏ hình nền ra khỏi section nếu muốn background có màu nền đơn sắc */
 }
-/* Prevent browser autofill from breaking input sizes */
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active {
-  transition: background-color 9999s ease-in-out 0s;
-  -webkit-text-fill-color: #fff !important;
-  box-shadow: 0 0 0px 1000px transparent inset !important;
-  caret-color: #fff;
-}
-
-/* Force consistent input height */
-.input-box input {
-  height: 50px;
-  line-height: 50px;
-  padding: 0 35px 0 5px;
-  font-size: 1em;
-  color: #fff;
-}
-
-/* Prevent resize caused by label movement when autofilled */
-.input-box label {
-  top: -5px !important;
-  transition: none;
-}
-
-/* Optional: Make box expand slightly to fit autofilled fields gracefully */
-.login-box,
-.register-box {
-  overflow: hidden;
-  max-width: 400px;
-  min-width: 350px;
-  transition: height 0.3s ease;
-}
 
 /* Tạo một lớp phủ (overlay) làm nền với độ mờ 0.5 */
 section::before {
@@ -198,4 +164,32 @@ button{
 }
 .nav__item--logout {
   display: none;
+}
+/* === FIX CHROME AUTOFILL === */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 1em !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill ~ label {
+  top: -5px;
+  background: transparent;
+  font-size: 0.9em;
+  color: #fff;
+}
+/* === FIX CHROME AUTOFILL === */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 1em !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill ~ label {
+  top: -5px;
+  background: transparent;
+  font-size: 0.9em;
+  color: #fff;
 }

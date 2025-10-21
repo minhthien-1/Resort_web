@@ -153,7 +153,11 @@ app.post("/auth/login", async (req, res) => {
         .json({ error: "Tài khoản không tồn tại hoặc bị khóa" });
     }
     const user = rows[0];
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+   const validPassword =
+  user.password_hash.startsWith("$2b$")
+    ? await bcrypt.compare(password, user.password_hash)
+    : password === user.password_hash;
+
     if (!validPassword) {
       return res.status(401).json({ error: "Sai mật khẩu" });
     }

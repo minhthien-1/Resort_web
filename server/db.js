@@ -1,33 +1,17 @@
+// db.js
 import dotenv from "dotenv";
 import pkg from "pg";
-import path from 'path';                              
-import { fileURLToPath } from 'url';                 
-dotenv.config();
+import path from "path";
+
+dotenv.config({ path: path.resolve("./.env") });
+
 const { Pool } = pkg;
 
-// Tạo __dirname trong ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-// Load biến môi trường từ file .env ở GỐC project
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
-
-// ===== KẾT NỐI DATABASE =====
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // bắt buộc với Neon
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: false }
 });
-
-pool.on('error', (err) => {
-  console.error('❌ Unexpected database error:', err.message);
-  process.exit(-1);
-});
-
-
-// ===== HÀM TRUY VẤN TIỆN DỤNG =====
-export const query = (text, params) => pool.query(text, params);
-
-// Kiểm tra env (tùy chọn - có thể bật nếu cần debug)
-// console.log('DATABASE_URL =', process.env.DATABASE_URL);
