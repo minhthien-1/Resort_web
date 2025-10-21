@@ -142,30 +142,36 @@ app.post("/auth/register", async (req, res) => {
 
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const { rows } = await pool.query(
       "SELECT id, email, username, password_hash, role, full_name FROM users WHERE email=$1 AND is_active=true",
       [email]
     );
+
     if (rows.length === 0) {
       return res
         .status(401)
         .json({ error: "Tài khoản không tồn tại hoặc bị khóa" });
     }
+
     const user = rows[0];
-   const validPassword =
-  user.password_hash.startsWith("$2b$")
-    ? await bcrypt.compare(password, user.password_hash)
-    : password === user.password_hash;
+
+    // ✅ Handle both bcrypt-hashed and plaintext passwords
+    const validPassword = user.password_hash.startsWith("$2b$")
+      ? await bcrypt.compare(password, user.password_hash)
+      : password === user.password_hash;
 
     if (!validPassword) {
       return res.status(401).json({ error: "Sai mật khẩu" });
     }
+
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET || "defaultsecret",
       { expiresIn: "8h" }
     );
+
     res.json({
       message: "Đăng nhập thành công",
       token,
@@ -178,6 +184,7 @@ app.post("/auth/login", async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi đăng nhập" });
   }
 });
+
 
 // ===== DASHBOARD APIs =====
 
