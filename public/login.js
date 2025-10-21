@@ -38,7 +38,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       localStorage.setItem("username", data.username);
       localStorage.setItem("fullname", data.full_name);
       localStorage.setItem("role", data.role);
-      window.location.href = "home.html";
+      if (data.role === "admin") {
+        window.location.href = "admin";
+      } else {
+        window.location.href = "home.html";
+      }
     } else {
       alert(data.error || "❌ Đăng nhập thất bại!");
     }
