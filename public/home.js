@@ -1,28 +1,35 @@
 // home.js – Script for public/home.html
 const API_BASE = window.location.origin + '/api';
-
 function slugify(text) {
   return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/Đ/g, "D")
+    .normalize("NFD")                                 // tách dấu
+    .replace(/[\u0300-\u036f]/g, "")                 // loại bỏ combining marks
+    .replace(/Đ/g, "D")                              
     .replace(/đ/g, "d")
-    .replace(/&/g, "-and-")
-    .replace(/[^a-zA-Z0-9\s-]/g, "")
-    .trim()
+    .replace(/&/g, "-and-")                           // ví dụ chuyển & → and
+    .replace(/[^a-zA-Z0-9\s-]/g, "")                  // loại bỏ ký tự không phải chữ số/chữ cái/khoảng trắng/hyphen
+    .trim()                                          
     .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .replace(/\s+/g, "-")                             // spaces → hyphens
+    .replace(/-+/g, "-");                             // gộp nhiều hyphen thành 1
 }
 
+
+// Format tiền VND
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(amount);
 }
 
+
+// Tạo card resort
 function createResortCard(r) {
+  // Lấy tên, địa điểm, giá và hình ảnh đúng key
   const title = r.resort_name || r.room_type || 'Không tên';
-  const loc = r.location || 'Chưa xác định';
-  const img = (r.images && r.images[0]) || 'Assets/placeholder.jpg';
+  const loc   = r.location || 'Chưa xác định';
+  const img   = (r.images && r.images[0]) || 'assets/default.jpg';
   const price = r.price_per_night || r.price || 0;
 
   return `
@@ -37,9 +44,14 @@ function createResortCard(r) {
   `;
 }
 
+
+
+// Lấy danh sách resort từ API
 async function fetchResorts(params = {}) {
-  const url = new URL(`${API_BASE}/rooms`);
-  Object.keys(params).forEach(k => { if (params[k]) url.searchParams.append(k, params[k]); });
+  const url = new URL(`${API_BASE}/rooms`, window.location.origin);
+  Object.keys(params).forEach(k => {
+    if (params[k]) url.searchParams.append(k, params[k]);
+  });
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error('API error');
@@ -50,6 +62,8 @@ async function fetchResorts(params = {}) {
   }
 }
 
+
+// Lấy danh sách loại phòng từ API
 async function fetchRoomTypes() {
   try {
     const res = await fetch(`${API_BASE}/room-types`);
@@ -61,80 +75,52 @@ async function fetchRoomTypes() {
   }
 }
 
-// ===== Pagination variables =====
-let allRooms = [];
-let currentPage = 1;
-const itemsPerPage = 6;
 
+// Render resort lên UI
 async function renderResorts(filter = {}) {
   const listEl = document.getElementById('room-cards-container');
   const msgContainer = document.querySelector('.search-instructions');
 
-  if (msgContainer) msgContainer.innerHTML = '';
-  if (listEl) listEl.innerHTML = '<p>Đang tải...</p>';
+  if (msgContainer) msgContainer.innerHTML = ''; // Xóa thông báo cũ
+  listEl.innerHTML = '<p>Đang tải...</p>';
 
-  allRooms = await fetchResorts(filter);
-  currentPage = 1;
-  renderRoomsForCurrentPage();
-  renderPagination();
+  const resorts = await fetchResorts(filter);
 
-  // Show search message
+  // Hiển thị thông báo kết quả
   const hasFilter = filter.location || filter.checkin || filter.room_type;
   if (msgContainer && hasFilter) {
-    if (allRooms.length === 0) {
-      msgContainer.innerHTML = `<div class="search-result-message error"><i class="fas fa-exclamation-circle"></i> Không tìm thấy resort phù hợp. Hãy thử tìm kiếm khác!</div>`;
+    if (resorts.length === 0) {
+      msgContainer.innerHTML = `
+        <div class="search-result-message error">
+          <i class="fas fa-exclamation-circle"></i>
+          Không tìm thấy resort phù hợp. Hãy thử tìm kiếm khác!
+        </div>
+      `;
     } else {
-      msgContainer.innerHTML = `<div class="search-result-message success"><i class="fas fa-check-circle"></i> Tìm thấy ${allRooms.length} resort</div>`;
+      msgContainer.innerHTML = `
+        <div class="search-result-message success">
+          <i class="fas fa-check-circle"></i>
+          Tìm thấy ${resorts.length} resort
+        </div>
+      `;
     }
   }
 
-  if (allRooms.length === 0) listEl.innerHTML = '<p>Không tìm thấy kết quả.</p>';
-}
-
-function renderRoomsForCurrentPage() {
-  const container = document.getElementById('room-cards-container');
-  if (!container) return;
-  container.innerHTML = '';
-
-  if (!allRooms.length) {
-    container.innerHTML = '<p>Không tìm thấy kết quả.</p>';
+  if (resorts.length === 0) {
+    listEl.innerHTML = '<p>Không tìm thấy kết quả.</p>';
     return;
   }
 
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  allRooms.slice(start, end).forEach(r => container.innerHTML += createResortCard(r));
+  listEl.innerHTML = resorts.map(createResortCard).join('');
 }
 
-function renderPagination() {
-  const paginationContainer = document.getElementById('pagination-container');
-  if (!paginationContainer) return;
-  paginationContainer.innerHTML = '';
-  const totalPages = Math.ceil(allRooms.length / itemsPerPage);
-  if (totalPages <= 1) return;
 
-  const createBtn = (html, disabled, onClick) => {
-    const btn = document.createElement('button');
-    btn.className = 'page-btn';
-    btn.innerHTML = html;
-    btn.disabled = disabled;
-    btn.addEventListener('click', onClick);
-    return btn;
-  };
-
-  paginationContainer.appendChild(createBtn('<i class="fas fa-chevron-left"></i>', currentPage === 1, () => { currentPage--; renderRoomsForCurrentPage(); renderPagination(); }));
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = createBtn(i, false, () => { currentPage = i; renderRoomsForCurrentPage(); renderPagination(); });
-    if (i === currentPage) btn.classList.add('active');
-    paginationContainer.appendChild(btn);
-  }
-  paginationContainer.appendChild(createBtn('<i class="fas fa-chevron-right"></i>', currentPage === totalPages, () => { currentPage++; renderRoomsForCurrentPage(); renderPagination(); }));
-}
-
+// Điền các loại phòng vào select
 async function populateRoomTypeSelect() {
   const types = await fetchRoomTypes();
   const select = document.getElementById('roomType');
   if (!select) return;
+  // giữ option đầu rồi thêm các type
   select.innerHTML = '<option value="">Tất cả loại phòng</option>';
   types.forEach(type => {
     const opt = document.createElement('option');
@@ -144,51 +130,86 @@ async function populateRoomTypeSelect() {
   });
 }
 
+
+// Khi load trang
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Render initial resorts
+  // 1. Render resorts mặc định
   renderResorts();
 
-  // 2. Flatpickr
+  // 2. Khởi tạo Flatpickr
   if (window.flatpickr) {
-    flatpickr("#dateRange", { mode: "range", dateFormat: "d/m/Y", locale: "vn", minDate: "today" });
+    flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "d/m/Y",
+      locale: "vn",
+      minDate: "today"
+    });
   }
 
-  // 3. Populate room types
+  // 3. Populate room types dropdown
   populateRoomTypeSelect();
 
-  // 4. Search button
+  // 4. Xử lý nút tìm kiếm
   const searchBtn = document.getElementById('searchBtn');
-  searchBtn?.addEventListener('click', () => {
-    const rawLocation = document.getElementById('location').value;
-    const location = slugify(rawLocation);
-    const dateRange = document.getElementById('dateRange').value;
-    const roomType = document.getElementById('roomType').value;
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      const rawLocation = document.getElementById('location').value;   // "Hà Nội"
+      const location = slugify(rawLocation);                            // "ha-noi"
+      const dateRange = document.getElementById('dateRange').value;
+      const roomType = document.getElementById('roomType').value;
 
-    let checkin = '', checkout = '';
-    if (dateRange.includes(' to ')) [checkin, checkout] = dateRange.split(' to ').map(s => s.trim());
-    else if (dateRange.includes(' - ')) [checkin, checkout] = dateRange.split(' - ').map(s => s.trim());
+      // Tách ngày - xử lý cả "to" và "-"
+      let checkin = '', checkout = '';
+      if (dateRange.includes(' to ')) {
+        const [start, end] = dateRange.split(' to ');
+        checkin = start.trim();
+        checkout = end.trim();
+      } else if (dateRange.includes(' - ')) {
+        const [start, end] = dateRange.split(' - ');
+        checkin = start.trim();
+        checkout = end.trim();
+      }
 
-    const filter = { location, checkin, checkout, room_type: roomType };
-    renderResorts(filter);
-    document.getElementById('room-cards-container').scrollIntoView({ behavior: 'smooth' });
-  });
+      const filter = { location, checkin, checkout, room_type: roomType };
+      renderResorts(filter);
 
-  // 5. Enter key in location input
+      // Scroll đến kết quả
+      document.getElementById('room-cards-container').scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  // 5. Tìm kiếm bằng Enter trong ô location
   const locationInput = document.getElementById('location');
-  locationInput?.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); } });
+  if (locationInput && searchBtn) {
+    locationInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchBtn.click();
+      }
+    });
+  }
 
-  // 6. Scroll deals/promo
-  const dealsGrid = document.getElementById("dealsGrid");
+  // 6. Xử lý scroll deals/promo
+  const grid = document.getElementById("dealsGrid");
   const btnLeft = document.querySelector(".promo-arrow.left");
   const btnRight = document.querySelector(".promo-arrow.right");
 
-  if (dealsGrid && btnLeft && btnRight) {
-    const scrollByOneCard = (dir) => {
-      const card = dealsGrid.querySelector(".resort-card");
+  if (grid && btnLeft && btnRight) {
+    function scrollByOneCard(direction) {
+      const card = grid.querySelector(".resort-card");
       if (!card) return;
-      const cardWidth = card.offsetWidth + parseFloat(window.getComputedStyle(card).marginRight);
-      dealsGrid.scrollBy({ left: dir === "right" ? cardWidth : -cardWidth, behavior: "smooth" });
-    };
+
+      const cardStyle = window.getComputedStyle(card);
+      const cardWidth = card.offsetWidth + parseFloat(cardStyle.marginRight);
+
+      grid.scrollBy({
+        left: direction === "right" ? cardWidth : -cardWidth,
+        behavior: "smooth"
+      });
+    }
+
     btnLeft.addEventListener("click", () => scrollByOneCard("left"));
     btnRight.addEventListener("click", () => scrollByOneCard("right"));
   }
