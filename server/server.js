@@ -314,25 +314,32 @@ app.get("/api/revenue/monthly", async (req, res) => {
 // ===== ROOMS APIs =====
 
 // Public rooms
-app.get("/api/rooms", async (req, res) => {
-  try {
-    const result = pool.query(`
 // Public: list rooms with optional filters
 app.get("/api/rooms", async (req, res) => {
   try {
     const { location, room_type } = req.query;
-    let sql = `,
-      SELECT, r.id, r.resort_name, r.room_type_id, rt.name, AS, room_type,
-      rt.price_per_night, rt.capacity, rd.images_url, AS, images,
-      r.location, rd.description, rd.features,
-      FROM, rooms, r,
-      JOIN, room_types, rt, ON, r.room_type_id = rt.id,
-      LEFT, JOIN, room_details, rd, ON, rd.room_id = r.id,
-      ORDER, BY, r.created_at, DESC`);
-    res.json(result.rows);
+
+    let sql = `
+      SELECT 
+        r.id,
+        r.resort_name,
+        r.room_type_id,
+        rt.name AS room_type,
+        rt.price_per_night,
+        rt.capacity,
+        rd.images_url AS images,
+        r.location,
+        rd.description,
+        rd.features
+      FROM rooms r
+      JOIN room_types rt ON r.room_type_id = rt.id
+      LEFT JOIN room_details rd ON rd.room_id = r.id
       WHERE 1=1
-    `);
+    `;
+
     const params = [];
+
+    // Apply filters if provided
     if (location) {
       params.push(`%${location}%`);
       sql += ` AND LOWER(r.location) LIKE LOWER($${params.length})`;
@@ -341,13 +348,18 @@ app.get("/api/rooms", async (req, res) => {
       params.push(room_type);
       sql += ` AND rt.name = $${params.length}`;
     }
+
     sql += " ORDER BY r.created_at DESC";
+
     const roomsResult = await pool.query(sql, params);
     res.json(roomsResult.rows);
+
   } catch (error) {
-    res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
+    console.error("❌ Lỗi khi lấy danh sách phòng:", error);
+    res.status(500).json({ error: "Lỗi server khi lấy danh sách phòng" });
   }
 });
+
 
 // Admin: room types
 app.get("/api/admin/room-types", authorize(["admin", "staff"]), async (req, res) => {
