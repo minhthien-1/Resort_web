@@ -27,6 +27,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ===== UPLOADS CONFIG =====
+const PROJECT_ROOT = path.resolve(__dirname, '..');
 const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
@@ -396,7 +397,71 @@ app.get("/api/rooms/:id", async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy chi tiết phòng" });
   }
 });
+// ===== POST NEW REVIEW (Public) =====
+app.post("/api/reviews", async (req, res) => {
+  try {
+    // 1. Destructure data from the request body
+    const { room_id, rating, comment, username } = req.body;
+    
+    // Simple validation (you should add more robust validation)
+    if (!room_id || !rating || !comment || !username) {
+      return res.status(400).json({ error: "Thiếu thông tin bắt buộc (room_id, rating, comment, username)" });
+    }
 
+    // 2. Insert the new review into the table
+    const sql = `
+      INSERT INTO reviews (room_id, rating, comment, username)
+      VALUES ($1, $2, $3, $4)
+      RETURNING review_id, created_at;
+    `;
+
+    const params = [room_id, rating, comment, username];
+    const { rows } = await pool.query(sql, params);
+
+    // 3. Return the newly created review's ID and timestamp
+    res.status(201).json({ 
+        message: "Đánh giá đã được gửi thành công!", 
+        review_id: rows[0].review_id,
+        created_at: rows[0].created_at
+    });
+
+  } catch (error) {
+    console.error("❌ Lỗi khi gửi đánh giá:", error);
+    // Check for specific foreign key errors or other database errors if needed
+    res.status(500).json({ error: "Lỗi server khi gửi đánh giá" });
+  }
+});
+// ===== GET REVIEWS BY ROOM ID (Public) =====
+app.get("/api/reviews/:roomId", async (req, res) => {
+  try {
+    // 1. Get the room ID from the URL path
+    const { roomId } = req.params;
+
+    // 2. Query the reviews table using the foreign key (room_id)
+    const sql = `
+      SELECT 
+        review_id,
+        room_id,
+        rating,
+        comment,
+        username,
+        created_at
+      FROM reviews
+      WHERE room_id = $1
+      ORDER BY created_at DESC;
+    `;
+
+    const { rows } = await pool.query(sql, [roomId]);
+    
+    // 3. Return the array of reviews (even if it's empty)
+    res.json(rows); 
+    
+  } catch (error) {
+    console.error(`❌ Lỗi khi lấy đánh giá cho phòng ${req.params.roomId}:`, error);
+    // Be careful not to expose internal errors to the client
+    res.status(500).json({ error: "Lỗi server khi lấy danh sách đánh giá" });
+  }
+});
 
 
 // Admin: room types
