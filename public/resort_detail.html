@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Resort</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="resort_detail.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .reviews-section { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+        .review-form label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        #rating-select { display: block; width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; background-color: white; cursor: pointer; }
+        #comment { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; resize: vertical; min-height: 80px; }
+        .submit-btn { margin-top: 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
+        .submit-btn:hover { background: #0056b3; }
+        .submit-btn:disabled { background: #cccccc; }
+        #review-list { margin-top: 20px; }
+        .review-item { background: #fff; border-radius: 4px; padding: 15px; margin-bottom: 15px; border: 1px solid #eee; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .review-header .stars { color: gold; font-size: 1.1em; }
+        .review-item small { color: #888; display: block; margin-top: 5px; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <a href="home.html" style="text-decoration: none; color: inherit;"><h1>Resort Booking</h1></a>
+            </div>
+            <nav class="navbar-menu">
+                <a href="">Khuyến mãi</a>
+                <a href="supports/support.html">Hỗ trợ</a>
+                <a href="">Đặt chỗ của tôi</a>
+                <a href="login.html" class="btn-login">Đăng nhập</a>
+                <a href="register.html" class="btn-register">Đăng ký</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="detail-container">
+        <div id="loading" class="loading-spinner" style="text-align: center; padding: 50px;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i> Đang tải thông tin...
+        </div>
+        <div id="error-message" style="color: red; text-align: center; padding: 50px; display: none;">
+            Không thể tải thông tin resort. Vui lòng thử lại.
+        </div>
+
+        <div id="resort-content" style="display: none;">
+            <section class="resort-header">
+                <h1 id="resort-name">Tên Resort</h1>
+                <p class="resort-location"><i class="fas fa-map-marker-alt"></i> <span id="resort-location-text">Địa chỉ cụ thể</span></p>
+                <div class="rating-info">
+                    <span class="rating-stars">⭐⭐⭐⭐⭐</span>
+                    <span class="rating-count">(0 đánh giá)</span>
+                </div>
+            </section>
+
+            <section class="image-gallery">
+                <div id="main-image-container" class="main-image"></div>
+                <div id="thumbnail-gallery" class="thumbnail-gallery"></div>
+            </section>
+            
+            <section class="resort-details-wrapper">
+                <div class="details-main">
+                    <h2>Mô tả Resort</h2>
+                    <p id="resort-description"></p>
+                    
+                    <h2 style="margin-top: 30px;">Tiện ích & Tính năng</h2>
+                    <ul id="resort-features" class="features-list"></ul>
+
+                    <div class="room-type-info">
+                        <h3>Thông tin phòng</h3>
+                        <p><i class="fas fa-bed"></i> Loại phòng: <span id="room-category"></span></p>
+                        <p><i class="fas fa-users"></i> Sức chứa: <span id="room-capacity"></span> người</p>
+                    </div>
+                </div>
+
+                <aside class="booking-box">
+                    <p class="price-display">Giá chỉ từ <span id="resort-price" class="price-value">0 VND</span> / đêm</p>
+                    <div class="date-picker-group">
+                        <label for="check-in">Nhận phòng</label>
+                        <input type="text" id="check-in" placeholder="Chọn ngày" readonly>
+                    </div>
+                    <div class="date-picker-group">
+                        <label for="check-out">Trả phòng</label>
+                        <input type="text" id="check-out" placeholder="Chọn ngày" readonly>
+                    </div>
+                    
+                    <button id="book-now-btn" class="btn-book">Đặt phòng ngay</button>
+                    <p class="note">Nhập ngày để xem giá chính xác và tình trạng phòng.</p>
+                </aside>
+            </section>
+            
+            <section id="reviews" class="reviews-section">
+                <h3>Đánh giá & Bình luận</h3>
+                <div id="review-list"></div>
+                <form id="review-form" class="review-form">
+                    <label for="rating-select">Đánh giá của bạn:</label>
+                    <select id="rating-select" required>
+                        <option value="" disabled selected>Chọn số sao</option>
+                        <option value="1"> ⭐️</option>
+                        <option value="2"> ⭐️⭐️ </option>
+                        <option value="3"> ⭐️⭐️⭐️</option>
+                        <option value="4"> ⭐️⭐️⭐️⭐️</option>
+                        <option value="5"> ⭐️⭐️⭐️⭐️⭐️</option>
+                    </select>
+                    <textarea id="comment" rows="3" placeholder="Viết bình luận của bạn..." required></textarea>
+                    <button type="submit" class="submit-btn">Gửi đánh giá</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="#">Chính sách bảo mật</a><span>|</span>
+                <a href="#">Điều khoản sử dụng</a><span>|</span>
+                <a href="#">Liên hệ</a>
+            </div>
+            <div class="footer-social">
+                <p>Theo dõi chúng tôi</p>
+                <div class="social-icons">
+                    <a href="#"><img src="Assets/Icon Images/facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="Assets/Icon Images/instagram.png" alt="Instagram"></a>
+                    <a href="#"><img src="Assets/Icon Images/communication.png" alt="Telegram"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046126.png" alt="TikTok"></a>
+                </div>
+            </div>
+            <br/>
+            <p>© 2025 <span>Resort Booking</span>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_BASE = "http://localhost:5500"; // Định nghĩa API_BASE
+
+            // --- CẬP NHẬT GIAO DIỆN NGƯỜI DÙNG (NAVBAR) ---
+            const navbarMenu = document.querySelector(".navbar-menu");
+            const username = localStorage.getItem("username");
+            const full_name = localStorage.getItem("full_name");
+
+            if (username || full_name) {
+                navbarMenu.innerHTML = `
+                    <a href="">Khuyến mãi</a>
+                    <a href="supports/support.html">Hỗ trợ</a>
+                    <a href="">Hợp tác với chúng tôi</a>
+                    <a href="">Đặt chỗ của tôi</a>
+                    <div class="user-menu">
+                        <span class="user-name">👤 ${full_name || username}</span>
+                        <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
+                    </div>
+                `;
+                document.getElementById("logoutBtn").addEventListener("click", () => {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                });
+            }
+
+            // --- CÁC HÀM HỖ TRỢ ---
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            function formatCurrency(amount) {
+                const numericAmount = parseFloat(amount);
+                if (isNaN(numericAmount)) return "Đang cập nhật";
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(numericAmount);
+            }
+
+            // SỬA ĐỔI: Thêm hàm resolveImageUrl để sửa lỗi hiển thị ảnh
+            function resolveImageUrl(url) {
+                if (!url) return 'Assets/placeholder.jpg';
+                if (/^https?:\/\//i.test(url)) return url;
+                if (url.startsWith('/')) return API_BASE + url;
+                return API_BASE + '/uploads/' + url;
+            }
+
+            function getLocationName(key) {
+                const locationMap = { 'da-lat': 'Đà Lạt', 'ha-long': 'Hạ Long', 'phu-quoc': 'Phú Quốc', 'nha-trang': 'Nha Trang', 'da-nang': 'Đà Nẵng', 'sapa': 'Sapa', 'hoi-an': 'Hội An', 'ha-noi': 'Hà Nội', 'sai-gon': 'Sài Gòn' };
+                return locationMap[key] || key || 'Không xác định';
+            }
+
+            // --- LOGIC ĐÁNH GIÁ ---
+            async function loadReviews(roomId) {
+                const container = document.getElementById('review-list');
+                container.innerHTML = "<p>Đang tải đánh giá...</p>";
+                try {
+                    const res = await fetch(`${API_BASE}/api/reviews/${roomId}`);
+                    if (!res.ok) throw new Error('Lỗi khi tải đánh giá');
+                    const reviews = await res.json();
+                    container.innerHTML = reviews.length ?
+                        reviews.map(r => `
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <strong>${r.username || 'Người dùng'}</strong>
+                                    <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                                </div>
+                                <p>${r.comment}</p>
+                                <small>${new Date(r.created_at).toLocaleString('vi-VN')}</small>
+                            </div>
+                        `).join('') : "<p>Chưa có đánh giá nào.</p>";
+                } catch (err) {
+                    console.error('Lỗi tải đánh giá:', err);
+                    container.innerHTML = "<p>Chưa có chức năng tải đánh giá hoặc đã xảy ra lỗi.</p>";
+                }
+            }
+
+            // --- HÀM TẢI DỮ LIỆU CHÍNH ---
+            async function fetchResortDetail() {
+                const resortId = getQueryParam('id');
+                const loadingElement = document.getElementById('loading');
+                const errorElement = document.getElementById('error-message');
+                const contentElement = document.getElementById('resort-content');
+                
+                loadingElement.style.display = 'block';
+                contentElement.style.display = 'none';
+                errorElement.style.display = 'none';
+
+                if (!resortId) {
+                    loadingElement.style.display = 'none';
+                    errorElement.textContent = 'Lỗi: Không tìm thấy ID resort trong đường dẫn.';
+                    errorElement.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/rooms/${resortId}`);
+                    if (!response.ok) throw new Error(`Lỗi server: ${response.statusText}`);
+                    
+                    const room = await response.json();
+                    
+                    document.title = room.resort_name || "Chi tiết Resort";
+                    document.getElementById('resort-name').textContent = room.resort_name || "Tên không xác định";
+                    document.getElementById('resort-location-text').textContent = getLocationName(room.location);
+                    document.getElementById('resort-description').textContent = room.description || 'Chưa có mô tả chi tiết.';
+                    document.getElementById('resort-price').textContent = formatCurrency(room.price_per_night);
+                    document.getElementById('room-category').textContent = room.category || "Đang cập nhật";
+                    document.getElementById('room-capacity').textContent = room.capacity || "?";
+
+                    const featuresList = document.getElementById('resort-features');
+                    featuresList.innerHTML = '';
+                    if (room.features && Array.isArray(room.features) && room.features.length > 0) {
+                        room.features.forEach(feature => {
+                            const li = document.createElement('li');
+                            li.textContent = feature;
+                            featuresList.appendChild(li);
+                        });
+                    } else {
+                        featuresList.innerHTML = '<li>Chưa có thông tin tiện ích.</li>';
+                    }
+
+                    // SỬA ĐỔI: Cập nhật thư viện ảnh với hàm resolveImageUrl
+                    const mainImageContainer = document.getElementById('main-image-container');
+                    const thumbnailGallery = document.getElementById('thumbnail-gallery');
+                    mainImageContainer.innerHTML = '';
+                    thumbnailGallery.innerHTML = '';
+                    const images = room.images || [];
+                    if (images.length > 0) {
+                        const mainImg = document.createElement('img');
+                        mainImg.src = resolveImageUrl(images[0]); // <--- SỬA Ở ĐÂY
+                        mainImg.alt = room.resort_name;
+                        mainImageContainer.appendChild(mainImg);
+                        
+                        images.forEach((imgUrl, index) => {
+                            const thumbImg = document.createElement('img');
+                            thumbImg.src = resolveImageUrl(imgUrl); // <--- VÀ Ở ĐÂY
+                            thumbImg.className = index === 0 ? 'active' : '';
+                            thumbImg.onclick = () => {
+                                mainImg.src = resolveImageUrl(imgUrl); // <--- VÀ Ở ĐÂY NỮA
+                                document.querySelectorAll('.thumbnail-gallery img').forEach(i => i.classList.remove('active'));
+                                thumbImg.classList.add('active');
+                            };
+                            thumbnailGallery.appendChild(thumbImg);
+                        });
+                    } else {
+                        mainImageContainer.innerHTML = `<img src="Assets/placeholder.jpg" alt="Placeholder">`;
+                    }
+
+                    let checkoutPicker = flatpickr("#check-out", {
+                        dateFormat: "d/m/Y", locale: "vn", minDate: new Date().fp_incr(1),
+                    });
+                    flatpickr("#check-in", {
+                        dateFormat: "d/m/Y", locale: "vn", minDate: "today",
+                        onChange: function(selectedDates) {
+                            if (selectedDates[0]) {
+                                checkoutPicker.set('minDate', new Date(selectedDates[0]).fp_incr(1));
+                            }
+                        }
+                    });
+
+                    await loadReviews(resortId);
+
+                    loadingElement.style.display = 'none';
+                    contentElement.style.display = 'block';
+
+                } catch (error) {
+                    console.error("Lỗi khi tải chi tiết resort:", error);
+                    loadingElement.style.display = 'none';
+                    errorElement.textContent = `Không thể tải dữ liệu resort. Lỗi: ${error.message}`;
+                    errorElement.style.display = 'block';
+                }
+            }
+
+            // --- GỌI HÀM VÀ ĐĂNG KÝ SỰ KIỆN ---
+            fetchResortDetail();
+            
+            document.getElementById('review-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const comment = document.getElementById('comment').value.trim();
+                const roomId = getQueryParam('id');
+                const ratingSelect = document.getElementById('rating-select');
+                const selectedRating = parseInt(ratingSelect.value);
+
+                if (isNaN(selectedRating)) {
+                    alert('Vui lòng chọn số sao đánh giá.');
+                    return;
+                }
+                
+                const loggedInUsername = localStorage.getItem('username') || "Khách ẩn danh";
+
+                const submitButton = e.target.querySelector('.submit-btn');
+                submitButton.textContent = 'Đang gửi...';
+                submitButton.disabled = true;
+
+                try {
+                    const res = await fetch(`${API_BASE}/api/reviews`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            rating: selectedRating,
+                            comment,
+                            room_id: roomId,
+                            username: loggedInUsername
+                        })
+                    });
+
+                    if (!res.ok) throw new Error('Lỗi khi gửi đánh giá');
+                    
+                    document.getElementById('comment').value = '';
+                    ratingSelect.value = "";
+                    await loadReviews(roomId);
+
+                } catch (err) {
+                    console.error('Lỗi gửi đánh giá:', err);
+                    alert('Chưa có chức năng gửi đánh giá hoặc đã xảy ra lỗi.');
+                } finally {
+                    submitButton.textContent = 'Gửi đánh giá';
+                    submitButton.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
