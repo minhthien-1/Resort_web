@@ -25,14 +25,28 @@ function formatCurrency(amount) {
 
 // 🏝️ Tạo card resort (clickable)
 function createResortCard(resort) {
-  const imgSrc = resort.images ? resort.images.split(',')[0] : 'assets/default.jpg';
+  // ✅ FIX: Xử lý images là array
+  let imgSrc = 'assets/default.jpg';
+  
+  if (resort.images) {
+    // Nếu images là array
+    if (Array.isArray(resort.images)) {
+      imgSrc = resort.images[0] ? `/uploads/${resort.images[0]}` : 'assets/default.jpg';
+    }
+    // Nếu images là string
+    else if (typeof resort.images === 'string' && resort.images.trim()) {
+      const firstImage = resort.images.split(',')[0].trim();
+      imgSrc = `/uploads/${firstImage}`;
+    }
+  }
+  
   const price = formatCurrency(resort.price_per_night || 0);
   const title = (resort.resort_name || "Không tên").replace(/"/g, '&quot;');
   const loc = (resort.location || "Chưa xác định").replace(/"/g, '&quot;');
 
   return `
     <div class="resort-card" data-id="${resort.id}">
-      <img src="${imgSrc}" alt="${title}" />
+      <img src="${imgSrc}" alt="${title}" onerror="this.src='assets/default.jpg'" />
       <div class="resort-info">
         <h3>${title}</h3>
         <p><i class="fas fa-map-marker-alt"></i> ${loc}</p>
@@ -42,6 +56,7 @@ function createResortCard(resort) {
     </div>
   `;
 }
+
 
 // 📦 Lấy danh sách resort từ API
 async function fetchResorts(params = {}) {
