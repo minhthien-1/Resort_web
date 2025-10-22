@@ -19,6 +19,41 @@ body {
   align-items: center;
   gap: 10px;
 }
+/* make the link wrap look and behave like a card */
+.resort-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;            /* keep text color */
+  outline: none;
+}
+
+.resort-link:focus .resort-card,
+.resort-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* existing card rules (if not present already) */
+.resort-card {
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.resort-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ensure links don't show default focus outline that breaks visuals;
+   still keep accessibility by providing a visible focus style (above) */
+.resort-link:focus {
+  outline: none;
+}
 
 .user-name {
   font-weight: 600;

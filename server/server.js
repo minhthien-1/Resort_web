@@ -360,6 +360,44 @@ app.get("/api/rooms", async (req, res) => {
   }
 });
 
+// ===== GET ROOM BY ID (Public) =====
+app.get("/api/rooms/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+    SELECT
+      r.id,
+      r.resort_name,
+      r.location,
+      r.category,
+      rt.name AS room_type,
+      rt.price_per_night,
+      rt.capacity,
+      COALESCE(rd.description, 'Chưa có mô tả') AS description,
+      COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
+      COALESCE(rd.images_url, ARRAY[]::text[]) AS images
+    FROM rooms r
+    JOIN room_types rt ON r.room_type_id = rt.id
+    LEFT JOIN room_details rd ON rd.room_id = r.id
+    WHERE r.id = $1
+    LIMIT 1;
+  `;
+
+
+    const { rows } = await pool.query(query, [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Không tìm thấy phòng" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy chi tiết phòng:", error);
+    res.status(500).json({ error: "Lỗi server khi lấy chi tiết phòng" });
+  }
+});
+
+
 
 // Admin: room types
 app.get("/api/admin/room-types", authorize(["admin", "staff"]), async (req, res) => {
@@ -387,6 +425,7 @@ app.get("/api/room-types", async (req, res) => {
     res.status(500).json({ error: "Lỗi khi lấy loại phòng" });
   }
 });
+
 
 // Admin: list room types
 app.get(
