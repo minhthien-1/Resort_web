@@ -179,10 +179,15 @@
     }
 
     function resolveImageUrl(url) {
-        if (!url) return 'assets/img-placeholder.png';
-        if (/^https?:\/\//i.test(url)) return url;
-        return API_BASE + (url.startsWith('/') ? url : ('/' + url));
-    }
+    if (!url) return 'assets/img-placeholder.png';
+    // Nếu đã là URL đầy đủ
+    if (/^https?:\/\//i.test(url)) return url;
+    // Nếu là đường dẫn tuyệt đối
+    if (url.startsWith('/')) return API_BASE + url;
+    // Nếu là tên file, thêm /uploads/
+    return API_BASE + '/uploads/' + url;
+}
+
 
     function getLocationName(k) {
         const map = {
@@ -228,40 +233,44 @@
     }
 
     function openRoomModal(mode, roomData = null){
-      currentMode = mode;
-      const modal = document.getElementById('room-modal');
-      const title = document.getElementById('modal-title');
-      const form = document.getElementById('room-form');
-      const preview = document.getElementById('image-preview');
-      if (!form) return;
-      form.reset();
-      preview.innerHTML = '';
-      document.getElementById('modal-error-message').textContent = '';
+  currentMode = mode;
+  const modal = document.getElementById('room-modal');
+  const title = document.getElementById('modal-title');
+  const form = document.getElementById('room-form');
+  const preview = document.getElementById('image-preview');
+  if (!form) return;
+  form.reset();
+  preview.innerHTML = '';
+  document.getElementById('modal-error-message').textContent = '';
 
-      if (mode === 'create'){
-        title.textContent = 'Thêm Phòng Mới';
-        currentMode = 'create';
-        document.getElementById('room-id').value = '';
-      } else {
-        currentMode = 'edit';
-        title.textContent = 'Sửa Phòng';
-        document.getElementById('room-id').value = roomData.id || '';
-        document.getElementById('room-resort-name').value = roomData.resort_name || '';
-        document.getElementById('room-type-id').value = roomData.room_type_id || '';
-        document.getElementById('room-category').value = roomData.category || 'standard';
-        document.getElementById('room-status').value = roomData.status || 'available';
-        document.getElementById('room-location').value = roomData.location || '';
-        document.getElementById('room-address').value = roomData.address || '';
-        if (Array.isArray(roomData.images) && roomData.images.length){
-          roomData.images.forEach(u => {
-            const d = document.createElement('div'); d.className = 'image-preview-item';
-            d.innerHTML = `<img src="${resolveImageUrl(u)}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
-            preview.appendChild(d);
-          });
-        }
-      }
-      modal.style.display = 'flex';
+  if (mode === 'create'){
+    title.textContent = 'Thêm Phòng Mới';
+    currentMode = 'create';
+    document.getElementById('room-id').value = '';
+  } else {
+    currentMode = 'edit';
+    title.textContent = 'Sửa Phòng';
+    document.getElementById('room-id').value = roomData.id || '';
+    document.getElementById('room-resort-name').value = roomData.resort_name || '';
+    document.getElementById('room-type-id').value = roomData.room_type_id || '';
+    document.getElementById('room-category').value = roomData.category || 'standard';
+    document.getElementById('room-status').value = roomData.status || 'available';
+    document.getElementById('room-location').value = roomData.location || '';
+    document.getElementById('room-address').value = roomData.address || '';
+    
+    // ✅ FIX: Xử lý images từ database
+    if (Array.isArray(roomData.images) && roomData.images.length){
+      roomData.images.forEach(u => {
+        const d = document.createElement('div'); 
+        d.className = 'image-preview-item';
+        const imgUrl = resolveImageUrl(u); // ✅ Dùng resolveImageUrl
+        d.innerHTML = `<img src="${imgUrl}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
+        preview.appendChild(d);
+      });
     }
+  }
+  modal.style.display = 'flex';
+}
 
     function closeRoomModal(){
       const modal = document.getElementById('room-modal'); if (modal) modal.style.display = 'none';
@@ -289,24 +298,39 @@
         });
     });
 
+    // ✅ SỬA: Form submit - gửi từng field riêng
     document.getElementById('room-form')?.addEventListener('submit', async function(e){
       e.preventDefault();
       if (isLoading) return;
       setLoading(true);
+      
       const id = document.getElementById('room-id').value;
-      const payload = {
-        resort_name: document.getElementById('room-resort-name').value.trim(),
-        room_type_id: document.getElementById('room-type-id').value,
-        category: document.getElementById('room-category').value,
-        status: document.getElementById('room-status').value,
-        location: document.getElementById('room-location').value,
-        address: document.getElementById('room-address').value
-      };
+      const resortName = document.getElementById('room-resort-name').value.trim();
+      const roomTypeId = document.getElementById('room-type-id').value;
+      const category = document.getElementById('room-category').value;
+      const status = document.getElementById('room-status').value;
+      const location = document.getElementById('room-location').value;
+      const address = document.getElementById('room-address').value;
 
+      // Validate
+      if (!resortName || !roomTypeId || !location) {
+        document.getElementById('modal-error-message').textContent = 'Vui lòng điền đầy đủ thông tin!';
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Tạo FormData - gửi từng field riêng
       const fd = new FormData();
-      fd.append('data', JSON.stringify(payload));
+      fd.append('resort_name', resortName);
+      fd.append('room_type_id', roomTypeId);
+      fd.append('category', category);
+      fd.append('status', status);
+      fd.append('location', location);
+      fd.append('address', address);
+
+      // Thêm file ảnh
       const files = document.getElementById('room-images').files;
-      if (files && files.length){
+      if (files && files.length > 0){
         Array.from(files).forEach(f => fd.append('images', f));
       }
 
@@ -314,14 +338,22 @@
         const url = currentMode === 'create' ? '/api/admin/rooms' : `/api/admin/rooms/${id}`;
         const method = currentMode === 'create' ? 'POST' : 'PUT';
         const token = localStorage.getItem("token");
-        const headers = { "Authorization": `Bearer ${token}` };
 
-        const res = await fetch(API_BASE + url, { method, body: fd, headers: headers });
+        console.log("Sending", method, "to", url);
+
+        const res = await fetch(API_BASE + url, { 
+          method, 
+          body: fd, 
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        console.log("Response status:", res.status);
 
         if (!res.ok) {
           const err = await res.json().catch(()=>({message:'Lỗi từ server'}));
           throw new Error(err.message || err.error || 'Lỗi server');
         }
+
         closeRoomModal();
         await fetchRooms();
       }catch(err){
