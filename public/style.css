@@ -165,3 +165,31 @@ button{
 .nav__item--logout {
   display: none;
 }
+/* === FIX CHROME AUTOFILL === */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 1em !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill ~ label {
+  top: -5px;
+  background: transparent;
+  font-size: 0.9em;
+  color: #fff;
+}
+/* === FIX CHROME AUTOFILL === */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 1em !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill ~ label {
+  top: -5px;
+  background: transparent;
+  font-size: 0.9em;
+  color: #fff;
+}
