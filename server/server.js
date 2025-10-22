@@ -27,6 +27,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ===== UPLOADS CONFIG =====
+const PROJECT_ROOT = path.resolve(__dirname, '..');
 const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
@@ -314,25 +315,32 @@ app.get("/api/revenue/monthly", async (req, res) => {
 // ===== ROOMS APIs =====
 
 // Public rooms
-app.get("/api/rooms", async (req, res) => {
-  try {
-    const result = pool.query(`
 // Public: list rooms with optional filters
 app.get("/api/rooms", async (req, res) => {
   try {
     const { location, room_type } = req.query;
-    let sql = `,
-      SELECT, r.id, r.resort_name, r.room_type_id, rt.name, AS, room_type,
-      rt.price_per_night, rt.capacity, rd.images_url, AS, images,
-      r.location, rd.description, rd.features,
-      FROM, rooms, r,
-      JOIN, room_types, rt, ON, r.room_type_id = rt.id,
-      LEFT, JOIN, room_details, rd, ON, rd.room_id = r.id,
-      ORDER, BY, r.created_at, DESC`);
-    res.json(result.rows);
+
+    let sql = `
+      SELECT 
+        r.id,
+        r.resort_name,
+        r.room_type_id,
+        rt.name AS room_type,
+        rt.price_per_night,
+        rt.capacity,
+        rd.images_url AS images,
+        r.location,
+        rd.description,
+        rd.features
+      FROM rooms r
+      JOIN room_types rt ON r.room_type_id = rt.id
+      LEFT JOIN room_details rd ON rd.room_id = r.id
       WHERE 1=1
-    `);
+    `;
+
     const params = [];
+
+    // Apply filters if provided
     if (location) {
       params.push(`%${location}%`);
       sql += ` AND LOWER(r.location) LIKE LOWER($${params.length})`;
@@ -341,13 +349,120 @@ app.get("/api/rooms", async (req, res) => {
       params.push(room_type);
       sql += ` AND rt.name = $${params.length}`;
     }
+
     sql += " ORDER BY r.created_at DESC";
+
     const roomsResult = await pool.query(sql, params);
     res.json(roomsResult.rows);
+
   } catch (error) {
-    res.status(500).json({ error: "Lỗi khi lấy danh sách phòng" });
+    console.error("❌ Lỗi khi lấy danh sách phòng:", error);
+    res.status(500).json({ error: "Lỗi server khi lấy danh sách phòng" });
   }
 });
+
+// ===== GET ROOM BY ID (Public) =====
+app.get("/api/rooms/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+    SELECT
+      r.id,
+      r.resort_name,
+      r.location,
+      r.category,
+      rt.name AS room_type,
+      rt.price_per_night,
+      rt.capacity,
+      COALESCE(rd.description, 'Chưa có mô tả') AS description,
+      COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
+      COALESCE(rd.images_url, ARRAY[]::text[]) AS images
+    FROM rooms r
+    JOIN room_types rt ON r.room_type_id = rt.id
+    LEFT JOIN room_details rd ON rd.room_id = r.id
+    WHERE r.id = $1
+    LIMIT 1;
+  `;
+
+
+    const { rows } = await pool.query(query, [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Không tìm thấy phòng" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy chi tiết phòng:", error);
+    res.status(500).json({ error: "Lỗi server khi lấy chi tiết phòng" });
+  }
+});
+// ===== POST NEW REVIEW (Public) =====
+app.post("/api/reviews", async (req, res) => {
+  try {
+    // 1. Destructure data from the request body
+    const { room_id, rating, comment, username } = req.body;
+    
+    // Simple validation (you should add more robust validation)
+    if (!room_id || !rating || !comment || !username) {
+      return res.status(400).json({ error: "Thiếu thông tin bắt buộc (room_id, rating, comment, username)" });
+    }
+
+    // 2. Insert the new review into the table
+    const sql = `
+      INSERT INTO reviews (room_id, rating, comment, username)
+      VALUES ($1, $2, $3, $4)
+      RETURNING review_id, created_at;
+    `;
+
+    const params = [room_id, rating, comment, username];
+    const { rows } = await pool.query(sql, params);
+
+    // 3. Return the newly created review's ID and timestamp
+    res.status(201).json({ 
+        message: "Đánh giá đã được gửi thành công!", 
+        review_id: rows[0].review_id,
+        created_at: rows[0].created_at
+    });
+
+  } catch (error) {
+    console.error("❌ Lỗi khi gửi đánh giá:", error);
+    // Check for specific foreign key errors or other database errors if needed
+    res.status(500).json({ error: "Lỗi server khi gửi đánh giá" });
+  }
+});
+// ===== GET REVIEWS BY ROOM ID (Public) =====
+app.get("/api/reviews/:roomId", async (req, res) => {
+  try {
+    // 1. Get the room ID from the URL path
+    const { roomId } = req.params;
+
+    // 2. Query the reviews table using the foreign key (room_id)
+    const sql = `
+      SELECT 
+        review_id,
+        room_id,
+        rating,
+        comment,
+        username,
+        created_at
+      FROM reviews
+      WHERE room_id = $1
+      ORDER BY created_at DESC;
+    `;
+
+    const { rows } = await pool.query(sql, [roomId]);
+    
+    // 3. Return the array of reviews (even if it's empty)
+    res.json(rows); 
+    
+  } catch (error) {
+    console.error(`❌ Lỗi khi lấy đánh giá cho phòng ${req.params.roomId}:`, error);
+    // Be careful not to expose internal errors to the client
+    res.status(500).json({ error: "Lỗi server khi lấy danh sách đánh giá" });
+  }
+});
+
 
 // Admin: room types
 app.get("/api/admin/room-types", authorize(["admin", "staff"]), async (req, res) => {
@@ -375,6 +490,7 @@ app.get("/api/room-types", async (req, res) => {
     res.status(500).json({ error: "Lỗi khi lấy loại phòng" });
   }
 });
+
 
 // Admin: list room types
 app.get(

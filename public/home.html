@@ -155,33 +155,40 @@
           }
       }
 
-      function renderRoomsForCurrentPage() {
-          const container = document.getElementById('room-cards-container'); // <-- Sửa đúng target
-          if (!container) return;
-          container.innerHTML = ''; 
+     function renderRoomsForCurrentPage() {
+  const container = document.getElementById("room-cards-container");
+  if (!container) return;
+  container.innerHTML = "";
 
-          const startIndex = (currentPage - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
-          const roomsToRender = allRooms.slice(startIndex, endIndex);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const roomsToRender = allRooms.slice(startIndex, endIndex);
 
-          roomsToRender.forEach(room => {
-              const card = document.createElement('div');
-              card.className = 'resort-card';
-              const formattedPrice = new Intl.NumberFormat('vi-VN', {
-                  style: 'currency', currency: 'VND'
-              }).format(room.price_per_night);
+  roomsToRender.forEach((room) => {
+    const card = document.createElement("div");
+    card.className = "resort-card";
+    const formattedPrice = new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(room.price_per_night);
 
-              card.innerHTML = `
-                  <img src="${room.images?.[0] || 'Assets/placeholder.jpg'}" alt="${room.resort_name || room.room_type}">
-                  <div class="resort-info">
-                      <h3>${room.resort_name || room.room_type}</h3>
-                      <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
-                      <p class="price">Từ <span>${formattedPrice}/đêm</span></p>
-                  </div>
-              `;
-              container.appendChild(card);
-          });
-      }
+    // 🟢 Add the click event here:
+    card.addEventListener("click", () => {
+      window.location.href = `room.html?id=${room.id}`;
+    });
+
+    card.innerHTML = `
+      <img src="${room.images?.[0] || 'Assets/placeholder.jpg'}" alt="${room.resort_name || room.room_type}">
+      <div class="resort-info">
+          <h3>${room.resort_name || room.room_type}</h3>
+          <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
+          <p class="price">Từ <span>${formattedPrice}/đêm</span></p>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
 
       function renderPagination() {
           const paginationContainer = document.getElementById('pagination-container');
