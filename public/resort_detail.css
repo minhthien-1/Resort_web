@@ -1,0 +1,202 @@
+/* resort_detail.css */
+
+.detail-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    margin-top: 100px;
+    padding: 0 20px;
+
+}
+
+.resort-header {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.resort-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.resort-location, .rating-info {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Gallery */
+.image-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.main-image img {
+    width: 100%;
+    max-height: 550px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail-gallery {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px; /* Để tránh scrollbar che ảnh */
+}
+
+.thumbnail-gallery img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.thumbnail-gallery img.active,
+.thumbnail-gallery img:hover {
+    opacity: 1;
+    border-color: #007bff; /* Màu xanh của nút đặt phòng */
+}
+
+/* Details and Booking Wrapper */
+.resort-details-wrapper {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.details-main {
+    flex: 2;
+}
+
+.details-main h2 {
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.features-list li {
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 5px;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.room-type-info {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.room-type-info h3 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+/* Booking Box */
+.booking-box {
+    flex: 1;
+    min-width: 300px;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.price-display {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.price-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e63946; /* Màu nổi bật cho giá */
+}
+
+.date-picker-group, .guest-group {
+    margin-bottom: 15px;
+}
+
+.date-picker-group label, .guest-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.date-picker-group input, .guest-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.btn-book {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.btn-book:hover {
+    background-color: #0056b3;
+}
+
+.note {
+    font-size: 0.85rem;
+    color: #999;
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .resort-details-wrapper {
+        flex-direction: column;
+    }
+    
+    .booking-box {
+        min-width: unset;
+        width: 100%;
+        position: static; /* Bỏ sticky trên màn hình nhỏ */
+    }
+}
+
+@media (max-width: 768px) {
+    .resort-header h1 {
+        font-size: 2rem;
+    }
+}

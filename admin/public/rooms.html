@@ -29,15 +29,15 @@
 <body class="p-8">
   <div class="max-w-7xl mx-auto">
     <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-            <button onclick="window.history.back()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors" aria-label="Quay lại trang trước">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
-            <h1 class="text-2xl font-bold">Quản Lý Phòng Khách Sạn</h1>
-        </div>
-        <button class="btn-primary" onclick="openRoomModal('create')">+ Thêm Phòng Mới</button>
+      <div class="flex items-center gap-4">
+        <button onclick="window.history.back()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors" aria-label="Quay lại trang trước">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold">Quản Lý Phòng Khách Sạn</h1>
+      </div>
+      <button class="btn-primary" onclick="openRoomModal('create')">+ Thêm Phòng Mới</button>
     </div>
 
     <div class="card overflow-x-auto">
@@ -65,12 +65,12 @@
         <input type="hidden" id="room-id" />
 
         <div class="mb-3">
-            <label class="block text-sm font-medium mb-1">Tên resort</label>
-            <input id="room-resort-name" class="w-full border rounded px-3 py-2" placeholder="VD: FLC Grand Hotel Halong" required />
+          <label class="block text-sm font-medium mb-1">Tên resort</label>
+          <input id="room-resort-name" class="w-full border rounded px-3 py-2" placeholder="VD: FLC Grand Hotel Halong" required />
         </div>
 
         <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Hạng phòng</label>
+          <label class="block text-sm font-medium mb-1">Loại phòng</label>
           <select id="room-type-id" class="w-full border rounded px-3 py-2" required></select>
         </div>
 
@@ -116,6 +116,11 @@
         <div class="mb-4">
           <label class="block text-sm font-medium mb-1">Địa chỉ cụ thể</label>
           <input id="room-address" class="w-full border rounded px-3 py-2" placeholder="Ví dụ: Khu A, Phường X..." />
+        </div>
+
+        <div class="mb-4">
+            <label for="room-description" class="block text-sm font-medium mb-1">Thông tin chi tiết phòng</label>
+            <textarea id="room-description" rows="4" class="w-full border rounded px-3 py-2" placeholder="Mô tả về phòng, các tiện ích đặc biệt..."></textarea>
         </div>
 
         <div class="flex justify-end items-center space-x-3">
@@ -179,22 +184,14 @@
     }
 
     function resolveImageUrl(url) {
-    if (!url) return 'assets/img-placeholder.png';
-    // Nếu đã là URL đầy đủ
-    if (/^https?:\/\//i.test(url)) return url;
-    // Nếu là đường dẫn tuyệt đối
-    if (url.startsWith('/')) return API_BASE + url;
-    // Nếu là tên file, thêm /uploads/
-    return API_BASE + '/uploads/' + url;
-}
-
+        if (!url) return 'assets/img-placeholder.png';
+        if (/^https?:\/\//i.test(url)) return url;
+        if (url.startsWith('/')) return API_BASE + url;
+        return API_BASE + '/uploads/' + url;
+    }
 
     function getLocationName(k) {
-        const map = {
-            'da-lat': 'Đà Lạt', 'ha-long': 'Hạ Long', 'phu-quoc': 'Phú Quốc',
-            'nha-trang': 'Nha Trang', 'da-nang': 'Đà Nẵng', 'sapa': 'Sapa',
-            'hoi-an': 'Hội An', 'ha-noi': 'Hà Nội', 'sai-gon': 'Sài Gòn'
-        };
+        const map = { 'da-lat': 'Đà Lạt', 'ha-long': 'Hạ Long', 'phu-quoc': 'Phú Quốc', 'nha-trang': 'Nha Trang', 'da-nang': 'Đà Nẵng', 'sapa': 'Sapa', 'hoi-an': 'Hội An', 'ha-noi': 'Hà Nội', 'sai-gon': 'Sài Gòn' };
         return map[k] || k || '';
     }
 
@@ -215,7 +212,7 @@
             <td class="p-4 flex items-center">${imgHtml}<div><div class="font-medium">${r.category || r.room_type || ''}</div></div></td>
             <td class="p-4">${r.room_type || ''}</td>
             <td class="p-4">${r.price_per_night ? Number(r.price_per_night).toLocaleString('vi-VN') : '-'}</td>
-            <td class="p-4"><span class="status-badge status-${r.status}">${r.status}</span></td>
+            <td class="p-4"><span class="status-badge" style="background-color:${r.status === 'available' ? '#dcfce7' : '#fee2e2'}; color:${r.status === 'available' ? '#166534' : '#991b1b'}">${r.status}</span></td>
             <td class="p-4">
               <div class="text-sm font-medium">${r.resort_name || ''}</div>
               <div class="text-xs">${getLocationName(r.location)}</div>
@@ -233,44 +230,46 @@
     }
 
     function openRoomModal(mode, roomData = null){
-  currentMode = mode;
-  const modal = document.getElementById('room-modal');
-  const title = document.getElementById('modal-title');
-  const form = document.getElementById('room-form');
-  const preview = document.getElementById('image-preview');
-  if (!form) return;
-  form.reset();
-  preview.innerHTML = '';
-  document.getElementById('modal-error-message').textContent = '';
+      currentMode = mode;
+      const modal = document.getElementById('room-modal');
+      const title = document.getElementById('modal-title');
+      const form = document.getElementById('room-form');
+      const preview = document.getElementById('image-preview');
+      if (!form) return;
+      form.reset();
+      preview.innerHTML = '';
+      document.getElementById('modal-error-message').textContent = '';
 
-  if (mode === 'create'){
-    title.textContent = 'Thêm Phòng Mới';
-    currentMode = 'create';
-    document.getElementById('room-id').value = '';
-  } else {
-    currentMode = 'edit';
-    title.textContent = 'Sửa Phòng';
-    document.getElementById('room-id').value = roomData.id || '';
-    document.getElementById('room-resort-name').value = roomData.resort_name || '';
-    document.getElementById('room-type-id').value = roomData.room_type_id || '';
-    document.getElementById('room-category').value = roomData.category || 'standard';
-    document.getElementById('room-status').value = roomData.status || 'available';
-    document.getElementById('room-location').value = roomData.location || '';
-    document.getElementById('room-address').value = roomData.address || '';
-    
-    // ✅ FIX: Xử lý images từ database
-    if (Array.isArray(roomData.images) && roomData.images.length){
-      roomData.images.forEach(u => {
-        const d = document.createElement('div'); 
-        d.className = 'image-preview-item';
-        const imgUrl = resolveImageUrl(u); // ✅ Dùng resolveImageUrl
-        d.innerHTML = `<img src="${imgUrl}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
-        preview.appendChild(d);
-      });
+      if (mode === 'create'){
+        title.textContent = 'Thêm Phòng Mới';
+        currentMode = 'create';
+        document.getElementById('room-id').value = '';
+      } else {
+        currentMode = 'edit';
+        title.textContent = 'Sửa Phòng';
+        document.getElementById('room-id').value = roomData.id || '';
+        document.getElementById('room-resort-name').value = roomData.resort_name || '';
+        document.getElementById('room-type-id').value = roomData.room_type_id || '';
+        document.getElementById('room-category').value = roomData.category || 'standard';
+        document.getElementById('room-status').value = roomData.status || 'available';
+        document.getElementById('room-location').value = roomData.location || '';
+        document.getElementById('room-address').value = roomData.address || '';
+        
+        // SỬA ĐỔI: Thêm dòng này để điền mô tả khi sửa
+        document.getElementById('room-description').value = roomData.description || '';
+        
+        if (Array.isArray(roomData.images) && roomData.images.length){
+          roomData.images.forEach(u => {
+            const d = document.createElement('div'); 
+            d.className = 'image-preview-item';
+            const imgUrl = resolveImageUrl(u);
+            d.innerHTML = `<img src="${imgUrl}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
+            preview.appendChild(d);
+          });
+        }
+      }
+      modal.style.display = 'flex';
     }
-  }
-  modal.style.display = 'flex';
-}
 
     function closeRoomModal(){
       const modal = document.getElementById('room-modal'); if (modal) modal.style.display = 'none';
@@ -298,37 +297,24 @@
         });
     });
 
-    // ✅ SỬA: Form submit - gửi từng field riêng
     document.getElementById('room-form')?.addEventListener('submit', async function(e){
       e.preventDefault();
       if (isLoading) return;
       setLoading(true);
       
       const id = document.getElementById('room-id').value;
-      const resortName = document.getElementById('room-resort-name').value.trim();
-      const roomTypeId = document.getElementById('room-type-id').value;
-      const category = document.getElementById('room-category').value;
-      const status = document.getElementById('room-status').value;
-      const location = document.getElementById('room-location').value;
-      const address = document.getElementById('room-address').value;
-
-      // Validate
-      if (!resortName || !roomTypeId || !location) {
-        document.getElementById('modal-error-message').textContent = 'Vui lòng điền đầy đủ thông tin!';
-        setLoading(false);
-        return;
-      }
-
-      // ✅ Tạo FormData - gửi từng field riêng
       const fd = new FormData();
-      fd.append('resort_name', resortName);
-      fd.append('room_type_id', roomTypeId);
-      fd.append('category', category);
-      fd.append('status', status);
-      fd.append('location', location);
-      fd.append('address', address);
+      
+      fd.append('resort_name', document.getElementById('room-resort-name').value.trim());
+      fd.append('room_type_id', document.getElementById('room-type-id').value);
+      fd.append('category', document.getElementById('room-category').value);
+      fd.append('status', document.getElementById('room-status').value);
+      fd.append('location', document.getElementById('room-location').value);
+      fd.append('address', document.getElementById('room-address').value.trim());
+      
+      // SỬA ĐỔI: Thêm description vào FormData
+      fd.append('description', document.getElementById('room-description').value.trim());
 
-      // Thêm file ảnh
       const files = document.getElementById('room-images').files;
       if (files && files.length > 0){
         Array.from(files).forEach(f => fd.append('images', f));
@@ -339,15 +325,11 @@
         const method = currentMode === 'create' ? 'POST' : 'PUT';
         const token = localStorage.getItem("token");
 
-        console.log("Sending", method, "to", url);
-
         const res = await fetch(API_BASE + url, { 
           method, 
           body: fd, 
           headers: { "Authorization": `Bearer ${token}` }
         });
-
-        console.log("Response status:", res.status);
 
         if (!res.ok) {
           const err = await res.json().catch(()=>({message:'Lỗi từ server'}));
@@ -378,7 +360,8 @@
     document.getElementById('room-modal')?.addEventListener('click', e => { if (e.target.id === 'room-modal') closeRoomModal(); });
 
     // init
-    document.addEventListener('DOMContentLoaded', async () => { await fetchRoomTypes(); await fetchRooms(); });
+    fetchRoomTypes();
+    fetchRooms();
   </script>
 </body>
 </html>
