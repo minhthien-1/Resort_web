@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - Resort Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-right a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header-right a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .logout-btn {
+            background: #dc3545 !important;
+            padding: 8px 20px !important;
+            border-radius: 5px !important;
+        }
+
+        .logout-btn:hover {
+            background: #c82333 !important;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .profile-header .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 48px;
+            color: #007bff;
+        }
+
+        .profile-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .profile-header p {
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tabs button:hover {
+            background: #f9f9f9;
+        }
+
+        .tabs button.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .info-item label {
+            display: block;
+            font-weight: 500;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 16px;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .danger-zone {
+            background: #fff5f5;
+            border: 2px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+
+        .danger-zone h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .danger-zone p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .loading-page {
+            text-align: center;
+            padding: 50px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tabs button {
+                flex: 1 1 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Resort Booking</h1>
+        <div class="header-right">
+            <a href="home.html">← Quay lại</a>
+            <a href="#" class="logout-btn" id="logoutBtn">Đăng xuất</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="avatar" id="avatarIcon">👤</div>
+            <h2 id="fullName">Tên người dùng</h2>
+            <p id="userEmail">email@example.com</p>
+        </div>
+
+        <!-- Alert Messages -->
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-danger" id="errorAlert"></div>
+        <div class="alert alert-warning" id="warningAlert"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="view">Xem thông tin</button>
+            <button class="tab-button" data-tab="edit">Chỉnh sửa</button>
+            <button class="tab-button" data-tab="password">Đổi mật khẩu</button>
+            <button class="tab-button" data-tab="delete">Xóa tài khoản</button>
+        </div>
+
+        <!-- TAB 1: View Profile -->
+        <div class="tab-content active" id="view">
+            <h3 style="margin-bottom: 20px; color: #333;">Thông tin cá nhân</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Tên đăng nhập</label>
+                    <div class="value" id="viewUsername">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Email</label>
+                    <div class="value" id="viewEmail">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Họ và tên</label>
+                    <div class="value" id="viewFullName">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Số điện thoại</label>
+                    <div class="value" id="viewPhone">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Vai trò</label>
+                    <div class="value" id="viewRole">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Trạng thái</label>
+                    <div class="value" id="viewStatus">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Ngày tạo</label>
+                    <div class="value" id="viewCreatedAt">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Cập nhật lần cuối</label>
+                    <div class="value" id="viewUpdatedAt">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Edit Profile -->
+        <div class="tab-content" id="edit">
+            <h3 style="margin-bottom: 20px; color: #333;">Chỉnh sửa thông tin</h3>
+            <form id="editForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editUsername">Tên đăng nhập</label>
+                        <input type="text" id="editUsername" name="username" placeholder="Tên đăng nhập">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" name="email" placeholder="Email">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editFullName">Họ và tên</label>
+                        <input type="text" id="editFullName" name="full_name" placeholder="Họ và tên">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone">Số điện thoại</label>
+                        <input type="tel" id="editPhone" name="phone" placeholder="Số điện thoại">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="resetEditBtn">Nhập lại</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 3: Change Password -->
+        <div class="tab-content" id="password">
+            <h3 style="margin-bottom: 20px; color: #333;">Đổi mật khẩu</h3>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="oldPassword">Mật khẩu hiện tại</label>
+                    <input type="password" id="oldPassword" name="old_password" placeholder="Nhập mật khẩu hiện tại" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Mật khẩu mới</label>
+                    <input type="password" id="newPassword" name="new_password" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                    <input type="password" id="confirmPassword" name="confirm_password" placeholder="Xác nhận mật khẩu mới" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="resetPasswordBtn">Nhập lại</button>
+                    <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 4: Delete Account -->
+        <div class="tab-content" id="delete">
+            <h3 style="margin-bottom: 20px; color: #333;">Xóa tài khoản</h3>
+            <div class="danger-zone">
+                <h3>⚠️ Khu vực nguy hiểm</h3>
+                <p>Xóa tài khoản của bạn là một hành động vĩnh viễn. Tất cả dữ liệu của bạn sẽ bị xóa và không thể khôi phục.</p>
+                <p><strong>Hãy cân nhắc kỹ trước khi xóa tài khoản.</strong></p>
+                <button type="button" class="btn btn-danger" id="deleteAccountBtn">Xóa tài khoản của tôi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <h2>Xác nhận xóa tài khoản</h2>
+            <p>Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể được hoàn tác.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa vĩnh viễn</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // API Base URL
+    const API_BASE_URL = 'http://localhost:3000/api';
+
+    let currentUser = null;
+    let currentUserId = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeUser();
+        setupEventListeners();
+    });
+
+    // Initialize user từ localStorage
+function initializeUser() {
+    console.log('=== Bắt đầu khởi tạo user ===');
+    
+    // Lấy userId từ localStorage
+    currentUserId = localStorage.getItem('userId');
+    
+    console.log('LocalStorage userId:', currentUserId);
+
+    // Kiểm tra user đã đăng nhập
+    if (!currentUserId) {
+        console.error('❌ Không tìm thấy userId trong localStorage');
+        alert('Vui lòng đăng nhập trước');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    console.log('✅ Current User ID:', currentUserId);
+    loadUserProfile();
+}
+
+// Load user profile từ API
+async function loadUserProfile() {
+    try {
+        console.log('📡 Đang tải profile từ API:', `${API_BASE_URL}/users/${currentUserId}`);
+        
+        const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`);
+        const result = await response.json();
+
+        console.log('📥 API Response:', result);
+
+        if (result.status && result.data) {
+            currentUser = result.data;
+            
+            // Cập nhật localStorage
+            localStorage.setItem('email', currentUser.email);
+            localStorage.setItem('username', currentUser.username);
+            localStorage.setItem('fullname', currentUser.full_name);
+            
+            displayProfile(currentUser);
+            console.log('✅ Profile loaded successfully');
+        } else {
+            showError('Không thể tải thông tin tài khoản: ' + (result.message || 'Unknown error'));
+            console.error('❌ Error from API:', result);
+        }
+    } catch (error) {
+        console.error('❌ Error loading profile:', error);
+        showError('Lỗi khi tải thông tin tài khoản: ' + error.message);
+    }
+}
+
+
+
+    // Display profile information
+    function displayProfile(user) {
+        console.log('🎨 Displaying profile:', user);
+        
+        // Header
+        document.getElementById('fullName').textContent = user.full_name || 'Người dùng';
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('avatarIcon').textContent = getAvatarInitials(user.full_name);
+
+        // View tab
+        document.getElementById('viewUsername').textContent = user.username || '-';
+        document.getElementById('viewEmail').textContent = user.email || '-';
+        document.getElementById('viewFullName').textContent = user.full_name || '-';
+        document.getElementById('viewPhone').textContent = user.phone || 'Chưa cập nhật';
+        document.getElementById('viewRole').textContent = getRoleLabel(user.role);
+        document.getElementById('viewStatus').textContent = user.is_active ? '✅ Hoạt động' : '❌ Không hoạt động';
+        document.getElementById('viewCreatedAt').textContent = formatDate(user.created_at);
+        document.getElementById('viewUpdatedAt').textContent = formatDate(user.updated_at);
+
+        // Edit form
+        document.getElementById('editUsername').value = user.username || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editFullName').value = user.full_name || '';
+        document.getElementById('editPhone').value = user.phone || '';
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+        // Tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => switchTab(button.dataset.tab));
+        });
+
+        // Edit form
+        document.getElementById('editForm').addEventListener('submit', updateProfile);
+        document.getElementById('resetEditBtn').addEventListener('click', resetEditForm);
+
+        // Password form
+        document.getElementById('passwordForm').addEventListener('submit', changePassword);
+        document.getElementById('resetPasswordBtn').addEventListener('click', resetPasswordForm);
+
+        // Delete account
+        document.getElementById('deleteAccountBtn').addEventListener('click', showDeleteConfirm);
+        document.getElementById('cancelDeleteBtn').addEventListener('click', hideDeleteConfirm);
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deleteAccount);
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    }
+
+    // Switch tabs
+    function switchTab(tabName) {
+        // Remove active from all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Add active to selected tab
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Update profile
+    async function updateProfile(e) {
+        e.preventDefault();
+
+        const formData = {
+            username: document.getElementById('editUsername').value,
+            email: document.getElementById('editEmail').value,
+            full_name: document.getElementById('editFullName').value,
+            phone: document.getElementById('editPhone').value
+        };
+
+        // Validation
+        if (!formData.username || !formData.email || !formData.full_name) {
+            showWarning('Vui lòng điền đầy đủ thông tin bắt buộc');
+            return;
+        }
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<span class="loading"></span>Đang cập nhật...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (result.status) {
+                currentUser = result.data;
+                localStorage.setItem('email', currentUser.email);
+                localStorage.setItem('fullname', currentUser.full_name);
+                displayProfile(currentUser);
+                showSuccess('Cập nhật thông tin thành công!');
+            } else {
+                showError(result.message || 'Cập nhật thất bại');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            showError('Lỗi khi cập nhật thông tin');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Change password
+    async function changePassword(e) {
+        e.preventDefault();
+
+        const oldPassword = document.getElementById('oldPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        // Validation
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            showWarning('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showWarning('Mật khẩu mới phải có ít nhất 6 ký tự');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showWarning('Mật khẩu mới không trùng khớp');
+            return;
+        }
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<span class="loading"></span>Đang cập nhật...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${currentUserId}/change-password`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    old_password: oldPassword,
+                    new_password: newPassword
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.status) {
+                showSuccess('Đổi mật khẩu thành công!');
+                resetPasswordForm();
+            } else {
+                showError(result.message || 'Đổi mật khẩu thất bại');
+            }
+        } catch (error) {
+            console.error('Error changing password:', error);
+            showError('Lỗi khi đổi mật khẩu');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Delete account
+    async function deleteAccount() {
+        const deleteBtn = document.getElementById('confirmDeleteBtn');
+        const originalText = deleteBtn.textContent;
+        deleteBtn.innerHTML = '<span class="loading"></span>Đang xóa...';
+        deleteBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.status) {
+                showSuccess('Tài khoản đã được xóa thành công!');
+                setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = 'home.html';
+                }, 2000);
+            } else {
+                showError(result.message || 'Xóa tài khoản thất bại');
+            }
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            showError('Lỗi khi xóa tài khoản');
+        } finally {
+            deleteBtn.innerHTML = originalText;
+            deleteBtn.disabled = false;
+            hideDeleteConfirm();
+        }
+    }
+
+    // Show delete confirmation modal
+    function showDeleteConfirm() {
+        document.getElementById('deleteModal').classList.add('show');
+    }
+
+    // Hide delete confirmation modal
+    function hideDeleteConfirm() {
+        document.getElementById('deleteModal').classList.remove('show');
+    }
+
+    // Reset forms
+    function resetEditForm() {
+        if (currentUser) {
+            displayProfile(currentUser);
+        }
+    }
+
+    function resetPasswordForm() {
+        document.getElementById('passwordForm').reset();
+    }
+
+    // Show alerts
+    function showSuccess(message) {
+        showAlert('successAlert', message);
+    }
+
+    function showError(message) {
+        showAlert('errorAlert', message);
+    }
+
+    function showWarning(message) {
+        showAlert('warningAlert', message);
+    }
+
+    function showAlert(alertId, message) {
+        const alert = document.getElementById(alertId);
+        alert.textContent = message;
+        alert.classList.add('show');
+
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+    }
+
+    // Logout
+    function logout(e) {
+        e.preventDefault();
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            localStorage.clear();
+            window.location.href = 'home.html';
+        }
+    }
+
+    // Utility functions
+    function getAvatarInitials(name) {
+        if (!name) return '👤';
+        const words = name.split(' ');
+        if (words.length >= 2) {
+            return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+        }
+        return name[0].toUpperCase();
+    }
+
+    function getRoleLabel(role) {
+        const roles = {
+            'admin': '👨‍💼 Quản trị viên',
+            'manager': '👨‍💻 Quản lý',
+            'staff': '👥 Nhân viên',
+            'guest': '👤 Khách hàng'
+        };
+        return roles[role] || role;
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleString('vi-VN');
+    }
+</script>
+
+
+</body>
+</html>

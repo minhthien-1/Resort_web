@@ -141,12 +141,13 @@ app.post("/auth/login", async (req, res) => {
       { expiresIn: "8h" }
     );
     res.json({
-      message: "Đăng nhập thành công",
-      token,
-      username: user.username,
-      full_name: user.full_name,
-      role: user.role,
-    });
+  message: "Đăng nhập thành công",
+  token,
+  id: user.id,  // ⭐ Thêm dòng này
+  username: user.username,
+  full_name: user.full_name,
+  role: user.role,
+});
   } catch (err) {
     console.error("❌ Lỗi đăng nhập:", err);
     res.status(500).json({ error: "Lỗi server khi đăng nhập" });
