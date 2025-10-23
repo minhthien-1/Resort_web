@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resort Booking – Đặt chỗ của tôi</title>
+    <link rel="stylesheet" href="home.css" /> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* CSS bổ sung cho trang này */
+        body {
+            background-color: #f4f7f9;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            min-height: 60vh;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #ff6b35;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .title-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        #bookings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .booking-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .booking-card .resort-image {
+            width: 220px;
+            height: auto;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .booking-details {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .resort-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-pending { background-color: #f39c12; }
+        .status-confirmed { background-color: #2ecc71; }
+        .status-cancelled { background-color: #e74c3c; }
+        .status-checked_in { background-color: #3498db; }
+        .status-checked_out { background-color: #95a5a6; }
+
+        .booking-info p {
+            margin: 0;
+            color: #555;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .booking-info p i {
+            color: #ff6b35;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .booking-code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #eef2f5;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .no-bookings {
+            text-align: center;
+            padding: 50px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+        .no-bookings h3 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .no-bookings p {
+            color: #777;
+            margin-bottom: 20px;
+        }
+        .no-bookings .btn-home {
+            background-color: #ff6b35;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .no-bookings .btn-home:hover {
+            background-color: #ff5520;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .booking-card {
+                flex-direction: column;
+            }
+            .booking-card .resort-image {
+                width: 100%;
+                height: 200px;
+            }
+
+            .card-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.btn-cancel {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #c0392b;
+}
+
+.btn-cancel:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+        }
+
+        /* Thêm các style cho user-menu và logout button từ home.html để đồng bộ */
+        .user-menu{display:flex;align-items:center;gap:15px}.user-profile-link{display:flex;align-items:center;gap:8px;color:white;text-decoration:none;padding:10px 15px;border-radius:5px;transition:background .3s ease;cursor:pointer}.user-profile-link:hover{background:rgba(255,255,255,.2)}.user-profile-link .avatar-icon{font-size:20px}.user-profile-link .user-name-text{font-weight:500}.btn-logout{background:#dc3545;color:white;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;transition:background .3s ease;font-weight:500}.btn-logout:hover{background:#c82333}
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <a href="home.html" style="text-decoration: none; color: inherit;"><h1>Resort Booking</h1></a>
+            </div>
+            <nav class="navbar-menu">
+                <a href="home.html#promo-codes">Khuyến mãi</a>
+                <a href="supports/support.html">Hỗ trợ</a>
+                <a href="">Hợp tác với chúng tôi</a>
+                <a href="my_bookings.html">Đặt chỗ của tôi</a>
+                <a href="login.html" class="btn-login">Đăng nhập</a>
+                <a href="register.html" class="btn-register">Đăng ký</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="title-container">
+            <h1 class="page-title">Đặt chỗ của tôi</h1>
+        </div>
+        <div id="bookings-container">
+            <p style="text-align: center;">Đang tải lịch sử đặt phòng...</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="#">Chính sách bảo mật</a><span>|</span>
+                <a href="#">Điều khoản sử dụng</a><span>|</span>
+                <a href="#">Liên hệ</a>
+            </div>
+            <p>© 2025 <span>Resort Booking</span>. All rights reserved.</p>
+        </div>
+    </footer>
+
+   <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const API_BASE = "http://localhost:5500";
+        const token = localStorage.getItem('token');
+        const container = document.getElementById('bookings-container');
+
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        updateNavbar();
+        
+        // ===================================================================
+        // HÀM HỦY ĐẶT PHÒNG
+        // ===================================================================
+        async function cancelBooking(bookingId, buttonElement) {
+            // Hỏi xác nhận người dùng
+            if (!confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')) {
+                return;
+            }
+
+            try {
+                buttonElement.disabled = true;
+                buttonElement.textContent = 'Đang xử lý...';
+
+                const response = await fetch(`${API_BASE}/api/bookings/${bookingId}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Hủy thất bại, vui lòng thử lại.');
+                }
+
+                // Cập nhật giao diện ngay lập tức
+                const card = buttonElement.closest('.booking-card');
+                const statusElement = card.querySelector('.status');
+                statusElement.textContent = 'Đã hủy';
+                statusElement.className = 'status status-cancelled';
+                buttonElement.remove(); // Xóa nút sau khi hủy thành công
+
+            } catch (error) {
+                alert(`Lỗi: ${error.message}`);
+                buttonElement.disabled = false;
+                buttonElement.textContent = 'Hủy đặt phòng';
+            }
+        }
+
+        // ===================================================================
+        // HÀM RENDER CÁC CARD
+        // ===================================================================
+        function renderBookings(bookings) {
+            container.innerHTML = ''; 
+
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="no-bookings">
+                        <h3>Bạn chưa có chuyến đi nào</h3>
+                        <p>Hãy bắt đầu hành trình khám phá và đặt ngay một kỳ nghỉ tuyệt vời!</p>
+                        <a href="home.html" class="btn-home">Tìm kiếm Resort</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusMap = {
+                pending: { text: 'Chờ xác nhận', class: 'status-pending' },
+                confirmed: { text: 'Đã xác nhận', class: 'status-confirmed' },
+                checked_in: { text: 'Đã nhận phòng', class: 'status-checked_in' },
+                checked_out: { text: 'Đã trả phòng', class: 'status-checked_out' },
+                cancelled: { text: 'Đã hủy', class: 'status-cancelled' }
+            };
+
+            bookings.forEach(booking => {
+                const card = document.createElement('div');
+                card.className = 'booking-card';
+
+                const formattedCheckIn = new Date(booking.check_in).toLocaleDateString('vi-VN');
+                const formattedCheckOut = new Date(booking.check_out).toLocaleDateString('vi-VN');
+                const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(booking.total_amount);
+                const statusInfo = statusMap[booking.status] || { text: booking.status, class: '' };
+                const imageUrl = booking.images_url && booking.images_url.length > 0
+                    ? `${API_BASE}/uploads/${booking.images_url[0]}`
+                    : 'Assets/placeholder.jpg';
+
+                // Chỉ hiển thị nút hủy nếu trạng thái cho phép
+                const canCancel = booking.status === 'pending' || booking.status === 'confirmed';
+                const actionsHTML = canCancel
+                    ? `<div class="card-actions">
+                           <button class="btn-cancel" data-booking-id="${booking.id}">Hủy đặt phòng</button>
+                       </div>`
+                    : '';
+
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${booking.resort_name}" class="resort-image">
+                    <div class="booking-details">
+                        <div class="card-header">
+                            <h3 class="resort-name">${booking.resort_name}</h3>
+                            <span class="status ${statusInfo.class}">${statusInfo.text}</span>
+                        </div>
+                        <div class="booking-info">
+                            <p><i class="fas fa-barcode"></i>Mã đặt phòng: <strong class="booking-code">${booking.booking_code}</strong></p>
+                            <p><i class="fas fa-calendar-check"></i>Nhận phòng: <strong>${formattedCheckIn}</strong></p>
+                            <p><i class="fas fa-calendar-times"></i>Trả phòng: <strong>${formattedCheckOut}</strong></p>
+                            <p><i class="fas fa-money-bill-wave"></i>Tổng thanh toán: <strong>${formattedPrice}</strong></p>
+                        </div>
+                        ${actionsHTML}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Gắn sự kiện cho các nút hủy vừa được tạo
+            document.querySelectorAll('.btn-cancel').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const bookingId = e.target.dataset.bookingId;
+                    cancelBooking(bookingId, e.target);
+                });
+            });
+        }
+        
+        // ===================================================================
+        // CÁC HÀM KHÁC (giữ nguyên)
+        // ===================================================================
+        async function fetchAndRenderBookings() {
+            try {
+                const response = await fetch(`${API_BASE}/api/my-bookings`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                    throw new Error('Không thể tải lịch sử đặt phòng.');
+                }
+                const bookings = await response.json();
+                renderBookings(bookings);
+            } catch (error) {
+                console.error('Lỗi:', error);
+                container.innerHTML = `<p style="text-align: center; color: red;">${error.message}</p>`;
+            }
+        }
+
+        function updateNavbar() {
+            const navbarMenu = document.querySelector(".navbar-menu");
+            const displayName = localStorage.getItem("username") || localStorage.getItem("full_name");
+            if (displayName) {
+                navbarMenu.innerHTML = `
+                    <a href="home.html#promo-codes">Khuyến mãi</a>
+                    <a href="supports/support.html">Hỗ trợ</a>
+                    <a href="my_bookings.html">Đặt chỗ của tôi</a>
+                    <div class="user-menu">
+                        <a href="profile.html" class="user-profile-link">
+                            <span class="avatar-icon">👤</span>
+                            <span class="user-name-text">${displayName}</span>
+                        </a>
+                        <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
+                    </div>
+                `;
+                document.getElementById("logoutBtn").addEventListener("click", () => {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                });
+            }
+        }
+
+        // Chạy hàm chính
+        fetchAndRenderBookings();
+    });
+</script>
+</body>
+</html>
