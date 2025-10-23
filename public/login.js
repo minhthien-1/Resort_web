@@ -10,34 +10,25 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    console.log("🔹 Gửi yêu cầu đăng nhập...");
-
     const response = await fetch("http://localhost:5500/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
 
-    console.log("📩 Phản hồi HTTP:", response.status);
-
     const text = await response.text();
-    console.log("🧾 Nội dung phản hồi:", text);
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (err) {
-      console.error("❌ Không thể parse JSON:", err);
-      alert("Lỗi phản hồi từ máy chủ!");
-      return;
-    }
+    let data = JSON.parse(text);
 
     if (response.ok) {
       alert("✅ Đăng nhập thành công!");
       localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.id); // ⭐ LƯU ID
       localStorage.setItem("username", data.username);
       localStorage.setItem("fullname", data.full_name);
+      localStorage.setItem("full_name", data.full_name);
+      localStorage.setItem("email", email);
       localStorage.setItem("role", data.role);
+      
       if (data.role === "admin") {
         window.location.href = "admin";
       } else {
@@ -48,6 +39,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     }
   } catch (err) {
     console.error("💥 Lỗi fetch:", err);
-    alert("Không thể kết nối đến máy chủ. Kiểm tra lại server!");
+    alert("Không thể kết nối đến máy chủ!");
   }
 });
+
+
