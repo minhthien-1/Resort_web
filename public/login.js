@@ -16,21 +16,26 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       body: JSON.stringify({ email, password }),
     });
 
-    const text = await response.text();
-    let data = JSON.parse(text);
+    const data = await response.json();
 
     if (response.ok) {
       alert("✅ Đăng nhập thành công!");
+      
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userId", data.id); // ⭐ LƯU ID
+      localStorage.setItem("userId", data.id);
       localStorage.setItem("username", data.username);
-      localStorage.setItem("fullname", data.full_name);
       localStorage.setItem("full_name", data.full_name);
-      localStorage.setItem("email", email);
+      
+      // SỬA ĐỔI: Giữ nguyên cách lưu email của bạn
+      localStorage.setItem("email", email); 
+
       localStorage.setItem("role", data.role);
       
-      if (data.role === "admin") {
-        window.location.href = "admin";
+      // SỬA ĐỔI: Chỉ thêm dòng này để lưu số điện thoại
+      localStorage.setItem('phone', data.phone);
+      
+      if (data.role === "admin" || data.role === "staff") {
+        window.location.href = "/admin";
       } else {
         window.location.href = "home.html";
       }
@@ -42,5 +47,3 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     alert("Không thể kết nối đến máy chủ!");
   }
 });
-
-

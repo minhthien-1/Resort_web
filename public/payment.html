@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    </style>
+</head>
+<body>
+    <div class="max-w-6xl mx-auto p-4 lg:p-8">
+        <div class="bg-blue-500 text-white p-3 rounded-lg flex justify-between items-center mb-6">
+            <span class="font-semibold">Đừng lo lắng, giá vẫn giữ nguyên. Hoàn tất thanh toán của bạn trong <span id="countdown" class="font-bold">10:00</span></span>
+            <span class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><i class="fas fa-check text-xs"></i></span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm">
+                <h2 class="text-2xl font-bold mb-6">Bạn muốn thanh toán thế nào?</h2>
+                
+                <div class="text-gray-500 mb-8">(Khu vực cho các lựa chọn thanh toán)</div>
+
+                <div class="mt-8 pt-6 border-t flex justify-between items-center">
+                    <span class="font-semibold text-lg">Tổng giá tiền</span>
+                    <span id="total-price" class="font-bold text-2xl text-red-600">0 VND</span>
+                </div>
+                <div class="mt-6">
+                    <button id="confirm-payment-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg py-3 rounded-lg transition">
+                        Thanh toán ngay
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                 <div class="bg-blue-50 p-6 rounded-2xl border border-blue-200">
+                    <h3 class="text-xl font-bold mb-4">Tóm tắt khách sạn</h3>
+                    <p class="text-sm text-gray-600 mb-4">Mã đặt chỗ <span id="booking-code">...</span></p>
+                    <h4 id="summary-resort-name" class="font-bold text-lg mb-2">Tên khách sạn...</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                        <div>
+                            <label class="font-semibold">Nhận phòng</label>
+                            <p id="summary-checkin-date">...</p>
+                            <p class="text-gray-500">Từ 12:00</p>
+                        </div>
+                         <div>
+                            <label class="font-semibold">Trả phòng</label>
+                            <p id="summary-checkout-date">...</p>
+                            <p class="text-gray-500">Trước 12:00</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-b border-gray-300 py-4 mb-4">
+                        <p id="summary-room-type" class="font-semibold mb-2">Tên loại phòng...</p>
+                        <div class="space-y-1 text-sm text-gray-700">
+                            <p><i class="fas fa-users w-5"></i> <span id="summary-capacity">...</span> khách</p>
+                            <p><i class="fas fa-wifi w-5"></i> WiFi miễn phí</p>
+                        </div>
+                    </div>
+                    <div class="border-b border-gray-300 pb-4 mb-4">
+                         <p class="font-semibold mb-2">Tên khách</p>
+                         <p id="summary-guest-name" class="text-sm text-gray-700">...</p>
+                         <div class="flex items-center text-green-600 text-sm mt-2">
+                             <i class="fas fa-check-circle mr-2"></i><span>Miễn phí hủy phòng</span>
+                         </div>
+                         <div class="flex items-center text-green-600 text-sm mt-1">
+                             <i class="fas fa-check-circle mr-2"></i><span>Có thể đổi lịch</span>
+                         </div>
+                    </div>
+                    <div>
+                         <p class="font-semibold mb-2">Chi tiết người liên lạc</p>
+                         <p id="summary-contact-name" class="text-sm text-gray-700">...</p>
+                         <p id="summary-contact-phone" class="text-sm text-gray-700">...</p>
+                         <p id="summary-contact-email" class="text-sm text-gray-700">...</p>
+                    </div>
+                 </div>
+                 <div class="bg-green-300 text-green-800 font-semibold text-center p-3 rounded-lg mt-4">
+                     Sự lựa chọn tuyệt vời cho kỳ nghỉ của bạn!
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookingDetailsJSON = sessionStorage.getItem('bookingDetails');
+            if (!bookingDetailsJSON) {
+                document.body.innerHTML = '<div class="text-center p-10"><h1 class="text-2xl font-bold text-red-600">Lỗi: Không tìm thấy thông tin đặt phòng.</h1><p class="mt-4">Vui lòng quay lại trang chi tiết và đặt phòng.</p><a href="home.html" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded">Về trang chủ</a></div>';
+                return;
+            }
+            
+            const booking = JSON.parse(bookingDetailsJSON);
+            const parseDate = (str) => { const [day, month, year] = str.split('/'); return new Date(`${year}-${month}-${day}`); };
+            const checkInDate = parseDate(booking.checkIn);
+            const checkOutDate = parseDate(booking.checkOut);
+            const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+            const nights = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+            const totalPrice = nights * booking.pricePerNight;
+            const formatCurrency = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+            // Điền thông tin vào trang
+            document.getElementById('booking-code').textContent = 'Chờ xác nhận...';
+            document.getElementById('summary-resort-name').textContent = booking.resortName;
+            document.getElementById('summary-checkin-date').textContent = booking.checkIn;
+            document.getElementById('summary-checkout-date').textContent = booking.checkOut;
+            document.getElementById('summary-room-type').textContent = `(1x) ${booking.roomTypeName || booking.roomCategory}`;
+            document.getElementById('summary-capacity').textContent = booking.capacity;
+            document.getElementById('summary-guest-name').textContent = booking.userFullName;
+            document.getElementById('summary-contact-name').textContent = booking.userFullName;
+            document.getElementById('summary-contact-phone').textContent = booking.userPhone;
+            document.getElementById('summary-contact-email').textContent = booking.userEmail;
+            document.getElementById('total-price').textContent = formatCurrency(totalPrice);
+
+            // SỬA ĐỔI: Thêm sự kiện click cho nút thanh toán
+            const paymentButton = document.getElementById('confirm-payment-btn');
+            paymentButton.addEventListener('click', async () => {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                paymentButton.disabled = true;
+                paymentButton.textContent = 'Đang xử lý...';
+
+                try {
+                    const response = await fetch('http://localhost:5500/api/bookings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            roomId: booking.resortId,
+                            checkIn: booking.checkIn,
+                            checkOut: booking.checkOut,
+                            pricePerNight: booking.pricePerNight
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Có lỗi xảy ra, vui lòng thử lại.');
+                    }
+
+                    // Xử lý thành công
+                    alert(`Đặt phòng thành công! Mã đặt phòng của bạn là: ${result.booking.booking_code}`);
+                    sessionStorage.removeItem('bookingDetails'); // Xóa thông tin tạm
+                    window.location.href = 'home.html'; // Chuyển về trang chủ
+
+                } catch (error) {
+                    alert(`Lỗi: ${error.message}`);
+                    paymentButton.disabled = false;
+                    paymentButton.textContent = 'Thanh toán ngay';
+                }
+            });
+
+            // Logic đếm ngược (giữ nguyên)
+            let time = 10 * 60;
+            const countdownEl = document.getElementById('countdown');
+            setInterval(() => {
+                if (time <= 0) {
+                    countdownEl.textContent = "00:00";
+                    return;
+                };
+                time--;
+                const minutes = String(Math.floor(time / 60)).padStart(2, '0');
+                const seconds = String(time % 60).padStart(2, '0');
+                countdownEl.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
