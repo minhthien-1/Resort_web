@@ -135,7 +135,7 @@
                 navbarMenu.innerHTML = `
                     <a href="">Khuyến mãi</a> <a href="supports/support.html">Hỗ trợ</a> <a href="">Hợp tác với chúng tôi</a> <a href="">Đặt chỗ của tôi</a>
                     <div class="user-menu">
-                        <span class="user-name">👤 ${full_name || username}</span>
+                        <span class="user-name">👤 ${username || full_name}</span>
                         <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
                     </div>`;
                 document.getElementById("logoutBtn").addEventListener("click", () => {

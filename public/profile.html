@@ -575,7 +575,7 @@ async function loadUserProfile() {
             localStorage.setItem('email', currentUser.email);
             localStorage.setItem('username', currentUser.username);
             localStorage.setItem('fullname', currentUser.full_name);
-            localStorage.setItem('phone', data.phone);
+            localStorage.setItem('phone', currentUser.phone);
             
             displayProfile(currentUser);
             console.log('✅ Profile loaded successfully');
