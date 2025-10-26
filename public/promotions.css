@@ -1,0 +1,306 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+}
+
+/* Banner */
+.promo-banner {
+  background: linear-gradient(120deg, #009fe3, #00c6ff);
+  color: white;
+  text-align: center;
+  padding: 60px 60px;
+  margin-top: 60px;
+}
+
+.promo-banner h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+/* Bộ lọc */
+.promo-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 30px auto;
+  max-width: 900px;
+  background-color: white;
+  padding : 20px 20px;
+  border-radius: 50px;
+}
+
+.promo-filter input,
+.promo-filter select {
+  padding: 15px 14px;
+  border-radius: 50px;
+  border: 1px solid #cccccc3b;
+  flex: 1;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.filter-btn {
+  background-color: #009fe3;
+  color: white;
+  border: none;
+  padding: 15px 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow:  0 4px 10px rgba(0,0,0,0.1);
+}
+
+.filter-btn:hover {
+  background-color: #ff9f33;
+  transition: background-color 0.5s ease, color 1s ease;
+  padding : 15px 20px;
+  transition: 0.3s;
+}
+
+/* Danh sách khuyến mãi */
+.promo-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.promo-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.promo-card:hover {
+  transform: translateY(-6px);
+}
+
+.promo-card img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.promo-content {
+  padding: 20px;
+}
+
+.promo-content h3 {
+  color: #009fe3;
+  margin-bottom: 10px;
+}
+
+.promo-content p {
+  color: #555;
+  font-size: 15px;
+}
+
+.promo-content button {
+  background-color: #009fe3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.promo-content button:hover {
+  background-color: #007bb5;
+}
+
+/* Gợi ý thêm */
+.promo-extra {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #fff;
+}
+
+.promo-extra h2 {
+  color: #009fe3;
+}
+
+/* Footer */
+footer {
+  background-color: #009fe3;
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+}
+
+.navbar.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px; 
+  z-index: 1000;
+  align-items: center;
+  transition: height 0.3s ease;
+}
+
+.navbar-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400px; 
+  object-fit: cover;
+  object-position: center;
+  z-index: -1;
+  transition: height 0.3s ease;
+}
+
+.navbar-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  top: 20px;
+}
+
+.navbar-logo h1 {
+  color: #009fe3;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  cursor: pointer;
+  background-color: rgba(255,255,255,0.6);
+  border-radius: 50px;
+  padding: 8px 18px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  transition: font-size 0.3s ease, padding 0.3s ease, background-color 0.3s ease;
+}
+
+.navbar .navbar-logo h1:hover {
+  background-color: #009fe3;
+  color: white;
+  transition: all 0.2s ease;
+  margin : 2px;
+}
+
+.navbar-menu {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  
+}
+
+.navbar .navbar-menu nav {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 18px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+}
+
+.navbar .navbar-menu a {
+  color: #009fe3;
+  text-decoration: none;
+  font-weight: bold;
+  
+  
+}
+
+.navbar .navbar-menu a:hover {
+  color: #ffffff;
+  background-color: #009fe3;
+  border-radius: 50px;
+  padding: 4px 8px;
+  transition: all 0.5s ease;
+}
+.login-menu {
+  position: absolute;
+  right: 40px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.btn-login {
+  background-color: #4cc3ff;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-weight: 600;
+  margin-right: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  text-decoration: none; /* ĐÃ THÊM */
+}
+
+.btn-login:hover {
+  background-color: white;
+  color: #009fe3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  transition: all 0.2s ease;
+}
+
+.btn-register {
+  background-color: white;
+  color: #009fe3;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-weight: 600;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  text-decoration: none; /* ĐÃ THÊM */
+}
+
+.btn-register:hover {
+  background-color: #4cc3ff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  transition: all 0.2s ease;
+}
+
+/* --- Fix Navbar cho trang Support --- */
+.navbar {
+  background-color: rgba(255, 255, 255);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding : 1px 1px;
+  
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.navbar-left {
+  order: 1;
+}
+
+.navbar-menu nav {
+  background-color: rgba(255, 255, 255);
+  color: #009fe3;
+}
+
+.navbar-menu a {
+  color: #009fe3;
+  
+}
+
+.navbar-menu a:hover {
+  background-color: #009fe3;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo h1 {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #009fe3;
+}
+
+.navbar-banner {
+  display: none; /
+}
