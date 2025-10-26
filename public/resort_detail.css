@@ -200,3 +200,71 @@
         font-size: 2rem;
     }
 }
+
+/* --- Fix Navbar cho trang Support --- */
+.navbar {
+  background-color: rgba(255, 255, 255);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding : 1px 1px;
+  
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+
+}
+
+.navbar-left {
+  order: 1;
+}
+
+.navbar-menu nav {
+  background-color: rgba(255, 255, 255);
+}
+
+.navbar-menu {
+  color: #009fe3;
+  display: flex;
+  gap : 16px;
+  order: 2;
+}
+
+.navbar-menu a {
+  text-decoration: none;
+  color: #009fe3; /* Màu chữ xanh */
+  font-weight: bold;
+  padding: 8px;
+  border-radius: 50px;
+  transition: all 0.2s ease;
+  
+}
+
+.navbar-menu a:hover {
+  background-color: #009fe3;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo h1 {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #009fe3;
+  right: 20px;
+}
+
+.navbar-logo h1:hover {
+  color: #ffffff;
+  background-color: #009fe3;
+}
+
+.navbar-banner {
+  display: none; /
+}
+
+.navbar-container
+{
+  
+  margin: 10px 10px;
+  padding: 5px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

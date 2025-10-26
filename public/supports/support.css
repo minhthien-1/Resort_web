@@ -2,8 +2,9 @@
 
 .support-main {
   width : 700px;
+  
   margin-top : 100px;
-  margin: 40px auto 60px auto;
+  margin: 80px auto 60px auto;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
@@ -84,4 +85,72 @@
   border-left: 3px solid #1976d2;
   margin-bottom: 12px;
   border-radius: 0 6px 6px 6px;
+}
+
+/* --- Fix Navbar cho trang Support --- */
+.navbar {
+  background-color: rgba(255, 255, 255);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding : 1px 1px;
+  
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+
+}
+
+.navbar-left {
+  order: 1;
+}
+
+.navbar-menu nav {
+  background-color: rgba(255, 255, 255);
+}
+
+.navbar-menu {
+  color: #009fe3;
+  display: flex;
+  gap : 16px;
+  order: 2;
+}
+
+.navbar-menu a {
+  text-decoration: none;
+  color: #009fe3; /* Màu chữ xanh */
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-menu a:hover {
+  background-color: #009fe3;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo h1 {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #009fe3;
+  right: 20px;
+}
+
+.navbar-logo h1:hover {
+  color: #ffffff;
+  background-color: #009fe3;
+}
+
+.navbar-banner {
+  display: none; /
+}
+
+.navbar-container
+{
+  
+  margin: 10px 10px;
+  padding: 5px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
