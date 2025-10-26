@@ -2,23 +2,34 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #fff; /* Thêm màu nền cho body */
+  background-color: #ebebeb; 
+  padding-top : 20px;
 }
 
 .navbar {
-  background-color: #00aaff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: fixed;
-  width: 100%;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 120px; 
   z-index: 1000;
+  transition: height 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px; 
+  box-sizing: border-box; 
+  
 }
+
 .user-menu {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
+
+
 /* make the link wrap look and behave like a card */
 .resort-link {
   display: block;
@@ -54,10 +65,54 @@ body {
 .resort-link:focus {
   outline: none;
 }
-
 .user-name {
   font-weight: 600;
   color: #fff; /* Đổi màu cho dễ nhìn trên nền xanh */
+}
+
+/*banner*/
+.navbar-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 420px; 
+  object-fit: cover; 
+  z-index: 1;        
+  object-fit: cover;       
+  object-position: center;
+  z-index: -1;
+  transition: height 0.3s ease ;
+  box-shadow: inset 100px 0 80px -40px rgb(255, 255, 255), 
+              inset -100px 0 80px -40px rgb(255, 255, 255);
+}
+
+
+.navbar-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 10px 10px;
+  height : 100%;
+  top : 0;
+  padding-top: 0%;
+}
+
+
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  top: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #fff; /
 }
 
 .btn-logout {
@@ -74,46 +129,57 @@ body {
   background-color: #e43d3f;
 }
 
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 12px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
+/*logo*/
 .navbar-logo h1 {
-  color: white;
+  color: #009fe3;
   font-size: 24px;
   font-weight: bold;
   margin: 0;
   cursor: pointer;
+  background-color: rgba(255,255,255,0.6);
+  border-radius: 50px;
+  padding: 8px 18px;
+  
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  transition: font-size 0.3s ease, padding 0.3s ease, background-color 0.3s ease;
+}
+
+.navbar-logo h1:hover {
+  background-color: white;
 }
 
 .navbar-menu {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/*menu giữa*/
+.navbar-menu nav {
   display: flex;
   align-items: center;
   gap: 25px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding : 8px 18px;
+  border-radius: 50px;
+  
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112)
 }
 
 .navbar-menu a {
   color: white;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: bold;
+  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .navbar-menu a:hover {
-  color: #ffe082;
-}
-
-.navbar-menu .btn-login {
-  background-color: #4cc3ff;
-  color: black;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-weight: 600;
+  color: #009fe3;
+  background-color: white;
+  border-radius: 50px;
+  padding: 4px 8px;
 }
 
 .navbar-menu .btn-register {
@@ -122,12 +188,100 @@ body {
   padding: 6px 14px;
   border-radius: 6px;
   font-weight: 600;
-  transition: 0.2s;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar.shrink {
+  height: 450px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s ease;
+}
+
+.navbar.shrink .navbar-logo h1 {
+  font-size: 18px;
+  padding: 4px 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.navbar.shrink .navbar-banner {
+  height: 70px;
+  filter: brightness(90%);
+  visibility: hidden;
+}
+
+.navbar.shrink .navbar-menu nav {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .navbar-menu .btn-register:hover {
   background-color: #e0f7ff;
 }
+
+.navbar.shrink .navbar-menu a {
+  color: #009fe3;
+}
+
+.navbar.shrink .navbar-menu a:hover {
+  background-color: #009fe3;
+  color: white;
+}
+
+/*  Đăng nhập - Đăng ký  */
+.login-menu {
+  position: absolute;
+  right: 40px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  
+}
+.btn-login {
+  background-color: #4cc3ff;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-weight: 600;
+  margin-right: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  text-decoration: none;
+}
+
+.btn-login .btn-register
+{
+  transition: background-color 0.2s, color 0.2s, padding 0.3s ease, font-size 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: white;
+  color: #009fe3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112)
+}
+
+.btn-register {
+  background-color: white;
+  color: #009fe3;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-weight: 600;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112);
+  text-decoration: none;
+}
+
+.btn-register:hover {
+  background-color: #4cc3ff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.112)
+}
+.login-register {
+  display: flex;
+  gap: 1px;
+  
+}
+
 
 /* ====== Phần Form Tìm Kiếm ====== */
 #dateRange {
@@ -135,14 +289,18 @@ body {
 }
 
 .search-container {
-  background-image: url('Assets/Icon Images/background.webp');
+  
+  position: relative;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   color: white;
-  padding-top: 150px; /* Giảm padding cho cân đối */
+  padding-top: 100px; 
   padding-bottom: 60px;
   text-align: center;
+  z-index: 10;
+  top : 50px;
+  background: transparent;
 }
 
 .resort_type {
@@ -196,13 +354,16 @@ body {
 }
 
 .search-form {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 20px;
+   display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 5px 5px;
+  max-width: 800px;
+  margin: 20px auto;
+  gap: 16px;
   flex-wrap: wrap;
-  max-width: 1000px;
-  margin: 0 auto;
 }
 
 .search-form label {
@@ -218,7 +379,7 @@ body {
 .search-form select {
   margin-top: 6px;
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: 50px;
   border: none;
   outline: none;
   font-size: 15px;
@@ -226,21 +387,23 @@ body {
 }
 
 .search-form button {
-  background-color: #ff8c00;
+  background-color: #007bff;
   color: white;
   font-weight: bold;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   padding: 12px 20px;
   cursor: pointer;
   transition: 0.2s;
   height: 52px;
-  margin-top: 26px;
+  margin-top: 0px;
   align-self: center;
+  margin-left: auto;
 }
 
 .search-form button:hover {
   background-color: #ff9f33;
+  box-shadow: 0 4px 12px rgba(255, 159, 51, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -272,6 +435,8 @@ body {
 }
 
 .promo-grid {
+  margin : 20px 20px;
+  border-style: 20px 20px;
   display: flex;
   gap: 20px;
   overflow: auto; /* Cho phép cuộn trên mobile */
@@ -389,7 +554,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
-  background: #f9fafb;
+  
   text-align: center;
   box-sizing: border-box;
 }
@@ -407,6 +572,8 @@ body {
   /* Đây là dòng quan trọng: tạo ra 3 cột */
   grid-template-columns: repeat(3, 1fr); 
   gap: 24px; /* Khoảng cách giữa các thẻ phòng */
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* Điều chỉnh cho màn hình nhỏ hơn (Responsive) */
@@ -518,10 +685,10 @@ body {
 
 /* --- WHY CHOOSE US --- */
 .why-choose-us {
-  background: #eef6ff;
+  
   max-width: 1200px;
   margin: 0 auto;
-  padding: 60px 20px;
+  padding: 20px 20px;
   text-align: center;
   box-sizing: border-box;
 }
@@ -549,7 +716,7 @@ footer {
   background-color: #003d91;
   color: #ffffff;
   text-align: center;
-  padding: 30px 10px;
+  padding: 20px 10px;
   font-size: 15px;
   border-top: 2px solid #007bff;
 }
@@ -736,4 +903,26 @@ footer:hover {
 
 .page-btn i {
   font-size: 14px;
+}
+
+/* --- NÚT VỀ ĐẦU TRANG --- */
+#scrollToTopBtn {
+  display: none; /* Ẩn nút ban đầu */
+  position: fixed; /* Vị trí cố định trên màn hình */
+  bottom: 100px; /* Cách lề dưới 20px */
+  right: 30px; /* Cách lề phải 30px */
+  z-index: 99; /* Đảm bảo nút luôn nổi lên trên */
+  border: none; /* Bỏ viền */
+  outline: none; /* Bỏ viền khi click */
+  background-color: #ffffff; /* Màu nền */
+  color: #007bff; /* Màu mũi tên */
+  cursor: pointer; /* Biểu tượng con trỏ */
+  padding: 12px 15px; /* Tăng kích thước vùng click */
+  border-radius: 50%; /* Làm cho nó hình tròn */
+  font-size: 18px; /* Kích thước mũi tên */
+  transition: background-color 0.3s; /* Hiệu ứng hover mượt */
+}
+
+#scrollToTopBtn:hover {
+  background-color: #333; /* Màu nền khi di chuột qua */
 }

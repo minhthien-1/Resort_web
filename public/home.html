@@ -43,11 +43,11 @@
     .user-profile-link .user-name-text {
       font-weight: 500;
     }
-
     .btn-logout {
       background: #dc3545;
       color: white;
       border: none;
+      
       padding: 8px 20px;
       border-radius: 5px;
       cursor: pointer;
@@ -66,12 +66,18 @@
     }
 
     .location-search-container input {
-      width: 100%;
-      padding: 10px;
+      display : flex;
+      align-items: center;
+      width: 400px;
+      padding: 20px;
       border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
+      border-radius: 50px;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      margin-top: 0px;
     }
+
 
     #locationSuggestions {
       position: absolute;
@@ -107,138 +113,52 @@
       border-bottom: none;
     }
 
-/* Khoảng cách giữa các khung tìm kiếm - Style Traveloka */
-.search-form {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  justify-content: center;
-  max-width: 500px;
-  margin: 0 auto;
-  flex-wrap: nowrap;
-}
-
-.search-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.search-form label span {
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.search-form label input,
-.search-form label select {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 14px;
-  box-sizing: border-box;
-  background: white;
-  color: #333;
-  transition: all 0.3s ease;
-  height: 44px;
-}
-
-.search-form label input::placeholder {
-  color: #999;
-}
-
-.search-form label input:focus,
-.search-form label select:focus {
-  outline: none;
-  border-color: #ff9800;
-  box-shadow: 0 0 8px rgba(255, 152, 0, 0.2);
-}
-
-.search-form .search-btn-icon {
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  background: #ff6b35;
-  color: white;
-  border: none;
-  font-size: 18px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.search-form .search-btn-icon:hover {
-  background: #ff5520;
-  transform: scale(1.08);
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-}
-
-.search-form .search-btn-icon:active {
-  transform: scale(0.95);
-}
-
-@media (max-width: 1024px) {
-  .search-form {
-    max-width: 100%;
-    padding: 0 15px;
-    gap: 10px;
-  }
-
-  .search-form label {
-    flex: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .search-form {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .search-form label {
-    flex: 1 1 100%;
-    width: 100%;
-  }
-
-  .search-form label input,
-  .search-form label select {
-    width: 100%;
-  }
-
-  .search-form .search-btn-icon {
-    width: 100%;
-    height: auto;
-    padding: 12px 20px;
-    flex: 1 1 100%;
-  }
-}
 
 
   </style>
 </head>
 <body>
-  <header class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-logo">
-        <h1>Resort Booking</h1>
-      </div>
-      <nav class="navbar-menu">
-        <a href="">Khuyến mãi</a>
-        <a href="supports/support.html">Hỗ trợ</a>
-        <a href="">Hợp tác với chúng tôi</a>
+  <!--Banner-->
+  <div class="banner">
+    <div class="banner-slide">
+      <img src ="../public/Assets/image-banner/banner1.jpg" alt="Banner" class="navbar-banner"/>
+    </div>
+    <div class="banner-slide">
+      <img src ="../public/Assets/image-banner/banner2.jpg" alt="Banner" class="navbar-banner"/>
+    </div>
+    <div class="banner-slide">
+      <img src ="../public/Assets/image-banner/banner3.jpg" alt="Banner" class="navbar-banner"/>
+    </div>
+    <div class="banner-slide">
+      <img src ="../public/Assets/image-banner/banner4.jpg" alt="Banner" class="navbar-banner"/>
+    </div>
+  </div>
+
+  <div class="navbar-container">
+    <div class="navbar-logo">
+      <h1>Resort Booking </h1>
+    </div>
+
+    <!--Thanh menu-->
+    <div class="navbar-menu">
+      <nav>
+        <a href="../public/promotions.html">Khuyến mãi</a>
+        <a href="../public/supports/support.html">Hỗ trợ</a>
+        <a href="#">Hợp tác với chúng tôi</a>
         <a href="my_bookings.html">Đặt chỗ của tôi</a>
+      </nav>
+    </div>
+
+    <div class="login-menu">
+      <nav class="login-register">
         <a href="login.html" class="btn-login">Đăng nhập</a>
         <a href="register.html" class="btn-register">Đăng ký</a>
       </nav>
     </div>
-  </header>
+  </div>
+</header>
+
+<button id="scrollToTopBtn" title="Về đầu trang">&#8679;</button>
 
   <div class="search-container">
     <div class="search-header">
@@ -253,7 +173,7 @@
     <div class="search-instructions"></div>
     <section class="search-form">
       <label>
-        Địa điểm
+        
         <div class="location-search-container">
           <input 
             type="text" 
@@ -265,7 +185,7 @@
         </div>
       </label>
       <label>
-        Loại phòng
+        
         <select id="roomType">
             <option value="">Tất cả loại phòng</option>
         </select>
@@ -642,6 +562,77 @@
         });
       }
     });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+  let slideIndex = 0; 
+  showSlides(); 
+  
+
+  //chuyển slide
+  function showSlides() {
+    let slides = document.querySelectorAll(".banner-slide");
+
+    // 1. Ẩn tất cả các slide
+    for (let i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+      slides[i].classList.remove("active");
+    }
+
+    // 2. Tăng chỉ số slide
+    slideIndex++;
+
+    // 3. Quay về slide đầu tiên nếu đã đi hết
+    if (slideIndex > slides.length) {
+      slideIndex = 1;
+    }
+
+    // 4. Hiển thị slide hiện tại
+    if (slides.length > 0) {
+      slides[slideIndex - 1].style.display = "block";
+      slides[slideIndex - 1].classList.add("active");
+    }
+    // 5. Tự động chuyển slide sau 6 giây
+    setTimeout(showSlides, 6000); 
+  }
+});
+
+
+  // Lấy navbar
+window.addEventListener('scroll', function() {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 50) {
+    navbar.classList.add('shrink');
+  } else {
+    navbar.classList.remove('shrink');
+  }
+});
+
+// Nút về đầu trang
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+    if (scrollToTopBtn) {
+        
+        window.addEventListener('scroll', () => {
+            
+            if (window.scrollY > 300) {
+                scrollToTopBtn.style.display = 'block';
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+        });
+
+        
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0, 
+                behavior: 'smooth' 
+            });
+        });
+    }
+});
   </script>
 </body>
 </html>
