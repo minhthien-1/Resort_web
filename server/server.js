@@ -314,121 +314,86 @@ app.post("/auth/login", async (req, res) => {
 });
 
 
-
+// API 1: Tổng số booking
 app.get("/api/bookings/total", async (req, res) => {
-
   try {
-
     const r = await pool.query("SELECT COUNT(*) AS total FROM bookings");
-
     res.json({ total: Number(r.rows[0].total) });
-
   } catch (err) {
-
-    console.error("❌ Lỗi:", err);
-
+    console.error("❌ Lỗi khi lấy tổng booking:", err);
     res.status(500).json({ error: "Lỗi server" });
-
   }
-
 });
 
-
-
+// API 2: Tổng doanh thu toàn hệ thống (sử dụng cho ô xanh lá)
 app.get("/api/revenue/total", async (req, res) => {
-
   try {
+    const result = await pool.query(`
+      SELECT COALESCE(SUM(total_amount), 0)::BIGINT AS total_revenue
+      FROM bookings
+      WHERE status = 'confirmed';
+    `);
 
-    const result = await pool.query(
-
-      "SELECT COALESCE(SUM(total_amount), 0)::BIGINT AS total_revenue FROM bookings WHERE status = 'confirmed'"
-
-    );
-
+    console.log("🟢 API /api/revenue/total:", result.rows[0]);
     res.json({ total_revenue: Number(result.rows[0].total_revenue) });
-
   } catch (err) {
-
-    console.error("❌ Lỗi:", err);
-
-    res.status(500).json({ error: "Lỗi server" });
-
+    console.error("❌ Lỗi khi tính tổng doanh thu:", err);
+    res.status(500).json({ error: "Lỗi khi tính tổng doanh thu" });
   }
-
 });
 
-
-
+// API 3: Doanh thu tháng hiện tại (tháng 10/2025) - cho ô cam
 app.get("/api/revenue/current-month", async (req, res) => {
-
   try {
+    const { rows } = await pool.query(`
+      SELECT COALESCE(SUM(total_amount), 0)::BIGINT AS monthly_revenue
+      FROM bookings
+      WHERE status = 'confirmed'
+        AND EXTRACT(MONTH FROM check_in) = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM check_in) = EXTRACT(YEAR FROM CURRENT_DATE);
+    `);
 
-    const { rows } = await pool.query(
-
-      `SELECT COALESCE(SUM(total_amount), 0)::BIGINT AS monthly_revenue FROM bookings
-
-       WHERE status = 'confirmed' AND EXTRACT(MONTH FROM check_in) = EXTRACT(MONTH FROM CURRENT_DATE)
-
-       AND EXTRACT(YEAR FROM check_in) = EXTRACT(YEAR FROM CURRENT_DATE)`
-
-    );
-
+    console.log("🟠 API /api/revenue/current-month:", rows[0]);
     res.json({ monthly_revenue: Number(rows[0].monthly_revenue) });
-
   } catch (err) {
-
-    console.error("❌ Lỗi:", err);
-
-    res.status(500).json({ error: "Lỗi server" });
-
+    console.error("❌ Lỗi khi lấy doanh thu tháng hiện tại:", err);
+    res.status(500).json({ error: "Lỗi server khi lấy doanh thu tháng hiện tại" });
   }
-
 });
 
-
-
-app.get("/api/admin/guests", authorize(["admin", "staff"]), async (req, res) => {
-
-  try {
-
-    const { rows } = await pool.query(
-
-      "SELECT id, username, full_name, email, created_at FROM users WHERE role='guest' ORDER BY created_at DESC"
-
-    );
-
-    res.json(rows);
-
-  } catch (error) {
-
-    console.error("❌ Lỗi:", error);
-
-    res.status(500).json({ error: "Lỗi server" });
-
-  }
-
-});
-
-
-
+// API 4: Số khách mới trong 30 ngày gần nhất
 app.get("/api/guests/new", async (req, res) => {
-
   try {
-
-    const result = await pool.query(
-
-      "SELECT COUNT(*) AS new_guests FROM users WHERE created_at >= NOW() - INTERVAL '30 days'"
-
-    );
-
+    const result = await pool.query(`
+      SELECT COUNT(*) AS new_guests
+      FROM users
+      WHERE created_at >= NOW() - INTERVAL '30 days';
+    `);
     res.json(result.rows[0]);
-
   } catch (err) {
-
-    res.status(500).json({ error: "Lỗi server" });
-
+    console.error("❌ Error loading new guests:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
+});
 
+
+// API 5: Xu hướng doanh thu theo tháng
+app.get("/api/revenue/monthly", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        TO_CHAR(DATE_TRUNC('month', check_in), 'YYYY-MM') AS month,
+        COALESCE(SUM(total_amount), 0) AS total_revenue
+      FROM bookings
+      WHERE status = 'confirmed'
+      GROUP BY 1
+      ORDER BY 1;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ Lỗi khi lấy doanh thu theo tháng:", err);
+    res.status(500).json({ error: "Lỗi server khi truy vấn doanh thu theo tháng" });
+  }
 });
 
 
@@ -483,29 +448,6 @@ app.get("/api/admin/customers/:id", authorize(["admin", "staff"]), async (req, r
 
 
 
-app.get("/api/revenue/monthly", async (req, res) => {
-
-  try {
-
-    const result = await pool.query(
-
-      `SELECT TO_CHAR(DATE_TRUNC('month', check_in), 'YYYY-MM') AS month,
-
-              COALESCE(SUM(total_amount), 0) AS total_revenue
-
-       FROM bookings WHERE status = 'confirmed' GROUP BY 1 ORDER BY 1`
-
-    );
-
-    res.json(result.rows);
-
-  } catch (err) {
-
-    res.status(500).json({ error: "Lỗi server" });
-
-  }
-
-});
 
 
 
