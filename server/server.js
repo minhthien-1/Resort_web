@@ -446,57 +446,66 @@ app.get("/api/admin/customers/:id", authorize(["admin", "staff"]), async (req, r
 
 });
 
+// ===== API QUẢN LÝ RESORTS (MỚI) =====
 
-
-
-
-
-app.get("/api/rooms", async (req, res) => {
-
+// Lấy danh sách tất cả resort
+app.get("/api/admin/resorts", authorize(['admin', 'staff']), async (req, res) => {
   try {
-
-    const { location, room_type } = req.query;
-
-    let sql = `SELECT r.id, r.resort_name, r.room_type_id, rt.name AS room_type, rt.price_per_night,
-
-                      rt.capacity, rd.images_url AS images, r.location, rd.description, rd.features
-
-               FROM rooms r JOIN room_types rt ON r.room_type_id = rt.id
-
-               LEFT JOIN room_details rd ON rd.room_id = r.id WHERE 1=1`;
-
-    const params = [];
-
-    if (location) {
-
-      params.push(`%${location}%`);
-
-      sql += ` AND LOWER(r.location) LIKE LOWER($${params.length})`;
-
-    }
-
-    if (room_type) {
-
-      params.push(room_type);
-
-      sql += ` AND rt.name = $${params.length}`;
-
-    }
-
-    sql += " ORDER BY r.created_at DESC";
-
-    const roomsResult = await pool.query(sql, params);
-
-    res.json(roomsResult.rows);
-
+      const { rows } = await pool.query("SELECT * FROM resorts ORDER BY name ASC");
+      res.json(rows);
   } catch (error) {
-
-    console.error("❌ Lỗi:", error);
-
-    res.status(500).json({ error: "Lỗi server" });
-
+      res.status(500).json({ error: "Lỗi server khi lấy danh sách resort" });
   }
+});
 
+// Tạo một resort mới
+app.post("/api/admin/resorts", authorize(['admin', 'staff']), async (req, res) => {
+  const { name } = req.body;
+  if (!name || name.trim() === '') {
+      return res.status(400).json({ error: "Tên resort là bắt buộc" });
+  }
+  try {
+      const { rows } = await pool.query(
+          "INSERT INTO resorts (name) VALUES ($1) RETURNING *",
+          [name.trim()]
+      );
+      res.status(201).json(rows[0]);
+  } catch (error) {
+      if (error.code === '23505') { // Lỗi trùng tên
+          return res.status(409).json({ error: "Tên resort này đã tồn tại." });
+      }
+      res.status(500).json({ error: "Lỗi server khi tạo resort" });
+  }
+});
+
+
+// ✅ SỬA: Lấy danh sách phòng cho khách (lấy num_bed từ room_details)
+app.get("/api/rooms", async (req, res) => {
+  try {
+    const { location, room_type } = req.query;
+    let sql = `SELECT r.id, res.name AS resort_name, r.room_type_id, rt.name AS room_type, rt.price_per_night,
+                      rt.capacity, rd.images_url AS images, r.location, rd.description, rd.features, rd.num_bed
+               FROM rooms r 
+               JOIN room_types rt ON r.room_type_id = rt.id
+               JOIN resorts res ON r.resort_id = res.id
+               LEFT JOIN room_details rd ON rd.room_id = r.id 
+               WHERE 1=1`;
+    const params = [];
+    if (location) {
+      params.push(`%${location}%`);
+      sql += ` AND LOWER(r.location) LIKE LOWER($${params.length})`;
+    }
+    if (room_type) {
+      params.push(room_type);
+      sql += ` AND rt.name = $${params.length}`;
+    }
+    sql += " ORDER BY r.created_at DESC";
+    const roomsResult = await pool.query(sql, params);
+    res.json(roomsResult.rows);
+  } catch (error) {
+    console.error("❌ Lỗi:", error);
+    res.status(500).json({ error: "Lỗi server" });
+  }
 });
 
 
@@ -534,43 +543,32 @@ app.get("/api/rooms/top-booked", async (req, res) => {
 });
 
 
-
+// ✅ SỬA: Lấy chi tiết phòng cho khách (lấy num_bed từ room_details)
 app.get("/api/rooms/:id", async (req, res) => {
-
   try {
-
-    const { id } = req.params;
-
-    const { rows } = await pool.query(
-
-      `SELECT r.id, r.resort_name, r.location, r.category, rt.name AS room_type,
-
-              rt.price_per_night, rt.capacity, COALESCE(rd.description, 'Chưa có mô tả') AS description,
-
-              COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
-
-              COALESCE(rd.images_url, ARRAY[]::text[]) AS images
-
-       FROM rooms r JOIN room_types rt ON r.room_type_id = rt.id
-
-       LEFT JOIN room_details rd ON rd.room_id = r.id WHERE r.id = $1 LIMIT 1`,
-
-      [id]
-
-    );
-
-    if (rows.length === 0) return res.status(404).json({ error: "Không tìm thấy phòng" });
-
-    res.json(rows[0]);
-
+      const { id } = req.params;
+      const { rows } = await pool.query(
+          `SELECT r.id, res.name AS resort_name, r.location, r.category, 
+                  rt.name AS room_type, rt.price_per_night, rt.capacity, 
+                  COALESCE(rd.description, 'Chưa có mô tả') AS description,
+                  COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
+                  COALESCE(rd.images_url, ARRAY[]::text[]) AS images,
+                  rd.num_bed
+           FROM rooms r 
+           JOIN room_types rt ON r.room_type_id = rt.id
+           JOIN resorts res ON r.resort_id = res.id
+           LEFT JOIN room_details rd ON rd.room_id = r.id 
+           WHERE r.id = $1 LIMIT 1`,
+          [id]
+      );
+      if (rows.length === 0) {
+          return res.status(404).json({ error: "Không tìm thấy phòng" });
+      }
+      res.json(rows[0]);
   } catch (error) {
-
-    console.error("❌ Lỗi:", error);
-
-    res.status(500).json({ error: "Lỗi server" });
-
+      console.error("❌ Lỗi khi lấy chi tiết phòng:", error);
+      res.status(500).json({ error: "Lỗi server" });
   }
-
 });
 
 
@@ -694,31 +692,35 @@ app.get("/api/room-types", async (req, res) => {
 });
 
 
-
+// ✅ SỬA: Lấy danh sách phòng cho admin (JOIN với bảng resorts)
 app.get("/api/admin/rooms", authorize(["admin", "staff"]), async (req, res) => {
-
   try {
-
-    const result = await pool.query(
-
-      `SELECT r.id, r.resort_name, rt.name AS room_type, rt.price_per_night, rd.description,
-
-              rd.features, rd.images_url AS images, r.status, r.category, r.location, r.address
-
-       FROM rooms r JOIN room_types rt ON r.room_type_id = rt.id
-
-       LEFT JOIN room_details rd ON rd.room_id = r.id ORDER BY r.created_at DESC`
-
-    );
-
-    res.json(result.rows);
-
+      const result = await pool.query(
+          `SELECT 
+              r.id, 
+              res.name as resort_name, -- Lấy tên từ bảng resorts
+              r.resort_id, 
+              rt.name AS room_type, 
+              rt.price_per_night, 
+              rd.description, 
+              rd.features, 
+              rd.images_url AS images, 
+              r.status, 
+              r.category, 
+              r.location, 
+              r.address, 
+              rd.num_bed
+           FROM rooms r 
+           JOIN room_types rt ON r.room_type_id = rt.id
+           JOIN resorts res ON r.resort_id = res.id -- JOIN bảng resorts vào đây
+           LEFT JOIN room_details rd ON rd.room_id = r.id 
+           ORDER BY res.name, r.created_at DESC`
+      );
+      res.json(result.rows);
   } catch (error) {
-
-    res.status(500).json({ error: "Lỗi server" });
-
+      console.error("Lỗi khi lấy danh sách phòng admin:", error);
+      res.status(500).json({ error: "Lỗi server" });
   }
-
 });
 
 
@@ -762,124 +764,109 @@ app.get("/api/admin/rooms/:id", authorize(["admin", "staff"]), async (req, res) 
 });
 
 
+// ✅ SỬA: POST tạo room mới (Xử lý được cả ảnh và dữ liệu)
+app.post("/api/admin/rooms", authorize(["admin", "staff"]), upload.array('images'), async (req, res) => {
+  // Dùng upload.array('images') làm middleware để xử lý file trước
+  try {
+      const { resort_id, room_type_id, status, category, location, address, description, num_bed } = req.body;
 
-// ✅ SỬA: POST tạo room mới (đã thêm xử lý description)
-app.post("/api/admin/rooms", authorize(["admin", "staff"]), (req, res) => {
-    upload.array("images")(req, res, async (err) => {
-        if (err) {
-            return res.status(400).json({ error: "Lỗi upload: " + err.message });
-        }
+      if (!resort_id || !room_type_id) {
+          return res.status(400).json({ error: "Thiếu thông tin Resort ID hoặc Loại phòng" });
+      }
+      
+      // Lấy tên file từ req.files do multer xử lý
+      const imageNames = (req.files && req.files.length > 0) ? req.files.map(f => f.filename) : [];
+      const client = await pool.connect();
+      
+      try {
+          await client.query("BEGIN");
+          
+          const roomResult = await client.query(
+              `INSERT INTO rooms (resort_id, room_type_id, status, category, location, address, created_at)
+               VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id`,
+              [resort_id, room_type_id, status || "available", category || "standard", location, address || ""]
+          );
+          const roomId = roomResult.rows[0].id;
 
-        try {
-            // LẤY THÊM DESCRIPTION TỪ FORM
-            const { resort_name, room_type_id, status, category, location, address, description } = req.body;
+          await client.query(
+              `INSERT INTO room_details (room_id, description, features, images_url, num_bed, created_at) 
+               VALUES ($1, $2, $3, $4, $5, NOW())`,
+              [roomId, description || "", [], imageNames, num_bed || '1 giường đôi']
+          );
 
-            if (!resort_name || !room_type_id || !location) {
-                return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
-            }
-
-            const imageNames = (req.files && req.files.length > 0) ? req.files.map(f => f.filename) : [];
-            const client = await pool.connect();
-            
-            try {
-                await client.query("BEGIN");
-                const roomResult = await client.query(
-                    `INSERT INTO rooms (resort_name, room_type_id, status, category, location, address, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id`,
-                    [resort_name, room_type_id, status || "active", category || "", location, address || ""]
-                );
-                const roomId = roomResult.rows[0].id;
-
-                // CHÈN DESCRIPTION VÀO BẢNG room_details
-                await client.query(
-                    `INSERT INTO room_details (room_id, description, features, images_url, created_at)
-                     VALUES ($1, $2, $3, $4, NOW())`,
-                    [roomId, description || "", [], imageNames] // Thêm description vào đây
-                );
-
-                await client.query("COMMIT");
-                res.status(201).json({ message: "Thêm phòng thành công", room_id: roomId });
-            } catch (dbErr) {
-                await client.query("ROLLBACK");
-                throw dbErr;
-            } finally {
-                client.release();
-            }
-        } catch (err) {
-            console.error("❌ POST Error:", err);
-            res.status(500).json({ error: "Lỗi server", details: err.message });
-        }
-    });
+          await client.query("COMMIT");
+          res.status(201).json({ message: "Thêm phòng thành công" }); // Trả về 201 cho thành công
+      } catch (dbErr) {
+          await client.query("ROLLBACK");
+          throw dbErr;
+      } finally {
+          client.release();
+      }
+  } catch (err) {
+      console.error("❌ POST Error:", err);
+      res.status(500).json({ error: "Lỗi server", details: err.message });
+  }
 });
 
 
-// ✅ SỬA: PUT cập nhật room (đã thêm xử lý description)
-app.put("/api/admin/rooms/:id", authorize(["admin", "staff"]), (req, res) => {
-    upload.array("images")(req, res, async (err) => {
-        if (err) {
-            return res.status(400).json({ error: "Lỗi upload: " + err.message });
-        }
+// ✅ SỬA: PUT cập nhật room (Xử lý được cả ảnh và dữ liệu)
+app.put("/api/admin/rooms/:id", authorize(["admin", "staff"]), upload.array('images'), async (req, res) => {
+  try {
+      const { id } = req.params;
+      const { resort_id, room_type_id, status, category, location, address, description, num_bed } = req.body;
+      
+      const imageNames = (req.files && req.files.length > 0) ? req.files.map(f => f.filename) : [];
+      const client = await pool.connect();
+      try {
+          await client.query("BEGIN");
 
-        try {
-            const { id } = req.params;
-            // LẤY THÊM DESCRIPTION TỪ FORM
-            const { resort_name, room_type_id, status, category, location, address, description } = req.body;
-            
-            const imageNames = (req.files && req.files.length > 0) ? req.files.map(f => f.filename) : [];
-            const client = await pool.connect();
-            
-            try {
-                await client.query("BEGIN");
-                const updateResult = await client.query(
-                    `UPDATE rooms SET resort_name=$1, room_type_id=$2, status=$3, category=$4, location=$5, address=$6, updated_at=NOW()
-                     WHERE id=$7 RETURNING id`,
-                    [resort_name, room_type_id, status, category, location, address, id]
-                );
+          const updateResult = await client.query(
+              `UPDATE rooms SET 
+                  resort_id=$1, room_type_id=$2, status=$3, category=$4, 
+                  location=$5, address=$6, updated_at=NOW()
+               WHERE id=$7 RETURNING id`,
+              [resort_id, room_type_id, status, category, location, address, id]
+          );
 
-                if (updateResult.rowCount === 0) {
-                    await client.query("ROLLBACK");
-                    return res.status(404).json({ error: "Không tìm thấy phòng" });
-                }
+          if (updateResult.rowCount === 0) {
+              await client.query("ROLLBACK");
+              return res.status(404).json({ error: "Không tìm thấy phòng" });
+          }
 
-                // CẬP NHẬT HOẶC TẠO MỚI room_details VỚI DESCRIPTION
-                const existingDetail = await client.query("SELECT id FROM room_details WHERE room_id=$1", [id]);
+          const existingDetail = await client.query("SELECT id FROM room_details WHERE room_id=$1", [id]);
+          
+          if (existingDetail.rows.length > 0) {
+              let updateQuery = 'UPDATE room_details SET description = $1, num_bed = $2, updated_at = NOW()';
+              const params = [description || '', num_bed || '1 giường đôi'];
+              
+              if (imageNames.length > 0) {
+                  params.push(imageNames);
+                  updateQuery += `, images_url = $${params.length}`;
+              }
+              params.push(id);
+              updateQuery += ` WHERE room_id = $${params.length}`;
+              await client.query(updateQuery, params);
+          } else {
+              await client.query(
+                  `INSERT INTO room_details (room_id, description, features, images_url, num_bed, created_at) 
+                   VALUES ($1, $2, $3, $4, $5, NOW())`,
+                  [id, description || "", [], imageNames, num_bed || '1 giường đôi']
+              );
+          }
 
-                if (existingDetail.rows.length > 0) {
-                    // Nếu đã có, cập nhật description và ảnh (nếu có ảnh mới)
-                    let updateQuery = 'UPDATE room_details SET description = $1, updated_at = NOW()';
-                    const params = [description || ''];
-                    if (imageNames.length > 0) {
-                        params.push(imageNames);
-                        updateQuery += `, images_url = $${params.length}`;
-                    }
-                    params.push(id);
-                    updateQuery += ` WHERE room_id = $${params.length}`;
-                    await client.query(updateQuery, params);
-
-                } else {
-                    // Nếu chưa có, tạo mới
-                    await client.query(
-                        `INSERT INTO room_details (room_id, description, features, images_url, created_at)
-                         VALUES ($1, $2, $3, $4, NOW())`,
-                        [id, description || "", [], imageNames]
-                    );
-                }
-
-                await client.query("COMMIT");
-                res.json({ message: "Cập nhật phòng thành công" });
-            } catch (dbErr) {
-                await client.query("ROLLBACK");
-                throw dbErr;
-            } finally {
-                client.release();
-            }
-        } catch (err) {
-            console.error("❌ PUT Error:", err);
-            res.status(500).json({ error: "Lỗi server", details: err.message });
-        }
-    });
+          await client.query("COMMIT");
+          res.json({ message: "Cập nhật phòng thành công" });
+      } catch (dbErr) {
+          await client.query("ROLLBACK");
+          throw dbErr;
+      } finally {
+          client.release();
+      }
+  } catch (err) {
+      console.error("❌ PUT Error:", err);
+      res.status(500).json({ error: "Lỗi server", details: err.message });
+  }
 });
-
 // ===== API XÓA PHÒNG (ADMIN) =====
 app.delete("/api/admin/rooms/:id", authorize(['admin', 'staff']), async (req, res) => {
     const { id } = req.params;
