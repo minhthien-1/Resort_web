@@ -53,31 +53,31 @@
                         </div>
                     </div>
                     <div class="border-t border-b border-gray-300 py-4 mb-4">
-                        <p id="summary-room-type" class="font-semibold mb-2">Tên loại phòng...</p>
+                        <p id="summary-room-type" class="font-semibold mb-2">Chi tiết phòng...</p>
                         <div class="space-y-1 text-sm text-gray-700">
                             <p><i class="fas fa-users w-5"></i> <span id="summary-capacity">...</span> khách</p>
                             <p><i class="fas fa-wifi w-5"></i> WiFi miễn phí</p>
                         </div>
                     </div>
                     <div class="border-b border-gray-300 pb-4 mb-4">
-                         <p class="font-semibold mb-2">Tên khách</p>
-                         <p id="summary-guest-name" class="text-sm text-gray-700">...</p>
-                         <div class="flex items-center text-green-600 text-sm mt-2">
-                             <i class="fas fa-check-circle mr-2"></i><span>Miễn phí hủy phòng</span>
-                         </div>
-                         <div class="flex items-center text-green-600 text-sm mt-1">
-                             <i class="fas fa-check-circle mr-2"></i><span>Có thể đổi lịch</span>
-                         </div>
+                        <p class="font-semibold mb-2">Tên khách</p>
+                        <p id="summary-guest-name" class="text-sm text-gray-700">...</p>
+                        <div class="flex items-center text-green-600 text-sm mt-2">
+                            <i class="fas fa-check-circle mr-2"></i><span>Miễn phí hủy phòng</span>
+                        </div>
+                        <div class="flex items-center text-green-600 text-sm mt-1">
+                            <i class="fas fa-check-circle mr-2"></i><span>Có thể đổi lịch</span>
+                        </div>
                     </div>
                     <div>
-                         <p class="font-semibold mb-2">Chi tiết người liên lạc</p>
-                         <p id="summary-contact-name" class="text-sm text-gray-700">...</p>
-                         <p id="summary-contact-phone" class="text-sm text-gray-700">...</p>
-                         <p id="summary-contact-email" class="text-sm text-gray-700">...</p>
+                        <p class="font-semibold mb-2">Chi tiết người liên lạc</p>
+                        <p id="summary-contact-name" class="text-sm text-gray-700">...</p>
+                        <p id="summary-contact-phone" class="text-sm text-gray-700">...</p>
+                        <p id="summary-contact-email" class="text-sm text-gray-700">...</p>
                     </div>
                  </div>
                  <div class="bg-green-300 text-green-800 font-semibold text-center p-3 rounded-lg mt-4">
-                     Sự lựa chọn tuyệt vời cho kỳ nghỉ của bạn!
+                    Sự lựa chọn tuyệt vời cho kỳ nghỉ của bạn!
                  </div>
             </div>
         </div>
@@ -105,7 +105,10 @@
             document.getElementById('summary-resort-name').textContent = booking.resortName;
             document.getElementById('summary-checkin-date').textContent = booking.checkIn;
             document.getElementById('summary-checkout-date').textContent = booking.checkOut;
-            document.getElementById('summary-room-type').textContent = `(1x) ${booking.roomTypeName || booking.roomCategory}`;
+            
+            // ✅ SỬA Ở ĐÂY: Hiển thị num_bed thay vì loại phòng
+            document.getElementById('summary-room-type').textContent = `(1x) ${booking.num_bed || 'Chưa xác định'}`;
+            
             document.getElementById('summary-capacity').textContent = booking.capacity;
             document.getElementById('summary-guest-name').textContent = booking.userFullName;
             document.getElementById('summary-contact-name').textContent = booking.userFullName;
@@ -113,7 +116,6 @@
             document.getElementById('summary-contact-email').textContent = booking.userEmail;
             document.getElementById('total-price').textContent = formatCurrency(totalPrice);
 
-            // SỬA ĐỔI: Thêm sự kiện click cho nút thanh toán
             const paymentButton = document.getElementById('confirm-payment-btn');
             paymentButton.addEventListener('click', async () => {
                 const token = localStorage.getItem('token');
@@ -147,10 +149,9 @@
                         throw new Error(result.error || 'Có lỗi xảy ra, vui lòng thử lại.');
                     }
 
-                    // Xử lý thành công
                     alert(`Đặt phòng thành công! Mã đặt phòng của bạn là: ${result.booking.booking_code}`);
-                    sessionStorage.removeItem('bookingDetails'); // Xóa thông tin tạm
-                    window.location.href = 'home.html'; // Chuyển về trang chủ
+                    sessionStorage.removeItem('bookingDetails');
+                    window.location.href = 'home.html';
 
                 } catch (error) {
                     alert(`Lỗi: ${error.message}`);
@@ -159,7 +160,7 @@
                 }
             });
 
-            // Logic đếm ngược (giữ nguyên)
+            // Logic đếm ngược
             let time = 10 * 60;
             const countdownEl = document.getElementById('countdown');
             setInterval(() => {

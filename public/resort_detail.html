@@ -29,23 +29,13 @@
             <div class="navbar-logo">
                 <a href="home.html" style="text-decoration: none; color: inherit;"><h1>Resort Booking</h1></a>
             </div>
-
-            <div class="navbar-menu">
-                <nav>
-                    <a href="home.html">Trang chủ</a>
-                    <a href="../public/promotions.html">Khuyến mãi</a>
-                    <a href="../public/supports/support.html">Hỗ trợ</a>
-                    <a href="#">Hợp tác với chúng tôi</a>
-                    <a href="my_bookings.html">Đặt chỗ của tôi</a>
-                </nav>
-            </div>
-
-            <div class="login-menu">
-                <nav class="login-register">
-                    <a href="login.html" class="btn-login">Đăng nhập</a>
-                    <a href="register.html" class="btn-register">Đăng ký</a>
-                </nav>
-            </div>
+            <nav class="navbar-menu">
+                <a href="">Khuyến mãi</a>
+                <a href="supports/support.html">Hỗ trợ</a>
+                <a href="">Đặt chỗ của tôi</a>
+                <a href="login.html" class="btn-login">Đăng nhập</a>
+                <a href="register.html" class="btn-register">Đăng ký</a>
+            </nav>
         </div>
     </header>
 
@@ -72,7 +62,7 @@
                     <ul id="resort-features" class="features-list"></ul>
                     <div class="room-type-info">
                         <h3>Thông tin phòng</h3>
-                        <p><i class="fas fa-bed"></i> Loại phòng: <span id="room-category"></span></p>
+                        <p><i class="fas fa-bed"></i> Số giường: <span id="room-bed-config-display"></span></p>
                         <p><i class="fas fa-users"></i> Sức chứa: <span id="room-capacity"></span> người</p>
                     </div>
                 </div>
@@ -145,7 +135,7 @@
                 navbarMenu.innerHTML = `
                     <a href="">Khuyến mãi</a> <a href="supports/support.html">Hỗ trợ</a> <a href="">Hợp tác với chúng tôi</a> <a href="">Đặt chỗ của tôi</a>
                     <div class="user-menu">
-                        <span class="user-name">👤 ${username || full_name}</span>
+                        <span class="user-name">👤 ${full_name || username}</span>
                         <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
                     </div>`;
                 document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -204,8 +194,8 @@
                     document.getElementById('resort-description').textContent = currentRoom.description || 'Chưa có mô tả chi tiết.';
                     document.getElementById('resort-price').textContent = formatCurrency(currentRoom.price_per_night);
                     
-                    // SỬA ĐỔI: Lấy dữ liệu từ `room.category` theo yêu cầu
-                    document.getElementById('room-category').textContent = currentRoom.category || "Đang cập nhật";
+                    // ✅ SỬA Ở ĐÂY: Lấy dữ liệu từ currentRoom.num_bed
+                    document.getElementById('room-bed-config-display').textContent = currentRoom.num_bed || "Đang cập nhật";
                     
                     document.getElementById('room-capacity').textContent = currentRoom.capacity || "?";
 
@@ -280,7 +270,7 @@
                 const bookingDetails = {
                     resortId: currentRoom.id, resortName: currentRoom.resort_name, roomCategory: currentRoom.category, capacity: currentRoom.capacity,
                     pricePerNight: currentRoom.price_per_night, checkIn: checkInDate, checkOut: checkOutDate, userFullName: localStorage.getItem('full_name') || 'N/A',
-                    userPhone: localStorage.getItem('phone') || 'Chưa có', userEmail: localStorage.getItem('email') || 'N/A'
+                    userPhone: localStorage.getItem('phone') || 'Chưa có', userEmail: localStorage.getItem('email') || 'N/A', num_bed: currentRoom.num_bed
                 };
                 sessionStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
                 window.location.href = 'payment.html';

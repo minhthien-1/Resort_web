@@ -1,367 +1,288 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Quản Lý Phòng - Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f5f7fa; color:#374151; }
-    .card{background:#fff;border-radius:12px;padding:1.25rem;box-shadow:0 6px 16px rgba(0,0,0,.06)}
-    .btn-primary{background:linear-gradient(90deg,#3b82f6,#2563eb);color:#fff;padding:.5rem 1rem;border-radius:10px}
-    .status-badge{padding:4px 8px;border-radius:999px;font-weight:600;text-transform:capitalize}
-    .image-preview-item{position:relative;width:60px;height:60px;border-radius:8px;overflow:hidden;margin-right:8px}
-    .image-preview-item img{width:100%;height:100%;object-fit:cover}
-    .image-preview-item .remove-image{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.95);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
-    #room-modal{display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;padding:20px}
-    #room-modal .modal-card{
-        width:100%;
-        max-width:520px;
-        border-radius:14px;
-        padding:26px;
-        background:#fff;
-        box-shadow:0 12px 40px rgba(2,6,23,.3);
-        max-height: 90vh; 
-        overflow-y: auto;
-    }
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Quản Lý Resort & Phòng - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f5f7fa; color:#374151; }
+        .card{background:#fff;border-radius:12px;padding:1.25rem;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+        .btn-primary{background:linear-gradient(90deg,#3b82f6,#2563eb);color:#fff;padding:.5rem 1rem;border-radius:10px}
+        .btn-secondary{background-color: #e5e7eb; color: #374151; padding: .5rem 1rem; border-radius: 10px; font-weight: 500;}
+        #room-modal .modal-card{ width:100%; max-width:520px; border-radius:14px; padding:26px; background:#fff; box-shadow:0 12px 40px rgba(2,6,23,.3); max-height: 90vh; overflow-y: auto; }
+        .image-preview-item{position:relative;width:60px;height:60px;border-radius:8px;overflow:hidden;margin-right:8px;margin-top: 8px;}
+        .image-preview-item img{width:100%;height:100%;object-fit:cover}
+        .image-preview-item .remove-image{position:absolute;top:2px;right:2px;background:rgba(239,68,68,.9);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+    </style>
 </head>
 <body class="p-8">
-  <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <div class="flex items-center gap-4">
-        <button onclick="window.history.back()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors" aria-label="Quay lại trang trước">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h1 class="text-2xl font-bold">Quản Lý Phòng Khách Sạn</h1>
-      </div>
-      <button class="btn-primary" onclick="openRoomModal('create')">+ Thêm Phòng Mới</button>
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-4">
+                <button onclick="window.history.back()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors" aria-label="Quay lại trang trước">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <h1 class="text-2xl font-bold">Quản Lý Resort & Phòng</h1>
+            </div>
+            <button class="btn-primary" onclick="openNewResortModal()">+ Tạo Resort Mới</button>
+        </div>
+        <div id="resorts-list-container" class="space-y-6">
+             <p id="list-message" class="text-center mt-6 text-sm text-gray-500">Đang tải danh sách resort...</p>
+        </div>
     </div>
 
-    <div class="card overflow-x-auto">
-      <table class="w-full" id="room-table">
-        <thead>
-          <tr class="text-left text-sm text-gray-600">
-            <th class="p-4">Hình & Loại</th>
-            <th class="p-4">Hạng phòng</th>
-            <th class="p-4">Giá/Đêm</th>
-            <th class="p-4">Trạng thái</th>
-            <th class="p-4">Resort & Vị trí</th>
-            <th class="p-4">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody id="room-table-body"></tbody>
-      </table>
-      <p id="room-list-message" class="text-center mt-6 text-sm text-gray-500">Đang tải phòng...</p>
+    <div id="room-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 z-50 items-center justify-center p-4">
+        <div class="modal-card">
+            <h3 id="modal-title" class="text-xl font-semibold mb-4">Thêm Phòng Mới</h3>
+            <form id="room-form">
+                <input type="hidden" id="room-id" />
+                <input type="hidden" id="resort-id" />
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Loại phòng</label>
+                    <select id="room-type-id" class="w-full border rounded px-3 py-2" required></select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Loại hình lưu trú</label>
+                    <select id="room-category" class="w-full border rounded px-3 py-2">
+                        <option value="standard">Khách sạn/Tiêu chuẩn</option>
+                        <option value="apartment">Căn hộ</option>
+                        <option value="villa">Biệt thự</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Cấu hình giường</label>
+                    <select id="num-bed" class="w-full border rounded px-3 py-2">
+                        <option value="1 giường đơn">1 Giường Đơn</option>
+                        <option value="1 giường đôi">1 Giường Đôi</option>
+                        <option value="2 giường đơn">2 Giường Đơn</option>
+                        <option value="2 giường đôi">2 Giường Đôi</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Trạng thái</label>
+                    <select id="room-status" class="w-full border rounded px-3 py-2">
+                        <option value="available">Sẵn có</option>
+                        <option value="maintenance">Bảo trì</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
+                    <input id="room-images" type="file" accept="image/*" multiple class="w-full" />
+                    <div id="image-preview" class="flex flex-wrap mt-2"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Vị trí</label>
+                    <select id="room-location" class="w-full border rounded px-3 py-2" required>
+                        <option value="">Chọn vị trí</option>
+                        <option value="da-lat">Đà Lạt</option><option value="ha-long">Hạ Long</option><option value="phu-quoc">Phú Quốc</option><option value="nha-trang">Nha Trang</option><option value="da-nang">Đà Nẵng</option><option value="sapa">Sapa</option><option value="hoi-an">Hội An</option><option value="ha-noi">Hà Nội</option><option value="sai-gon">Sài Gòn</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">Địa chỉ cụ thể</label>
+                    <input id="room-address" class="w-full border rounded px-3 py-2" placeholder="Ví dụ: Khu A, Phường X..." />
+                </div>
+                <div class="mb-4">
+                    <label for="room-description" class="block text-sm font-medium mb-1">Thông tin chi tiết</label>
+                    <textarea id="room-description" rows="3" class="w-full border rounded px-3 py-2" placeholder="Mô tả về phòng, các tiện ích đặc biệt..."></textarea>
+                </div>
+                <div class="flex justify-end items-center space-x-3">
+                    <button type="button" onclick="closeRoomModal()" class="btn-secondary">Hủy</button>
+                    <button type="submit" id="modal-submit-btn" class="btn-primary">Thêm Phòng</button>
+                </div>
+                <p id="modal-error-message" class="text-sm text-red-500 mt-3"></p>
+            </form>
+        </div>
     </div>
-  </div>
 
-  <div id="room-modal" aria-hidden="true">
-    <div class="modal-card">
-      <h3 id="modal-title" class="text-xl font-semibold mb-4">Thêm Phòng Mới</h3>
-      <form id="room-form">
-        <input type="hidden" id="room-id" />
-
-        <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Tên resort</label>
-          <input id="room-resort-name" class="w-full border rounded px-3 py-2" placeholder="VD: FLC Grand Hotel Halong" required />
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Loại phòng</label>
-          <select id="room-type-id" class="w-full border rounded px-3 py-2" required></select>
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Loại hình lưu trú</label>
-          <select id="room-category" class="w-full border rounded px-3 py-2">
-            <option value="standard">Khách sạn/Tiêu chuẩn</option>
-            <option value="apartment">Căn hộ</option>
-            <option value="villa">Biệt thự</option>
-          </select>
-        </div>
-        
-        <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Trạng thái</label>
-          <select id="room-status" class="w-full border rounded px-3 py-2">
-            <option value="available">Sẵn có (Available)</option>
-            <option value="reserved">Đã đặt (Reserved)</option>
-            <option value="occupied">Đang ở (Occupied)</option>
-            <option value="maintenance">Bảo trì (Maintenance)</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
-          <input id="room-images" type="file" accept="image/*" multiple class="w-full" />
-          <div id="image-preview" class="flex mt-2"></div>
-          <p class="text-xs text-gray-500 mt-1">Tối đa 5MB / ảnh. Chọn nhiều ảnh nếu cần.</p>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Vị trí</label>
-          <select id="room-location" class="w-full border rounded px-3 py-2" required>
-            <option value="">Chọn vị trí</option>
-            <option value="da-lat">Đà Lạt</option>
-            <option value="ha-long">Hạ Long</option>
-            <option value="phu-quoc">Phú Quốc</option>
-            <option value="nha-trang">Nha Trang</option>
-            <option value="da-nang">Đà Nẵng</option>
-            <option value="sapa">Sapa</option>
-            <option value="hoi-an">Hội An</option>
-            <option value="ha-noi">Hà Nội</option>
-            <option value="sai-gon">Sài Gòn</option>
-          </select>
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium mb-1">Địa chỉ cụ thể</label>
-          <input id="room-address" class="w-full border rounded px-3 py-2" placeholder="Ví dụ: Khu A, Phường X..." />
-        </div>
-
-        <div class="mb-4">
-            <label for="room-description" class="block text-sm font-medium mb-1">Thông tin chi tiết phòng</label>
-            <textarea id="room-description" rows="4" class="w-full border rounded px-3 py-2" placeholder="Mô tả về phòng, các tiện ích đặc biệt..."></textarea>
-        </div>
-
-        <div class="flex justify-end items-center space-x-3">
-          <button type="button" onclick="closeRoomModal()" class="px-4 py-2 border rounded">Hủy</button>
-          <button type="submit" id="modal-submit-btn" class="btn-primary">Thêm Phòng</button>
-        </div>
-
-        <p id="modal-error-message" class="text-sm text-red-500 mt-3"></p>
-      </form>
-    </div>
-  </div>
-
-  <script>
+    <script>
     const API_BASE = "http://localhost:5500";
+    let ALL_ROOMS = [];
     let ROOM_TYPES = [];
-    let currentMode = 'create';
-    let isLoading = false;
-
-    function setLoading(val){
-      isLoading = val;
-      const btn = document.getElementById('modal-submit-btn');
-      if (!btn) return;
-      btn.disabled = val;
-      btn.textContent = val ? 'Đang xử lý...' : (currentMode === 'create' ? 'Thêm Phòng' : 'Lưu Thay Đổi');
-    }
+    let currentMode = 'create'; 
 
     async function apiFetch(url, opts = {}) {
         const token = localStorage.getItem("token");
-        const headers = {
-            ...(opts.headers || {}),
-            "Authorization": `Bearer ${token}`
-        };
-        const res = await fetch(API_BASE + url, {
-            ...opts,
-            headers
-        });
-        if (res.status === 204) return null;
-        const data = await res.json().catch(() => {
-            throw new Error("Invalid JSON");
-        });
-        if (!res.ok) throw new Error(data.message || data.error || ("HTTP " + res.status));
+        const headers = { "Authorization": `Bearer ${token}` };
+        if (!(opts.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+        }
+        const res = await fetch(API_BASE + url, { ...opts, headers });
+        if (res.status === 204 || res.status === 201) return null;
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || data.error || `HTTP Error ${res.status}`);
         return data;
     }
+    
+    async function fetchAndRenderAll() {
+        const container = document.getElementById('resorts-list-container');
+        container.innerHTML = `<p class="text-center text-gray-500">Đang tải danh sách...</p>`;
+        try {
+            const [resorts, rooms] = await Promise.all([
+                apiFetch('/api/admin/resorts'),
+                apiFetch('/api/admin/rooms')
+            ]);
+            
+            ALL_ROOMS = rooms;
+            container.innerHTML = '';
+            if (!resorts.length) {
+                container.innerHTML = `<p class="text-center text-gray-500">Chưa có resort nào. Hãy tạo một resort mới!</p>`;
+                return;
+            }
+            resorts.forEach(resort => {
+                const resortRooms = rooms.filter(room => room.resort_id === resort.id);
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">${resort.name}</h2>
+                        <button class="btn-primary" onclick="openRoomModal('create', ${resort.id})">+ Thêm phòng</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="text-left text-gray-500"><th class="p-2">Hạng phòng</th><th class="p-2">Số giường</th><th class="p-2">Trạng thái</th><th class="p-2">Thao tác</th></tr></thead>
+                            <tbody>
+                                ${resortRooms.length ? resortRooms.map(room => `
+                                    <tr class="border-t">
+                                        <td class="p-2 font-medium">${room.room_type}</td>
+                                        <td class="p-2">${room.num_bed || '-'}</td>
+                                        <td class="p-2">${room.status}</td>
+                                        <td class="p-2">
+                                            <button class="text-blue-600 hover:underline" onclick='openRoomModal("edit", ${room.resort_id}, ${JSON.stringify(room)})'>Sửa</button>
+                                            <button class="text-red-600 hover:underline ml-2" onclick="deleteRoom('${room.id}')">Xóa</button>
+                                        </td>
+                                    </tr>
+                                `).join('') : `<tr><td colspan="4" class="text-center p-4 text-gray-500">Resort này chưa có phòng.</td></tr>`}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        } catch (error) {
+            container.innerHTML = `<p class="text-center text-red-500">Lỗi: ${error.message}</p>`;
+        }
+    }
+
+    async function openNewResortModal() {
+        const resortName = prompt("Nhập tên resort mới:");
+        if (resortName && resortName.trim() !== "") {
+            try {
+                await apiFetch('/api/admin/resorts', { method: 'POST', body: JSON.stringify({ name: resortName }) });
+                fetchAndRenderAll();
+            } catch (error) { alert(`Lỗi: ${error.message}`); }
+        }
+    }
+
+    function openRoomModal(mode, resortId, roomData = null) {
+        currentMode = mode;
+        const modal = document.getElementById('room-modal');
+        const form = document.getElementById('room-form');
+        form.reset();
+        document.getElementById('image-preview').innerHTML = '';
+        document.getElementById('modal-error-message').textContent = '';
+        
+        if (mode === 'create') {
+            document.getElementById('modal-title').textContent = 'Thêm Phòng Mới';
+            document.getElementById('modal-submit-btn').textContent = 'Thêm Phòng';
+            document.getElementById('room-id').value = '';
+            document.getElementById('resort-id').value = resortId;
+        } else if (mode === 'edit' && roomData) {
+            document.getElementById('modal-title').textContent = `Sửa Phòng: ${roomData.room_type}`;
+            document.getElementById('modal-submit-btn').textContent = 'Lưu Thay Đổi';
+            document.getElementById('room-id').value = roomData.id;
+            document.getElementById('resort-id').value = resortId;
+            document.getElementById('room-type-id').value = roomData.room_type_id;
+            document.getElementById('room-category').value = roomData.category;
+            document.getElementById('num-bed').value = roomData.num_bed;
+            document.getElementById('room-status').value = roomData.status;
+            document.getElementById('room-location').value = roomData.location;
+            document.getElementById('room-address').value = roomData.address || '';
+            document.getElementById('room-description').value = roomData.description || '';
+        }
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeRoomModal() {
+        document.getElementById('room-modal').classList.add('hidden');
+    }
+    
+    document.getElementById('room-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('modal-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Đang xử lý...';
+        
+        const roomId = document.getElementById('room-id').value;
+        const fd = new FormData();
+        fd.append('resort_id', document.getElementById('resort-id').value);
+        fd.append('room_type_id', document.getElementById('room-type-id').value);
+        fd.append('category', document.getElementById('room-category').value);
+        fd.append('num_bed', document.getElementById('num-bed').value);
+        fd.append('status', document.getElementById('room-status').value);
+        fd.append('location', document.getElementById('room-location').value);
+        fd.append('address', document.getElementById('room-address').value);
+        fd.append('description', document.getElementById('room-description').value);
+        
+        const files = document.getElementById('room-images').files;
+        Array.from(files).forEach(file => fd.append('images', file));
+
+        try {
+            const url = currentMode === 'create' ? '/api/admin/rooms' : `/api/admin/rooms/${roomId}`;
+            const method = currentMode === 'create' ? 'POST' : 'PUT';
+            await apiFetch(url, { method, body: fd });
+            closeRoomModal();
+            fetchAndRenderAll();
+        } catch (error) {
+            document.getElementById('modal-error-message').textContent = error.message;
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    async function deleteRoom(roomId) {
+        if (confirm('Bạn có chắc chắn muốn xóa phòng này không?')) {
+            try {
+                await apiFetch(`/api/admin/rooms/${roomId}`, { method: 'DELETE' });
+                fetchAndRenderAll();
+            } catch (error) {
+                alert(`Lỗi khi xóa phòng: ${error.message}`);
+            }
+        }
+    }
+    
+    document.getElementById('room-images').addEventListener('change', function(e) {
+        const preview = document.getElementById('image-preview');
+        preview.innerHTML = '';
+        Array.from(e.target.files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const div = document.createElement('div');
+                div.className = 'image-preview-item';
+                div.innerHTML = `<img src="${ev.target.result}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
 
     async function fetchRoomTypes() {
         const sel = document.getElementById('room-type-id');
-        if (!sel) return;
-        sel.innerHTML = '<option>Đang tải...</option>';
         try {
-            const data = await apiFetch('/api/admin/room-types');
-            ROOM_TYPES = Array.isArray(data) ? data : (data.data || []);
-            if (!ROOM_TYPES.length) {
-                sel.innerHTML = '<option value="">Chưa có loại phòng</option>';
-                return;
-            }
-            sel.innerHTML = ROOM_TYPES.map(t => `<option value="${t.id}">${t.name} — ${Number(t.price_per_night||0).toLocaleString('vi-VN')}</option>`).join('');
+            ROOM_TYPES = await apiFetch('/api/admin/room-types');
+            sel.innerHTML = ROOM_TYPES.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
         } catch (err) {
-            sel.innerHTML = '<option value="">Lỗi tải</option>';
-            console.error(err);
+            sel.innerHTML = '<option value="">Lỗi tải loại phòng</option>';
         }
     }
 
-    function resolveImageUrl(url) {
-        if (!url) return 'assets/img-placeholder.png';
-        if (/^https?:\/\//i.test(url)) return url;
-        if (url.startsWith('/')) return API_BASE + url;
-        return API_BASE + '/uploads/' + url;
-    }
-
-    function getLocationName(k) {
-        const map = { 'da-lat': 'Đà Lạt', 'ha-long': 'Hạ Long', 'phu-quoc': 'Phú Quốc', 'nha-trang': 'Nha Trang', 'da-nang': 'Đà Nẵng', 'sapa': 'Sapa', 'hoi-an': 'Hội An', 'ha-noi': 'Hà Nội', 'sai-gon': 'Sài Gòn' };
-        return map[k] || k || '';
-    }
-
-    async function fetchRooms(){
-      const table = document.getElementById('room-table-body');
-      const msg = document.getElementById('room-list-message');
-      if (msg) { msg.textContent = 'Đang tải danh sách phòng...'; msg.style.display = ''; }
-      if (!table) return;
-      table.innerHTML = '';
-      try{
-        const data = await apiFetch('/api/admin/rooms');
-        const arr = Array.isArray(data) ? data : (data.data || data.rooms || []);
-        if (!arr.length){ if (msg) msg.textContent = 'Chưa có phòng nào.'; return; }
-        if (msg) msg.style.display = 'none';
-        table.innerHTML = arr.map(r => {
-          const imgHtml = (r.images && r.images.length) ? `<img src="${resolveImageUrl(r.images[0])}" style="width:72px;height:48px;object-fit:cover;border-radius:6px;margin-right:8px">` : '';
-          return `<tr class="border-t">
-            <td class="p-4 flex items-center">${imgHtml}<div><div class="font-medium">${r.category || r.room_type || ''}</div></div></td>
-            <td class="p-4">${r.room_type || ''}</td>
-            <td class="p-4">${r.price_per_night ? Number(r.price_per_night).toLocaleString('vi-VN') : '-'}</td>
-            <td class="p-4"><span class="status-badge" style="background-color:${r.status === 'available' ? '#dcfce7' : '#fee2e2'}; color:${r.status === 'available' ? '#166534' : '#991b1b'}">${r.status}</span></td>
-            <td class="p-4">
-              <div class="text-sm font-medium">${r.resort_name || ''}</div>
-              <div class="text-xs">${getLocationName(r.location)}</div>
-              <div class="text-xs text-gray-500">${r.address||''}</div>
-            </td>
-            <td class="p-4">
-              <button class="px-3 py-1 mr-2 bg-green-500 text-white rounded" onclick='openRoomModal("edit", ${JSON.stringify(r).replace(/'/g,"\\'").replace(/"/g,'&quot;')})'>Sửa</button>
-              <button class="px-3 py-1 bg-red-500 text-white rounded" onclick='deleteRoom("${r.id}")'>Xóa</button>
-            </td>
-          </tr>`; }).join('');
-      }catch(err){
-        if (msg) { msg.textContent = 'Lỗi tải danh sách phòng'; msg.style.color = '#b91c1c'; }
-        console.error(err);
-      }
-    }
-
-    function openRoomModal(mode, roomData = null){
-      currentMode = mode;
-      const modal = document.getElementById('room-modal');
-      const title = document.getElementById('modal-title');
-      const form = document.getElementById('room-form');
-      const preview = document.getElementById('image-preview');
-      if (!form) return;
-      form.reset();
-      preview.innerHTML = '';
-      document.getElementById('modal-error-message').textContent = '';
-
-      if (mode === 'create'){
-        title.textContent = 'Thêm Phòng Mới';
-        currentMode = 'create';
-        document.getElementById('room-id').value = '';
-      } else {
-        currentMode = 'edit';
-        title.textContent = 'Sửa Phòng';
-        document.getElementById('room-id').value = roomData.id || '';
-        document.getElementById('room-resort-name').value = roomData.resort_name || '';
-        document.getElementById('room-type-id').value = roomData.room_type_id || '';
-        document.getElementById('room-category').value = roomData.category || 'standard';
-        document.getElementById('room-status').value = roomData.status || 'available';
-        document.getElementById('room-location').value = roomData.location || '';
-        document.getElementById('room-address').value = roomData.address || '';
-        
-        // SỬA ĐỔI: Thêm dòng này để điền mô tả khi sửa
-        document.getElementById('room-description').value = roomData.description || '';
-        
-        if (Array.isArray(roomData.images) && roomData.images.length){
-          roomData.images.forEach(u => {
-            const d = document.createElement('div'); 
-            d.className = 'image-preview-item';
-            const imgUrl = resolveImageUrl(u);
-            d.innerHTML = `<img src="${imgUrl}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
-            preview.appendChild(d);
-          });
-        }
-      }
-      modal.style.display = 'flex';
-    }
-
-    function closeRoomModal(){
-      const modal = document.getElementById('room-modal'); if (modal) modal.style.display = 'none';
-      const preview = document.getElementById('image-preview'); if (preview) preview.innerHTML = '';
-      const form = document.getElementById('room-form'); if (form) form.reset();
-      document.getElementById('modal-error-message').textContent = '';
-    }
-
-    document.getElementById('room-images')?.addEventListener('change', function(e){
-        const preview = document.getElementById('image-preview');
-        if (!preview) return;
-        preview.innerHTML = '';
-        const files = Array.from(e.target.files || []);
-        files.forEach(f => {
-            if (!f.type.startsWith('image/')) return;
-            if (f.size > 5 * 1024 * 1024) return;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                const d = document.createElement('div');
-                d.className = 'image-preview-item';
-                d.innerHTML = `<img src="${ev.target.result}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
-                preview.appendChild(d);
-            };
-            reader.readAsDataURL(f);
-        });
-    });
-
-    document.getElementById('room-form')?.addEventListener('submit', async function(e){
-      e.preventDefault();
-      if (isLoading) return;
-      setLoading(true);
-      
-      const id = document.getElementById('room-id').value;
-      const fd = new FormData();
-      
-      fd.append('resort_name', document.getElementById('room-resort-name').value.trim());
-      fd.append('room_type_id', document.getElementById('room-type-id').value);
-      fd.append('category', document.getElementById('room-category').value);
-      fd.append('status', document.getElementById('room-status').value);
-      fd.append('location', document.getElementById('room-location').value);
-      fd.append('address', document.getElementById('room-address').value.trim());
-      
-      // SỬA ĐỔI: Thêm description vào FormData
-      fd.append('description', document.getElementById('room-description').value.trim());
-
-      const files = document.getElementById('room-images').files;
-      if (files && files.length > 0){
-        Array.from(files).forEach(f => fd.append('images', f));
-      }
-
-      try{
-        const url = currentMode === 'create' ? '/api/admin/rooms' : `/api/admin/rooms/${id}`;
-        const method = currentMode === 'create' ? 'POST' : 'PUT';
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(API_BASE + url, { 
-          method, 
-          body: fd, 
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(()=>({message:'Lỗi từ server'}));
-          throw new Error(err.message || err.error || 'Lỗi server');
-        }
-
-        closeRoomModal();
-        await fetchRooms();
-      }catch(err){
-        document.getElementById('modal-error-message').textContent = err.message || 'Lỗi';
-        console.error(err);
-      }finally{
-        setLoading(false);
-      }
-    });
-
-    async function deleteRoom(id){
-      if (!confirm('Xác nhận xóa phòng?')) return;
-      try{
-        await apiFetch(`/api/admin/rooms/${id}`, { method: 'DELETE' });
-        await fetchRooms();
-      }catch(err){
-        console.error(err);
-      }
-    }
-
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRoomModal(); });
-    document.getElementById('room-modal')?.addEventListener('click', e => { if (e.target.id === 'room-modal') closeRoomModal(); });
-
-    // init
     fetchRoomTypes();
-    fetchRooms();
-  </script>
+    fetchAndRenderAll();
+    </script>
 </body>
 </html>

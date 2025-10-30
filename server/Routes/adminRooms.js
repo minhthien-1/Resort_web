@@ -23,9 +23,14 @@ router.get("/room-types", async (req, res) => {
 router.get("/rooms", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT r.id, r.room_number, r.status, r.room_type_id,
-             rt.name AS room_type, rt.price_per_night, rt.capacity,
-             'standard' AS category
+      SELECT r.id,
+             r.resort_name,
+             r.status,
+             r.room_type_id,
+             rt.name AS room_type,
+             rt.price_per_night,
+             rt.capacity,
+             COALESCE(r.category, 'standard') AS category
       FROM rooms r
       JOIN room_types rt ON r.room_type_id = rt.id
       ORDER BY r.created_at DESC
@@ -42,15 +47,15 @@ router.get("/rooms", async (req, res) => {
 // -----------------------------
 router.post("/rooms", async (req, res) => {
   try {
-    const { room_number, room_type_id, status, category } = req.body;
-    if (!room_number || !room_type_id) {
+    const { resort_name, room_type_id, status, category } = req.body;
+    if (!resort_name || !room_type_id) {
       return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
     }
 
     const insert = await pool.query(
-      `INSERT INTO rooms (room_number, room_type_id, status)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [room_number, room_type_id, status]
+      `INSERT INTO rooms (resort_name, room_type_id, status, category, created_at)
+       VALUES ($1, $2, $3, $4, NOW()) RETURNING *`,
+      [resort_name, room_type_id, status || 'available', category || 'standard']
     );
 
     res.status(201).json(insert.rows[0]);
@@ -66,13 +71,13 @@ router.post("/rooms", async (req, res) => {
 router.put("/rooms/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { room_number, room_type_id, status } = req.body;
+    const { resort_name, room_type_id, status, category } = req.body;
 
     const update = await pool.query(
       `UPDATE rooms 
-       SET room_number=$1, room_type_id=$2, status=$3, created_at=created_at 
-       WHERE id=$4 RETURNING *`,
-      [room_number, room_type_id, status, id]
+       SET resort_name=$1, room_type_id=$2, status=$3, category=$4, updated_at=NOW()
+       WHERE id=$5 RETURNING *`,
+      [resort_name, room_type_id, status, category || 'standard', id]
     );
 
     if (update.rowCount === 0) return res.status(404).json({ error: "Không tìm thấy phòng" });

@@ -51,14 +51,14 @@ function renderRoomsTable(rooms) {
 
   tbody.innerHTML = rooms.map(room => `
     <tr>
-      <td>${room.room_number}</td>
+      <td>${room.resort_name || ''}</td>
       <td>${room.room_type}</td>
       <td>
         <span class="status status--${room.status}">
           ${room.status.replace('_', ' ')}
         </span>
       </td>
-      <td>${formatCurrency(room.price_per_night)}</td>
+      <td>${formatCurrency(Number(room.price_per_night || 0))}</td>
     </tr>
   `).join('');
 }
