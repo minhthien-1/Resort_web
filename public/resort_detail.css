@@ -111,68 +111,101 @@
     color: #007bff;
 }
 
-/* Booking Box */
+/* ====== Booking Box (ĐÃ SỬA LỖI XUNG ĐỘT) ====== */
 .booking-box {
     flex: 1;
     min-width: 300px;
     background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     height: fit-content;
     position: sticky;
-    top: 20px;
+    /* --- Style mới được áp dụng --- */
+    padding: 25px;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    top: 100px; 
 }
 
 .price-display {
-    text-align: center;
+    text-align: left;
     font-size: 1.1rem;
     margin-bottom: 20px;
-    padding-bottom: 15px;
+    padding-bottom: 20px;
     border-bottom: 1px solid #eee;
 }
 
 .price-value {
     font-size: 1.8rem;
     font-weight: bold;
-    color: #e63946; /* Màu nổi bật cho giá */
+    color: #667eea; /* Màu đồng bộ */
 }
 
-.date-picker-group, .guest-group {
-    margin-bottom: 15px;
+/* Form đặt phòng mới */
+.detail-booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
 }
 
-.date-picker-group label, .guest-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.date-picker-group input, .guest-group input {
+.detail-booking-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+}
+
+.detail-booking-form label span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    text-align: left;
+}
+
+.detail-booking-form label input {
+    width: 100%;
+    padding: 16px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 15px;
+    background: #ffffff;
+    color: #2d3748;
+    transition: all 0.3s ease;
+    height: 56px;
+    font-weight: 500;
+    cursor: pointer;
     box-sizing: border-box;
 }
 
-.btn-book {
+.detail-booking-form label input::placeholder {
+    color: #a0aec0;
+}
+
+.detail-booking-form label input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+}
+
+.btn-book-styled {
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
+    height: 56px;
+    padding: 0 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 1.1rem;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     margin-top: 10px;
 }
 
-.btn-book:hover {
-    background-color: #0056b3;
+.btn-book-styled:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 25px rgba(102, 126, 234, 0.6);
 }
 
 .note {
@@ -199,4 +232,239 @@
     .resort-header h1 {
         font-size: 2rem;
     }
+
+
+    /* ============================================== */
+/* ====== BỔ SUNG STYLE CHO NAVBAR & FOOTER ====== */
+/* ============================================== */
+
+/* ====== Navbar Styles ====== */
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.navbar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-logo h1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+    cursor: pointer;
+    letter-spacing: -0.5px;
+}
+
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.navbar-menu a {
+    color: #2d3748;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navbar-menu a:not(.btn-login):not(.btn-register):hover {
+    color: #667eea;
+}
+
+.navbar-menu a:not(.btn-login):not(.btn-register)::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+.navbar-menu a:not(.btn-login):not(.btn-register):hover::after {
+    width: 100%;
+}
+
+.navbar-menu .btn-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.navbar-menu .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.navbar-menu .btn-register {
+    background: white;
+    color: #667eea;
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 2px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.navbar-menu .btn-register:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2d3748;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.user-profile-link:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+
+/* ====== Footer Styles ====== */
+footer {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    color: #ffffff;
+    text-align: center;
+    padding: 60px 40px 30px;
+    font-size: 15px;
+    margin-top: 80px;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+footer p {
+    margin: 0;
+    font-weight: 400;
+    color: #cbd5e0;
+}
+
+footer p span {
+    color: #ffffff;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.footer-links {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.footer-links a {
+    color: #cbd5e0;
+    text-decoration: none;
+    margin: 0 15px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.footer-links span {
+    color: #4a5568;
+}
+
+.footer-social p {
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-icons img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+}
+
+.social-icons a:hover {
+    transform: translateY(-4px) scale(1.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+}
 }

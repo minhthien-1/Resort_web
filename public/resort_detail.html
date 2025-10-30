@@ -4,35 +4,634 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết Resort</title>
-    <link rel="stylesheet" href="home.css">
-    <link rel="stylesheet" href="resort_detail.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <style>
-        .reviews-section { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
-        .review-form label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        #rating-select { display: block; width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; background-color: white; cursor: pointer; }
-        #comment { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; resize: vertical; min-height: 80px; }
-        .submit-btn { margin-top: 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
-        .submit-btn:hover { background: #0056b3; }
-        .submit-btn:disabled { background: #cccccc; }
-        #review-list { margin-top: 20px; }
-        .review-item { background: #fff; border-radius: 4px; padding: 15px; margin-bottom: 15px; border: 1px solid #eee; }
-        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .review-header .stars { color: gold; font-size: 1.1em; }
-        .review-item small { color: #888; display: block; margin-top: 5px; font-size: 0.85em; }
+        /* ============================================== */
+        /* ==       RESORT DETAIL - FINAL STYLES       == */
+        /* ============================================== */
+
+        /* ====== General Layout ====== */
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        .detail-container {
+            max-width: 1200px;
+            margin: 120px auto 40px auto; /* Tăng margin-top để không bị navbar che */
+            padding: 0 20px;
+        }
+
+        /* ====== Resort Header ====== */
+        .resort-header {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .resort-header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .resort-location {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .resort-location .fa-map-marker-alt {
+            color: #f5576c;
+            margin-right: 8px;
+        }
+
+        /* ====== Image Gallery ====== */
+        .image-gallery {
+            margin-bottom: 40px;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 550px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .thumbnail-gallery img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail-gallery img:hover {
+            transform: scale(1.05);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .thumbnail-gallery img.active {
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+        }
+
+        /* ====== Details & Booking Wrapper ====== */
+        .resort-details-wrapper {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .details-main {
+            flex: 2;
+        }
+
+        .details-main h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .details-main #resort-description {
+            line-height: 1.7;
+            color: #4a5568;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .features-list li {
+            background: #ffffff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: #4a5568;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .room-type-info {
+            padding: 20px;
+            border-radius: 16px;
+            background-color: #f8f9ff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .room-type-info h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2d3748;
+            font-size: 1.4rem;
+        }
+
+        .room-type-info p {
+            font-size: 1rem;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .room-type-info .fas {
+            color: #667eea;
+        }
+
+
+        /* ====== Booking Box (FINAL VERSION) ====== */
+        .booking-box {
+            flex: 1;
+            min-width: 320px;
+            background: #fff;
+            height: fit-content;
+            position: sticky;
+            padding: 25px;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            top: 100px; 
+        }
+
+        .price-display {
+            text-align: left;
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .price-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .detail-booking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-booking-form label {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .detail-booking-form label span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            text-align: left;
+        }
+
+        .detail-booking-form label input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            background: #ffffff;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            height: 56px;
+            font-weight: 500;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .detail-booking-form label input::placeholder {
+            color: #a0aec0;
+        }
+
+        .detail-booking-form label input:focus, .detail-booking-form label input:hover {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-book-styled {
+            width: 100%;
+            height: 56px;
+            padding: 0 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn-book-styled:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: #999;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* ====== Reviews Section ====== */
+        .reviews-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .reviews-section h3 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .review-form {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .review-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        #rating-select, #comment {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+        #rating-select:focus, #comment:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #comment {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            margin-top: 10px;
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #review-list {
+            margin-top: 20px;
+        }
+
+        .review-item {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .review-header strong {
+            color: #2d3748;
+        }
+
+        .review-header .stars {
+            color: #ffc107; /* Gold color */
+            font-size: 1.1em;
+        }
+
+        .review-item p {
+            color: #4a5568;
+            margin: 10px 0;
+        }
+
+        .review-item small {
+            color: #a0aec0;
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+
+        /* ====== Responsive Design ====== */
+        @media (max-width: 992px) {
+            .resort-details-wrapper {
+                flex-direction: column;
+            }
+            
+            .booking-box {
+                width: 100%;
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .resort-header h1 {
+                font-size: 2rem;
+            }
+            .navbar-container {
+                padding: 12px 20px;
+            }
+            .navbar-menu {
+                /* This will be handled by JS, but good to have fallbacks */
+                display: none; 
+            }
+        }
+
+        /* ============================================== */
+        /* ==       NAVBAR & FOOTER STYLES             == */
+        /* ============================================== */
+
+        /* Navbar Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-logo h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+        }
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .navbar-menu a {
+            color: #2d3748;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .navbar-menu a:not(.btn-login):not(.btn-register):hover {
+            color: #667eea;
+        }
+        .navbar-menu a:not(.btn-login):not(.btn-register)::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        .navbar-menu a:not(.btn-login):not(.btn-register):hover::after {
+            width: 100%;
+        }
+        .navbar-menu .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .navbar-menu .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .navbar-menu .btn-register {
+            background: white;
+            color: #667eea;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        .navbar-menu .btn-register:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2d3748;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .user-profile-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        .btn-logout {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 60px 40px 30px;
+            font-size: 15px;
+            margin-top: 80px;
+        }
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        footer p {
+            margin: 0;
+            font-weight: 400;
+            color: #cbd5e0;
+        }
+        footer p span {
+            color: #ffffff;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .footer-links {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .footer-links a {
+            color: #cbd5e0;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .footer-links a:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .footer-links span {
+            color: #4a5568;
+        }
+        .footer-social p {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .social-icons img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+        .social-icons a:hover {
+            transform: translateY(-4px) scale(1.1);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
     </style>
 </head>
 <body>
     <header class="navbar">
         <div class="navbar-container">
-            <div class="navbar-logo">
-                <a href="home.html" style="text-decoration: none; color: inherit;"><h1>Resort Booking</h1></a>
-            </div>
+           <div class="navbar-logo">
+    <a href="home.html" style="text-decoration: none;">
+        <h1>Resort Booking</h1>
+    </a>
+</div>
             <nav class="navbar-menu">
                 <a href="">Khuyến mãi</a>
                 <a href="supports/support.html">Hỗ trợ</a>
-                <a href="">Đặt chỗ của tôi</a>
+                <a href="">Hợp tác với chúng tôi</a>
+                <a href="my_bookings.html">Đặt chỗ của tôi</a>
                 <a href="login.html" class="btn-login">Đăng nhập</a>
                 <a href="register.html" class="btn-register">Đăng ký</a>
             </nav>
@@ -50,39 +649,48 @@
                 <h1 id="resort-name"></h1>
                 <p class="resort-location"><i class="fas fa-map-marker-alt"></i> <span id="resort-location-text"></span></p>
             </section>
+            
             <section class="image-gallery">
                 <div id="main-image-container" class="main-image"></div>
                 <div id="thumbnail-gallery" class="thumbnail-gallery"></div>
             </section>
+            
             <section class="resort-details-wrapper">
                 <div class="details-main">
                     <h2>Mô tả Resort</h2>
                     <p id="resort-description"></p>
+                    
                     <h2 style="margin-top: 30px;">Tiện ích & Tính năng</h2>
                     <ul id="resort-features" class="features-list"></ul>
+                    
                     <div class="room-type-info">
                         <h3>Thông tin phòng</h3>
                         <p><i class="fas fa-bed"></i> Số giường: <span id="room-bed-config-display"></span></p>
                         <p><i class="fas fa-users"></i> Sức chứa: <span id="room-capacity"></span> người</p>
                     </div>
                 </div>
+                
                 <aside class="booking-box">
                     <p class="price-display">Giá chỉ từ <span id="resort-price" class="price-value"></span> / đêm</p>
-                    <div class="date-picker-group">
-                        <label for="check-in">Nhận phòng</label>
-                        <input type="text" id="check-in" placeholder="Chọn ngày" readonly>
+                    
+                    <div class="detail-booking-form">
+                        <label>
+                            <span>Ngày nhận phòng</span>
+                            <input type="text" id="check-in" placeholder="Chọn ngày" readonly>
+                        </label>
+                        <label>
+                            <span>Ngày trả phòng</span>
+                            <input type="text" id="check-out" placeholder="Chọn ngày" readonly>
+                        </label>
+                        <button id="book-now-btn" class="btn-book-styled">Đặt Phòng Ngay</button>
                     </div>
-                    <div class="date-picker-group">
-                        <label for="check-out">Trả phòng</label>
-                        <input type="text" id="check-out" placeholder="Chọn ngày" readonly>
-                    </div>
-                    <button id="book-now-btn" class="btn-book">Đặt phòng ngay</button>
                     <p class="note">Nhập ngày để xem giá chính xác và tình trạng phòng.</p>
                 </aside>
             </section>
             <section id="reviews" class="reviews-section">
                 <h3>Đánh giá & Bình luận (<span id="rating-count">0</span>)</h3>
                 <div id="review-list"></div>
+                
                 <form id="review-form" class="review-form">
                     <label for="rating-select">Đánh giá của bạn:</label>
                     <select id="rating-select" required>
@@ -99,11 +707,14 @@
             </section>
         </div>
     </main>
+
     <footer>
         <div class="footer-container">
             <div class="footer-links">
-                <a href="#">Chính sách bảo mật</a><span>|</span>
-                <a href="#">Điều khoản sử dụng</a><span>|</span>
+                <a href="#">Chính sách bảo mật</a>
+                <span>|</span>
+                <a href="#">Điều khoản sử dụng</a>
+                <span>|</span>
                 <a href="#">Liên hệ</a>
             </div>
             <div class="footer-social">
@@ -130,14 +741,25 @@
             const navbarMenu = document.querySelector(".navbar-menu");
             const username = localStorage.getItem("username");
             const full_name = localStorage.getItem("full_name");
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-            if (username || full_name) {
+            if (username || full_name || currentUser.id) {
+                const displayName = full_name || username || currentUser.username;
+                
                 navbarMenu.innerHTML = `
-                    <a href="">Khuyến mãi</a> <a href="supports/support.html">Hỗ trợ</a> <a href="">Hợp tác với chúng tôi</a> <a href="">Đặt chỗ của tôi</a>
+                    <a href="">Khuyến mãi</a>
+                    <a href="supports/support.html">Hỗ trợ</a>
+                    <a href="">Hợp tác với chúng tôi</a>
+                    <a href="my_bookings.html">Đặt chỗ của tôi</a>
                     <div class="user-menu">
-                        <span class="user-name">👤 ${full_name || username}</span>
+                        <a href="profile.html" class="user-profile-link">
+                            <span class="avatar-icon">👤</span>
+                            <span class="user-name-text">${displayName}</span>
+                        </a>
                         <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
-                    </div>`;
+                    </div>
+                `;
+                
                 document.getElementById("logoutBtn").addEventListener("click", () => {
                     localStorage.clear();
                     window.location.href = "login.html";
@@ -157,7 +779,7 @@
                     const res = await fetch(`${API_BASE}/api/reviews/${roomId}`);
                     if (!res.ok) throw new Error('Lỗi khi tải đánh giá');
                     const reviews = await res.json();
-                    if(ratingCount) ratingCount.textContent = `(${reviews.length} đánh giá)`;
+                    if(ratingCount) ratingCount.textContent = `${reviews.length}`;
                     container.innerHTML = reviews.length ? reviews.map(r => `
                         <div class="review-item">
                             <div class="review-header">
@@ -193,10 +815,7 @@
                     document.getElementById('resort-location-text').textContent = getLocationName(currentRoom.location);
                     document.getElementById('resort-description').textContent = currentRoom.description || 'Chưa có mô tả chi tiết.';
                     document.getElementById('resort-price').textContent = formatCurrency(currentRoom.price_per_night);
-                    
-                    // ✅ SỬA Ở ĐÂY: Lấy dữ liệu từ currentRoom.num_bed
                     document.getElementById('room-bed-config-display').textContent = currentRoom.num_bed || "Đang cập nhật";
-                    
                     document.getElementById('room-capacity').textContent = currentRoom.capacity || "?";
 
                     const featuresList = document.getElementById('resort-features');
