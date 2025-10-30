@@ -1,1285 +1,1567 @@
 <!DOCTYPE html>
-
 <html lang="vi">
-
 <head>
-
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <title>Resort Booking – Trang chủ</title>
-
-  <link rel="stylesheet" href="home.css" />
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
 
-    .resort-card {
-
-      text-decoration: none;
-
-      color: inherit;
-
-      display: block;
-
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      overflow-x: hidden;
+    }
 
+    /* ====== Navbar với Glassmorphism ====== */
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .navbar-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-logo h1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0;
+      cursor: pointer;
+      letter-spacing: -0.5px;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .navbar-menu a {
+      color: #2d3748;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .navbar-menu a:not(.btn-login):not(.btn-register):hover {
+      color: #667eea;
+    }
+
+    .navbar-menu a:not(.btn-login):not(.btn-register)::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
+    }
+
+    .navbar-menu a:not(.btn-login):not(.btn-register):hover::after {
+      width: 100%;
+    }
+
+    .navbar-menu .btn-login {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .navbar-menu .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .navbar-menu .btn-register {
+      background: white;
+      color: #667eea;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      border: 2px solid #667eea;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-menu .btn-register:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
 
     .user-menu {
-
       display: flex;
-
       align-items: center;
-
       gap: 15px;
-
     }
-
-
 
     .user-profile-link {
-
       display: flex;
-
       align-items: center;
-
-      gap: 8px;
-
-      color: white;
-
+      gap: 10px;
+      color: #2d3748;
       text-decoration: none;
-
-      padding: 10px 15px;
-
-      border-radius: 5px;
-
-      transition: background 0.3s ease;
-
-      cursor: pointer;
-
+      padding: 10px 18px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      background: rgba(102, 126, 234, 0.1);
     }
-
-
 
     .user-profile-link:hover {
-
-      background: rgba(255, 255, 255, 0.2);
-
+      background: rgba(102, 126, 234, 0.2);
+      transform: translateY(-2px);
     }
-
-
-
-    .user-profile-link .avatar-icon {
-
-      font-size: 20px;
-
-    }
-
-
-
-    .user-profile-link .user-name-text {
-
-      font-weight: 500;
-
-    }
-
-
 
     .btn-logout {
-
-      background: #dc3545;
-
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       color: white;
-
       border: none;
-
-      padding: 8px 20px;
-
-      border-radius: 5px;
-
+      padding: 10px 24px;
+      border-radius: 12px;
       cursor: pointer;
-
-      transition: background 0.3s ease;
-
-      font-weight: 500;
-
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
     }
-
-
 
     .btn-logout:hover {
-
-      background: #c82333;
-
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
     }
 
-
-
-    /* Styles cho location search */
-
-    .location-search-container {
-
+    /* ====== Hero Section với Parallax Effect ====== */
+    .search-container {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%),
+                  url('Assets/Icon Images/background.webp');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
+      padding: 180px 20px 100px;
+      text-align: center;
       position: relative;
-
-      width: 100%;
-
+      overflow: hidden;
     }
 
+    .search-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: pulse 8s ease-in-out infinite;
+    }
 
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
 
-    .location-search-container input {
+    .search-header {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 50px;
+      animation: fadeInUp 0.8s ease-out;
+    }
 
-      width: 100%;
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-      padding: 10px;
+    .search-header h2 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.2;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
 
-      border: 1px solid #ddd;
+    .search-header p {
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 400;
+    }
 
-      border-radius: 5px;
+    /* ====== Search Form với Card Design ====== */
+    .search-form {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      justify-content: center;
+      max-width: 900px;
+      margin: 0 auto;
+      flex-wrap: nowrap;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 1s ease-out 0.2s both;
+    }
 
+    .search-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .search-form label span {
       font-size: 14px;
-
+      font-weight: 600;
+      color: white;
+      text-align: left;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
+    .search-form label input,
+    .search-form label select {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      color: #2d3748;
+      transition: all 0.3s ease;
+      height: 56px;
+      font-weight: 500;
+    }
 
+    .search-form label input::placeholder {
+      color: #a0aec0;
+    }
+
+    .search-form label input:focus,
+    .search-form label select:focus {
+      outline: none;
+      border-color: white;
+      background: white;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .search-form .search-btn-icon {
+      flex: 0 0 auto;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+    }
+
+    .search-form .search-btn-icon:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 35px rgba(245, 87, 108, 0.6);
+    }
+
+    /* Location suggestions */
+    .location-search-container {
+      position: relative;
+      width: 100%;
+    }
 
     #locationSuggestions {
-
       position: absolute;
-
       top: 100%;
-
       left: 0;
-
       right: 0;
-
       background: white;
-
-      border: 1px solid #ddd;
-
-      border-top: none;
-
-      border-radius: 0 0 5px 5px;
-
-      max-height: 200px;
-
+      border: none;
+      border-radius: 12px;
+      max-height: 250px;
       overflow-y: auto;
-
       display: none;
-
       z-index: 100;
-
-      margin-top: 0;
-
+      margin-top: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
-
-
 
     #locationSuggestions.show {
-
       display: block;
-
+      animation: slideIn 0.3s ease-out;
     }
 
-
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .suggestion-item {
-
-      padding: 10px;
-
+      padding: 14px 18px;
       cursor: pointer;
-
-      border-bottom: 1px solid #eee;
-
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+      color: #2d3748;
+      font-weight: 500;
     }
-
-
 
     .suggestion-item:hover {
-
-      background: #f5f5f5;
-
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      padding-left: 24px;
     }
-
-
 
     .suggestion-item:last-child {
-
       border-bottom: none;
-
     }
 
+    /* ====== Resorts Section ====== */
+    .resorts {
+      max-width: 1400px;
+      margin: 60px auto;
+      padding: 0 40px;
+    }
 
+    .resort-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
 
-/* Khoảng cách giữa các khung tìm kiếm - Style Traveloka */
+    .resort-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      outline: none;
+    }
 
-.search-form {
+    .resort-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
 
-  display: flex;
+    .resort-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
 
-  gap: 12px;
+    .resort-card:hover::before {
+      opacity: 1;
+    }
 
-  align-items: flex-end;
+    .resort-link:focus .resort-card,
+    .resort-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 20px 50px rgba(102, 126, 234, 0.25);
+    }
 
-  justify-content: center;
+    .resort-card img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
 
-  max-width: 500px;
+    .resort-card:hover img {
+      transform: scale(1.1);
+    }
 
-  margin: 0 auto;
+    .resort-info {
+      padding: 24px;
+      position: relative;
+      z-index: 2;
+    }
 
-  flex-wrap: nowrap;
+    .resort-info h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      color: #2d3748;
+      font-weight: 700;
+    }
 
+    .resort-info p {
+      margin: 8px 0;
+      color: #718096;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+
+    .resort-info .price {
+      margin-top: 16px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .resort-info .price span {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .fa-map-marker-alt {
+      color: #f5576c;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    /* ====== Promo Section ====== */
+    .promo-codes {
+      position: relative;
+      overflow: hidden;
+      max-width: 1400px;
+      margin: 80px auto;
+      padding: 0 40px;
+    }
+
+    .promo-codes h2 {
+      font-size: 32px;
+      color: #2d3748;
+      font-weight: 800;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .promo-grid {
+      display: flex;
+      gap: 24px;
+      overflow: auto;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      padding: 8px 0;
+    }
+
+    .promo-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .promo-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 28px;
+      flex: 0 0 380px;
+      min-width: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .promo-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .promo-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .promo-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .promo-desc {
+      font-size: 15px;
+      color: #718096;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .promo-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 2px solid #e2e8f0;
+      padding-top: 16px;
+    }
+
+    .promo-code {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      color: #667eea;
+      font-weight: 800;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      border: 2px dashed #667eea;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .promo-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      border: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .promo-arrow:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .promo-arrow.left { left: 0; }
+    .promo-arrow.right { right: 0; }
+
+    /* ====== Deals Section ====== */
+    .deals-section {
+      max-width: 1400px;
+      margin: 80px auto;
+      padding: 60px 40px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    }
+
+    .deals-section h2 {
+      font-size: 32px;
+      margin-bottom: 40px;
+      text-align: center;
+      color: #2d3748;
+      font-weight: 800;
+    }
+
+    /* ====== Popular Destinations ====== */
+    .popular-destinations {
+      max-width: 1400px;
+      margin: 80px auto;
+      padding: 0 40px;
+      text-align: center;
+    }
+
+    .popular-destinations h2 {
+      font-size: 32px;
+      color: #2d3748;
+      font-weight: 800;
+      margin-bottom: 40px;
+    }
+
+    .destination-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .destination-card {
+      width: 220px;
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+
+    .destination-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .destination-card:hover::after {
+      opacity: 1;
+    }
+
+    .destination-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+    }
+
+    .destination-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .destination-card:hover img {
+      transform: scale(1.1);
+    }
+
+    .destination-card p {
+      padding: 16px;
+      font-weight: 700;
+      color: #2d3748;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ====== Why Choose Us ====== */
+    .why-choose-us {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      max-width: 1400px;
+      margin: 80px auto;
+      padding: 80px 40px;
+      text-align: center;
+      border-radius: 40px;
+      color: white;
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    }
+
+    .why-choose-us h2 {
+      font-size: 36px;
+      margin-bottom: 60px;
+      font-weight: 800;
+    }
+
+    .why-choose-us .reasons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 60px;
+    }
+
+    .reason {
+      max-width: 280px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .reason:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .reason img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      filter: brightness(0) invert(1);
+    }
+
+    .reason h4 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .reason p {
+      font-size: 15px;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+
+    /* ====== Footer ====== */
+    footer {
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 60px 40px 30px;
+      font-size: 15px;
+      margin-top: 80px;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    footer p {
+      margin: 0;
+      font-weight: 400;
+      color: #cbd5e0;
+    }
+
+    footer p span {
+      color: #ffffff;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .footer-links {
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
+
+    .footer-links a {
+      color: #cbd5e0;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .footer-links span {
+      color: #4a5568;
+    }
+
+    .footer-social p {
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .social-icons a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .social-icons img {
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1);
+    }
+
+    .social-icons a:hover {
+      transform: translateY(-4px) scale(1.1);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: transparent;
+    }
+
+    /* ====== Pagination ====== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 60px;
+      gap: 12px;
+    }
+
+    .page-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      height: 48px;
+      padding: 0 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      background-color: #ffffff;
+      color: #718096;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: #667eea;
+      color: #667eea;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .page-btn:disabled {
+      background-color: #f7fafc;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .page-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    /* ====== Responsive Design ====== */
+    @media (max-width: 1200px) {
+      .promo-arrow { display: none; }
+      .resort-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-container {
+        padding: 12px 20px;
+      }
+
+      .navbar-menu {
+        gap: 15px;
+        font-size: 13px;
+      }
+
+      .search-header h2 {
+        font-size: 32px;
+      }
+
+      .search-form {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 20px;
+      }
+
+      .search-form label {
+        width: 100%;
+      }
+
+      .search-form .search-btn-icon {
+        width: 100%;
+        height: 56px;
+      }
+
+      .resort-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .resorts,
+      .promo-codes,
+      .deals-section,
+      .popular-destinations,
+      .why-choose-us {
+        padding: 40px 20px;
+      }
+
+      .deals-section {
+        border-radius: 20px;
+      }
+
+      .why-choose-us {
+        border-radius: 20px;
+      }
+
+      .why-choose-us .reasons {
+        gap: 30px;
+      }
+
+      .reason {
+        max-width: 100%;
+      }
+    }
+
+    /* ====== Featured Offer Section ====== */
+.featured-offer {
+    max-width: 1400px;
+    margin: 60px auto;
+    padding: 0 40px;
 }
 
-
-
-.search-form label {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-
-  flex: 1 1 0;
-
-  min-width: 0;
-
+.featured-offer-container {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
 }
 
-
-
-.search-form label span {
-
-  font-size: 12px;
-
-  font-weight: 500;
-
-  color: rgba(255, 255, 255, 0.8);
-
-}
-
-
-
-.search-form label input,
-
-.search-form label select {
-
-  width: 100%;
-
-  padding: 12px 14px;
-
-  border: 1px solid #e0e0e0;
-
-  border-radius: 6px;
-
-  font-size: 14px;
-
-  box-sizing: border-box;
-
-  background: white;
-
-  color: #333;
-
-  transition: all 0.3s ease;
-
-  height: 44px;
-
-}
-
-
-
-.search-form label input::placeholder {
-
-  color: #999;
-
-}
-
-
-
-.search-form label input:focus,
-
-.search-form label select:focus {
-
-  outline: none;
-
-  border-color: #ff9800;
-
-  box-shadow: 0 0 8px rgba(255, 152, 0, 0.2);
-
-}
-
-
-
-.search-form .search-btn-icon {
-
-  flex: 0 0 auto;
-
-  width: 44px;
-
-  height: 44px;
-
-  padding: 0;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  border-radius: 6px;
-
-  background: #ff6b35;
-
-  color: white;
-
-  border: none;
-
-  font-size: 18px;
-
-  transition: all 0.3s ease;
-
-  cursor: pointer;
-
-}
-
-
-
-.search-form .search-btn-icon:hover {
-
-  background: #ff5520;
-
-  transform: scale(1.08);
-
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-
-}
-
-
-
-.search-form .search-btn-icon:active {
-
-  transform: scale(0.95);
-
-}
-
-
-
-@media (max-width: 1024px) {
-
-  .search-form {
-
-    max-width: 100%;
-
-    padding: 0 15px;
-
-    gap: 10px;
-
-  }
-
-
-
-  .search-form label {
-
+.featured-offer-content {
     flex: 1;
-
-  }
-
+    animation: fadeInUp 1s ease-out;
 }
 
+.featured-offer-content h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2d3748;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
+.featured-offer-content p {
+    font-size: 16px;
+    color: #4a5568;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
 
-@media (max-width: 768px) {
+.btn-explore {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    display: inline-block;
+}
 
-  .search-form {
+.btn-explore:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 25px rgba(102, 126, 234, 0.6);
+}
 
-    flex-direction: column;
+.featured-offer-image {
+    flex: 1;
+    max-width: 500px;
+}
 
-    gap: 12px;
-
-  }
-
-
-
-  .search-form label {
-
-    flex: 1 1 100%;
-
+.featured-offer-image img {
     width: 100%;
-
-  }
-
-
-
-  .search-form label input,
-
-  .search-form label select {
-
-    width: 100%;
-
-  }
-
-
-
-  .search-form .search-btn-icon {
-
-    width: 100%;
-
     height: auto;
-
-    padding: 12px 20px;
-
-    flex: 1 1 100%;
-
-  }
-
+    border-radius: 20px;
+    object-fit: cover;
+    transform: scale(1.05);
+    transition: transform 0.5s ease;
 }
 
+.featured-offer-container:hover .featured-offer-image img {
+    transform: scale(1.15);
+}
 
+/* Responsive cho banner */
+@media (max-width: 768px) {
+    .featured-offer-container {
+        flex-direction: column-reverse; /* Đưa ảnh lên trên trên mobile */
+        padding: 20px;
+    }
+    .featured-offer-content {
+        text-align: center;
+    }
+}
 
+/* ====== About Us Section ====== */
+.about-us {
+    max-width: 1400px;
+    margin: 80px auto;
+    padding: 60px 40px;
+}
 
+.about-us-container {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 60px;
+    align-items: center;
+}
 
+.about-us-image img {
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.about-us-content h2 {
+    font-size: 32px;
+    color: #2d3748;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.about-us-content p {
+    font-size: 16px;
+    color: #4a5568;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+/* Responsive cho About Us */
+@media (max-width: 768px) {
+    .about-us-container {
+        grid-template-columns: 1fr;
+    }
+}
   </style>
-
 </head>
-
 <body>
-
   <header class="navbar">
-
     <div class="navbar-container">
-
       <div class="navbar-logo">
-
+    <a href="home.html" style="text-decoration: none;">
         <h1>Resort Booking</h1>
-
-      </div>
-
+    </a>
+</div>
       <nav class="navbar-menu">
-
         <a href="">Khuyến mãi</a>
-
         <a href="supports/support.html">Hỗ trợ</a>
-
         <a href="">Hợp tác với chúng tôi</a>
-
         <a href="my_bookings.html">Đặt chỗ của tôi</a>
-
         <a href="login.html" class="btn-login">Đăng nhập</a>
-
         <a href="register.html" class="btn-register">Đăng ký</a>
-
       </nav>
-
     </div>
-
   </header>
 
-
-
   <div class="search-container">
-
     <div class="search-header">
-
       <h2>Tìm resort hoàn hảo cho kỳ nghỉ của bạn</h2>
-
       <p>Tận hưởng những ưu đãi tốt nhất cho kỳ nghỉ trong mơ của bạn</p>
-
     </div>
-
    
-
     <div class="search-instructions"></div>
-
     <section class="search-form">
-
       <label>
-
-        Địa điểm
-
+        <span>Địa điểm</span>
         <div class="location-search-container">
-
           <input
-
             type="text"
-
             id="location"
-
             placeholder="Nhập tên địa điểm hoặc resort"
-
             autocomplete="off"
-
           />
-
           <div id="locationSuggestions" class="suggestions-dropdown"></div>
-
         </div>
-
       </label>
-
       <label>
-
-        Loại phòng
-
+        <span>Loại phòng</span>
         <select id="roomType">
-
             <option value="">Tất cả loại phòng</option>
-
         </select>
-
       </label>
-
       <button id="searchBtn" class="search-btn-icon" title="Tìm kiếm">
-
          <i class="fas fa-search"></i>
-
       </button>
-
     </section>
-
   </div>
 
-
+  <section class="featured-offer">
+    <div class="featured-offer-container">
+        <div class="featured-offer-content">
+            <h2>Ưu Đãi Mùa Hè Rực Rỡ!</h2>
+            <p>
+                Đừng bỏ lỡ cơ hội tận hưởng kỳ nghỉ tại Phú Quốc với ưu đãi giảm giá lên đến 40%
+                khi đặt phòng trước ngày 30/11. Khám phá vẻ đẹp của biển xanh, cát trắng, nắng vàng!
+            </p>
+            <a href="#" class="btn-explore">Khám Phá Ngay</a>
+        </div>
+        <div class="featured-offer-image">
+            <img src="uploads/andreas-m-Fi_7T4Bl95g-unsplash.jpg" alt="Ưu đãi mùa hè Phú Quốc">
+    </div>
+</section>
 
   <section class="resorts">
-
+    <div style="text-align: center; margin-bottom: 40px;">
+    <h2 style="font-size: 32px; color: #2d3748; font-weight: 800; margin-bottom: 12px;">
+        Khám Phá Thiên Đường Nghỉ Dưỡng
+    </h2>
+    <p style="font-size: 18px; color: #718096; max-width: 700px; margin: 0 auto;">
+        Chúng tôi đã lựa chọn cẩn thận những resort hàng đầu, mang đến cho bạn trải nghiệm
+        đẳng cấp và những kỷ niệm khó phai.
+    </p>
+</div>
       <div id="room-cards-container" class="resort-grid"></div>
-
       <div id="pagination-container" class="pagination"></div>
-
   </section>
-
-
 
   <section class="promo-codes">
-
     <h2><span class="icon">🎁</span> Mã Ưu Đãi Tặng Bạn Mới</h2>
-
-    <button class="promo-arrow left" id="prevBtn"><i>&#10094;</i></button>
-
+    <button class="promo-arrow left" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
     <div class="promo-grid" id="promoGrid"></div>
-
-    <button class="promo-arrow right" id="nextBtn"><i>&#10095;</i></button>
-
+    <button class="promo-arrow right" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
   </section>
-
-
 
   <section class="deals-section">
-
     <h2>Ưu đãi nổi bật</h2>
-
     <div class="resort-grid" id="dealsGrid"></div>
-
   </section>
-
-
 
   <section class="popular-destinations">
-
     <h2>Điểm đến phổ biến</h2>
-
     <div class="destination-grid" id="destinationGrid"></div>
-
   </section>
 
-
+  <section class="about-us">
+    <div class="about-us-container">
+        <div class="about-us-image">
+            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070&auto=format&fit=crop" alt="Về chúng tôi">
+        </div>
+        <div class="about-us-content">
+            <h2>Câu Chuyện Về Resort Booking</h2>
+            <p>
+                Được thành lập bởi những người có niềm đam mê du lịch mãnh liệt, Resort Booking
+                ra đời với sứ mệnh kết nối bạn với những kỳ nghỉ trong mơ một cách đơn giản và
+                tiện lợi nhất. Chúng tôi tin rằng mỗi chuyến đi không chỉ là việc thay đổi
+                địa điểm, mà còn là cơ hội để làm mới tâm hồn và tạo ra những kỷ niệm trọn đời.
+            </p>
+            <p>
+                Từ những resort sang trọng bên bờ biển đến những biệt thự ẩn mình giữa núi rừng,
+                hệ thống của chúng tôi luôn sẵn sàng đáp ứng mọi nhu cầu của bạn với mức giá tốt nhất.
+            </p>
+        </div>
+    </div>
+</section>
 
   <section class="why-choose-us">
-
     <h2>Vì sao nên chọn Resort Booking?</h2>
-
     <div class="reasons">
-
       <div class="reason">
-
         <img src="Assets/Icon Images/thumbs-up.png" alt="Đặt phòng dễ dàng">
-
         <h4>Đặt chỗ dễ dàng</h4>
-
         <p>Chỉ vài bước đơn giản để hoàn tất đặt phòng của bạn.</p>
-
       </div>
-
       <div class="reason">
-
         <img src="Assets/Icon Images/voucher.png" alt="Ưu đãi hấp dẫn">
-
         <h4>Ưu đãi hấp dẫn</h4>
-
         <p>Giá tốt nhất mỗi ngày dành cho khách hàng thân thiết.</p>
-
       </div>
-
       <div class="reason">
-
         <img src="Assets/Icon Images/customer-service.png" alt="Hỗ trợ 24/7">
-
         <h4>Hỗ trợ 24/7</h4>
-
         <p>Đội ngũ CSKH sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi.</p>
-
       </div>
-
     </div>
-
   </section>
 
-
-
   <footer>
-
     <div class="footer-container">
-
       <div class="footer-links">
-
         <a href="#">Chính sách bảo mật</a>
-
         <span>|</span>
-
         <a href="#">Điều khoản sử dụng</a>
-
         <span>|</span>
-
         <a href="#">Liên hệ</a>
-
       </div>
-
       <div class="footer-social">
-
         <p>Theo dõi chúng tôi</p>
-
         <div class="social-icons">
-
           <a href="#"><img src="Assets/Icon Images/facebook.png" alt="Facebook"></a>
-
           <a href="#"><img src="Assets/Icon Images/instagram.png" alt="Instagram"></a>
-
           <a href="#"><img src="Assets/Icon Images/communication.png" alt="Telegram"></a>
-
           <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046126.png" alt="TikTok"></a>
-
         </div>
-
       </div>
-
       <br/>
-
       <p>© 2025 <span>Resort Booking</span>. All rights reserved.</p>
-
     </div>
-
   </footer>
 
-
-
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
-
   <script src="voucher.js"></script>
-
   <script src="destinations.js"></script>
 
-
-
   <script>
-
   document.addEventListener('DOMContentLoaded', async () => {
-
       let allRooms = [];
-
       let currentPage = 1;
-
       const itemsPerPage = 6;
-
       const API_BASE = "http://localhost:5500";
 
-
-
       function resolveImageUrl(url) {
-
         if (!url) return 'Assets/placeholder.jpg';
-
         if (/^https?:\/\//i.test(url)) return url;
-
         if (url.startsWith('/')) return API_BASE + url;
-
         return API_BASE + '/uploads/' + url;
-
       }
-
-
 
       function getLocationName(key) {
-
           const locationMap = { 'da-lat': 'Đà Lạt', 'ha-long': 'Hạ Long', 'phu-quoc': 'Phú Quốc', 'nha-trang': 'Nha Trang', 'da-nang': 'Đà Nẵng', 'sapa': 'Sapa', 'hoi-an': 'Hội An', 'ha-noi': 'Hà Nội', 'sai-gon': 'Sài Gòn' };
-
           return locationMap[key] || key || 'Không xác định';
-
       }
-
-
 
       async function fetchRooms() {
-
           try {
-
               const response = await fetch(`${API_BASE}/api/rooms`);
-
               if (!response.ok) throw new Error('Network response was not ok');
-
               allRooms = await response.json();
-
               populateRoomTypes();
-
           } catch (error) {
-
               console.error('Lỗi khi lấy dữ liệu phòng:', error);
-
               allRooms = [];
-
           }
-
       }
-
-
 
       // Populate room types dropdown
-
       function populateRoomTypes() {
-
           const roomTypeSelect = document.getElementById('roomType');
-
           const uniqueRoomTypes = [...new Set(allRooms.map(room => room.room_type))];
-
          
-
           uniqueRoomTypes.forEach(roomType => {
-
               if (roomType) {
-
                   const option = document.createElement('option');
-
                   option.value = roomType;
-
                   option.textContent = roomType;
-
                   roomTypeSelect.appendChild(option);
-
               }
-
           });
-
       }
-
-
 
       // Location search with suggestions
-
       const locationInput = document.getElementById('location');
-
       const suggestionsList = document.getElementById('locationSuggestions');
 
-
-
       locationInput.addEventListener('input', (e) => {
-
           const searchTerm = e.target.value.toLowerCase().trim();
 
-
-
           if (!searchTerm) {
-
               suggestionsList.classList.remove('show');
-
               return;
-
           }
-
-
 
           // Lấy tất cả địa điểm + tên resort từ dữ liệu
-
           const suggestions = new Set();
-
           allRooms.forEach(room => {
-
               if (room.location) {
-
                   suggestions.add(getLocationName(room.location));
-
               }
-
               if (room.resort_name && room.resort_name.toLowerCase().includes(searchTerm)) {
-
                   suggestions.add(room.resort_name);
-
               }
-
           });
-
-
 
           // Filter suggestions theo search term
-
           const filtered = Array.from(suggestions).filter(item =>
-
               item.toLowerCase().includes(searchTerm)
-
           );
 
-
-
           if (filtered.length === 0) {
-
               suggestionsList.classList.remove('show');
-
               return;
-
           }
-
-
 
           // Display suggestions
-
           suggestionsList.innerHTML = filtered.map(item =>
-
               `<div class="suggestion-item">${item}</div>`
-
           ).join('');
-
           suggestionsList.classList.add('show');
 
-
-
           // Add click event to suggestions
-
           document.querySelectorAll('.suggestion-item').forEach(item => {
-
               item.addEventListener('click', () => {
-
                   locationInput.value = item.textContent;
-
                   suggestionsList.classList.remove('show');
-
               });
-
           });
-
       });
-
-
 
       // Close suggestions when clicking outside
-
       document.addEventListener('click', (e) => {
-
           if (e.target !== locationInput) {
-
               suggestionsList.classList.remove('show');
-
           }
-
       });
-
-
 
       function renderRooms(roomsToDisplay) {
-
         const container = document.getElementById("room-cards-container");
-
         if (!container) return;
-
         container.innerHTML = "";
 
-
-
         if (!roomsToDisplay || roomsToDisplay.length === 0) {
-
             container.innerHTML = '<p style="text-align: center; width: 100%; padding: 2rem 0;">Không tìm thấy kết quả phù hợp.</p>';
-
             return;
-
         }
 
-
-
         roomsToDisplay.forEach((room) => {
-
           const card = document.createElement("a");
-
-          card.className = "resort-card";
-
+          card.className = "resort-link";
           card.href = `resort_detail.html?id=${room.id}`;
 
-
-
           const formattedPrice = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(room.price_per_night);
-
           const imageUrl = resolveImageUrl(room.images?.[0]);
 
-
-
           card.innerHTML = `
-
-            <img src="${imageUrl}" alt="${room.resort_name || room.room_type}">
-
-            <div class="resort-info">
-
-                <h3>${room.resort_name || room.room_type}</h3>
-
-                <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
-
-                <p class="price">Từ : <span>${formattedPrice}/đêm</span></p>
-
+            <div class="resort-card">
+              <img src="${imageUrl}" alt="${room.resort_name || room.room_type}">
+              <div class="resort-info">
+                  <h3>${room.resort_name || room.room_type}</h3>
+                  <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
+                  <p class="price">Từ : <span>${formattedPrice}/đêm</span></p>
+              </div>
             </div>
-
           `;
-
           container.appendChild(card);
-
         });
-
       }
-
-
 
       function renderRoomsForCurrentPage() {
-
         const startIndex = (currentPage - 1) * itemsPerPage;
-
         const endIndex = startIndex + itemsPerPage;
-
         const roomsToRender = allRooms.slice(startIndex, endIndex);
-
         renderRooms(roomsToRender);
-
       }
-
-
 
       function renderPagination() {
-
           const paginationContainer = document.getElementById('pagination-container');
-
           if (!paginationContainer) return;
-
           paginationContainer.innerHTML = '';
-
           const totalPages = Math.ceil(allRooms.length / itemsPerPage);
-
           if (totalPages <= 1) {
-
               paginationContainer.style.display = 'none';
-
               return;
-
           };
-
           paginationContainer.style.display = 'flex';
 
-
-
           const prevButton = document.createElement('button');
-
           prevButton.className = 'page-btn';
-
           prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
-
           if (currentPage === 1) prevButton.disabled = true;
-
           prevButton.addEventListener('click', () => {
-
               if (currentPage > 1) {
-
                   currentPage--;
-
                   renderRoomsForCurrentPage();
-
                   renderPagination();
-
                   document.getElementById('room-cards-container').scrollIntoView({ behavior: 'smooth' });
-
               }
-
           });
-
           paginationContainer.appendChild(prevButton);
 
-
-
           for (let i = 1; i <= totalPages; i++) {
-
               const pageButton = document.createElement('button');
-
               pageButton.className = 'page-btn';
-
               pageButton.textContent = i;
-
               if (i === currentPage) pageButton.classList.add('active');
-
               pageButton.addEventListener('click', () => {
-
                   currentPage = i;
-
                   renderRoomsForCurrentPage();
-
                   renderPagination();
-
                   document.getElementById('room-cards-container').scrollIntoView({ behavior: 'smooth' });
-
               });
-
               paginationContainer.appendChild(pageButton);
-
           }
 
-
-
           const nextButton = document.createElement('button');
-
           nextButton.className = 'page-btn';
-
           nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
-
           if (currentPage === totalPages) nextButton.disabled = true;
-
           nextButton.addEventListener('click', () => {
-
               if (currentPage < totalPages) {
-
                   currentPage++;
-
                   renderRoomsForCurrentPage();
-
                   renderPagination();
-
                   document.getElementById('room-cards-container').scrollIntoView({ behavior: 'smooth' });
-
               }
-
           });
-
           paginationContainer.appendChild(nextButton);
-
       }
-
      
-
       const token = localStorage.getItem('token');
-
       const role = localStorage.getItem('role');
-
       if (token && (role === 'admin' || role === 'staff')) {
-
           window.location.href = '/admin/index.html';
-
           return;
-
       }
-
-
 
       await fetchRooms();
-
       renderRoomsForCurrentPage();
-
       renderPagination();
 
-
-
       const dealsContainer = document.getElementById('dealsGrid');
-
       if(dealsContainer){
-
           dealsContainer.innerHTML = '';
-
-          allRooms.slice(0, 4).forEach(room => {
-
-              const card = document.createElement('a');
-
-              card.className = 'resort-card';
-
-              card.href = `resort_detail.html?id=${room.id}`;
-
+          allRooms.slice(0, 3).forEach(room => {
+              const link = document.createElement('a');
+              link.className = 'resort-link';
+              link.href = `resort_detail.html?id=${room.id}`;
               const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.price_per_night);
-
               const imageUrl = resolveImageUrl(room.images?.[0]);
-
-              card.innerHTML = `
-
-                  <img src="${imageUrl}" alt="${room.resort_name || room.room_type}">
-
-                  <div class="resort-info">
-
-                      <h3>${room.resort_name || room.room_type}</h3>
-
-                      <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
-
-                      <p class="price">Từ: <span> ${formattedPrice}/đêm</span></p>
-
+              link.innerHTML = `
+                  <div class="resort-card">
+                    <img src="${imageUrl}" alt="${room.resort_name || room.room_type}">
+                    <div class="resort-info">
+                        <h3>${room.resort_name || room.room_type}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
+                        <p class="price">Từ: <span> ${formattedPrice}/đêm</span></p>
+                    </div>
                   </div>`;
-
-              dealsContainer.appendChild(card);
-
+              dealsContainer.appendChild(link);
           });
-
       }
-
-
 
       // Search functionality
-
       document.getElementById('searchBtn').addEventListener('click', () => {
-
           const locationValue = locationInput.value.toLowerCase().trim();
-
           const roomTypeValue = document.getElementById('roomType').value;
 
-
-
           const filteredRooms = allRooms.filter(room => {
-
               const locationName = getLocationName(room.location);
-
               const matchesLocation = !locationValue ||
-
                                       locationName.toLowerCase().includes(locationValue) ||
-
                                       (room.resort_name && room.resort_name.toLowerCase().includes(locationValue));
-
               const matchesRoomType = !roomTypeValue || room.room_type === roomTypeValue;
-
               return matchesLocation && matchesRoomType;
-
           });
-
          
-
           document.getElementById('pagination-container').style.display = 'none';
-
           renderRooms(filteredRooms);
-
       });
-
-
 
       document.querySelectorAll('.type-btn').forEach(btn => {
-
           btn.addEventListener('click', () => {
-
               document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-
               btn.classList.add('active');
-
           });
-
       });
-
      
-
       document.getElementById('nextBtn').onclick = () => document.getElementById('promoGrid').scrollBy({ left: 360, behavior: 'smooth' });
-
       document.getElementById('prevBtn').onclick = () => document.getElementById('promoGrid').scrollBy({ left: -360, behavior: 'smooth' });
 
-
-
       if (typeof destinations !== 'undefined') {
-
           destinations.forEach(place => {
-
               const card = document.createElement('div');
-
               card.className = 'destination-card';
-
               card.innerHTML = `
-
                 <img src="${place.image}" alt="${place.name}">
-
                 <p>${place.name}</p>
-
               `;
-
               document.getElementById('destinationGrid').appendChild(card);
-
           });
-
       }
-
   });
-
   </script>
-
-
 
   <script>
-
     document.addEventListener("DOMContentLoaded", () => {
-
       const navbarMenu = document.querySelector(".navbar-menu");
-
       const username = localStorage.getItem("username");
-
       const full_name = localStorage.getItem("full_name");
-
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-
-
       if (username || full_name || currentUser.id) {
-
         const displayName = username || full_name || currentUser.username;
-
        
-
         navbarMenu.innerHTML = `
-
           <a href="">Khuyến mãi</a>
-
           <a href="supports/support.html">Hỗ trợ</a>
-
           <a href="">Hợp tác với chúng tôi</a>
-
           <a href="my_bookings.html">Đặt chỗ của tôi</a>
-
           <div class="user-menu">
-
             <a href="profile.html" class="user-profile-link">
-
               <span class="avatar-icon">👤</span>
-
               <span class="user-name-text">${displayName}</span>
-
             </a>
-
             <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
-
           </div>
-
         `;
-
        
-
         document.getElementById("logoutBtn").addEventListener("click", () => {
-
           localStorage.clear();
-
           window.location.href = "login.html";
-
         });
-
       }
-
     });
-
   </script>
-
 </body>
-
 </html>
