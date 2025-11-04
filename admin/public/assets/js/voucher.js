@@ -31,6 +31,10 @@ async function loadVouchers() {
         });
         if (!res.ok) throw new Error("Không thể tải danh sách voucher");
         vouchers = await res.json();
+         // 🔥 Thêm đây
+        console.log("📥 Response từ API:", JSON.stringify(vouchers, null, 2));
+        console.log("🔎 Voucher đầu tiên:", vouchers[0]);
+        console.log("📝 Có field 'name' không?", vouchers[0]?.name);
         renderTable();
     } catch (err) {
         console.error(err);

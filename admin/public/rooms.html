@@ -8,12 +8,23 @@
     <style>
         body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f5f7fa; color:#374151; }
         .card{background:#fff;border-radius:12px;padding:1.25rem;box-shadow:0 6px 16px rgba(0,0,0,.06)}
-        .btn-primary{background:linear-gradient(90deg,#3b82f6,#2563eb);color:#fff;padding:.5rem 1rem;border-radius:10px}
-        .btn-secondary{background-color: #e5e7eb; color: #374151; padding: .5rem 1rem; border-radius: 10px; font-weight: 500;}
-        #room-modal .modal-card{ width:100%; max-width:520px; border-radius:14px; padding:26px; background:#fff; box-shadow:0 12px 40px rgba(2,6,23,.3); max-height: 90vh; overflow-y: auto; }
+        .btn-primary{background:linear-gradient(90deg,#3b82f6,#2563eb);color:#fff;padding:.5rem 1rem;border-radius:10px;transition:all 0.3s}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(59,130,246,0.4)}
+        .btn-secondary{background-color: #e5e7eb; color: #374151; padding: .5rem 1rem; border-radius: 10px; font-weight: 500; transition: all 0.3s;}
+        .btn-secondary:hover{background-color: #d1d5db;}
+        #room-modal .modal-card{ width:100%; max-width:620px; border-radius:14px; padding:26px; background:#fff; box-shadow:0 12px 40px rgba(2,6,23,.3); max-height: 90vh; overflow-y: auto; }
         .image-preview-item{position:relative;width:60px;height:60px;border-radius:8px;overflow:hidden;margin-right:8px;margin-top: 8px;}
         .image-preview-item img{width:100%;height:100%;object-fit:cover}
-        .image-preview-item .remove-image{position:absolute;top:2px;right:2px;background:rgba(239,68,68,.9);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+        .image-preview-item .remove-image{position:absolute;top:2px;right:2px;background:rgba(239,68,68,.9);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:bold}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+        .form-row.full{grid-template-columns:1fr}
+        .table-responsive{overflow-x:auto}
+        .price-badge{background:#e0f2fe;color:#0369a1;padding:0.25rem 0.75rem;border-radius:9999px;font-weight:600;font-size:0.875rem}
+        .status-badge{padding:0.25rem 0.75rem;border-radius:9999px;font-weight:600;font-size:0.875rem}
+        .error-message{color:#dc2626;font-size:0.875rem;margin-top:0.5rem}
+        .success-message{color:#059669;font-size:0.875rem;margin-top:0.5rem}
+        .bed-input-hint{color:#6b7280;font-size:0.75rem;margin-top:0.25rem}
+        input[type="text"].bed-input{font-size:0.95rem}
     </style>
 </head>
 <body class="p-8">
@@ -25,7 +36,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
-                <h1 class="text-2xl font-bold">Quản Lý Resort & Phòng</h1>
+                <h1 class="text-2xl font-bold">🏨 Quản Lý Resort & Phòng</h1>
             </div>
             <button class="btn-primary" onclick="openNewResortModal()">+ Tạo Resort Mới</button>
         </div>
@@ -34,7 +45,8 @@
         </div>
     </div>
 
-    <div id="room-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 z-50 items-center justify-center p-4">
+    <!-- Modal Thêm/Sửa Phòng -->
+    <div id="room-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-4">
         <div class="modal-card">
             <h3 id="modal-title" class="text-xl font-semibold mb-4">Thêm Phòng Mới</h3>
             <form id="room-form">
@@ -85,26 +97,54 @@
                     <p class="text-xs text-gray-500 mt-1">Các ảnh xem trước (mới) bên dưới. Khi sửa, upload ảnh mới sẽ **thay thế toàn bộ** ảnh cũ.</p>
                     <div id="image-preview" class="flex flex-wrap mt-2"></div>
                 </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-medium mb-1">Vị trí</label>
-                    <select id="room-location" class="w-full border rounded px-3 py-2" required>
-                        <option value="">Chọn vị trí</option>
-                        <option value="da-lat">Đà Lạt</option><option value="ha-long">Hạ Long</option><option value="phu-quoc">Phú Quốc</option><option value="nha-trang">Nha Trang</option><option value="da-nang">Đà Nẵng</option><option value="sapa">Sapa</option><option value="hoi-an">Hội An</option><option value="ha-noi">Hà Nội</option><option value="sai-gon">Sài Gòn</option>
-                    </select>
+
+                <!-- Hàng 4: Vị trí & Địa chỉ -->
+                <div class="form-row">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Vị trí *</label>
+                        <select id="room-location" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" required>
+                            <option value="">-- Chọn vị trí --</option>
+                            <option value="da-lat">📍 Đà Lạt</option>
+                            <option value="ha-long">📍 Hạ Long</option>
+                            <option value="phu-quoc">📍 Phú Quốc</option>
+                            <option value="nha-trang">📍 Nha Trang</option>
+                            <option value="da-nang">📍 Đà Nẵng</option>
+                            <option value="sapa">📍 Sapa</option>
+                            <option value="hoi-an">📍 Hội An</option>
+                            <option value="ha-noi">📍 Hà Nội</option>
+                            <option value="sai-gon">📍 Sài Gòn</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Địa chỉ cụ thể</label>
+                        <input id="room-address" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" placeholder="Khu A, Phường X..." />
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Địa chỉ cụ thể</label>
-                    <input id="room-address" class="w-full border rounded px-3 py-2" placeholder="Ví dụ: Khu A, Phường X..." />
+
+                <!-- Hàng 5: Thông tin chi tiết -->
+                <div class="form-row full">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Thông tin chi tiết</label>
+                        <textarea id="room-description" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" placeholder="Mô tả về phòng, các tiện ích đặc biệt..."></textarea>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="room-description" class="block text-sm font-medium mb-1">Thông tin chi tiết</label>
-                    <textarea id="room-description" rows="3" class="w-full border rounded px-3 py-2" placeholder="Mô tả về phòng, các tiện ích đặc biệt..."></textarea>
+
+                <!-- Hàng 6: Hình ảnh -->
+                <div class="form-row full">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
+                        <input id="room-images" type="file" accept="image/*" multiple class="w-full border border-gray-300 rounded px-3 py-2" />
+                        <div id="image-preview" class="flex flex-wrap mt-2"></div>
+                    </div>
                 </div>
-                <div class="flex justify-end items-center space-x-3">
-                    <button type="button" onclick="closeRoomModal()" class="btn-secondary">Hủy</button>
-                    <button type="submit" id="modal-submit-btn" class="btn-primary">Thêm Phòng</button>
+
+                <!-- Nút hành động -->
+                <div class="flex justify-end items-center space-x-3 mt-6">
+                    <button type="button" onclick="closeRoomModal()" class="btn-secondary">❌ Hủy</button>
+                    <button type="submit" id="modal-submit-btn" class="btn-primary">✅ Thêm Phòng</button>
                 </div>
-                <p id="modal-error-message" class="text-sm text-red-500 mt-3"></p>
+                <p id="modal-error-message" class="error-message"></p>
+                <p id="modal-success-message" class="success-message"></p>
             </form>
         </div>
     </div>
@@ -155,10 +195,10 @@
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">${resort.name}</h2>
+                        <h2 class="text-xl font-bold">🏨 ${resort.name}</h2>
                         <button class="btn-primary" onclick="openRoomModal('create', ${resort.id})">+ Thêm phòng</button>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="table-responsive">
                         <table class="w-full text-sm">
                             <thead><tr class="text-left text-gray-500"><th class="p-2">Hạng phòng</th><th class="p-2">Giá</th><th class="p-2">Số giường</th><th class="p-2">Trạng thái</th><th class="p-2">Thao tác</th></tr></thead>
                             <tbody>
@@ -181,7 +221,7 @@
                 container.appendChild(card);
             });
         } catch (error) {
-            container.innerHTML = `<p class="text-center text-red-500">Lỗi: ${error.message}</p>`;
+            container.innerHTML = `<p class="text-center text-red-500">❌ Lỗi: ${error.message}</p>`;
         }
     }
 
@@ -191,7 +231,10 @@
             try {
                 await apiFetch('/api/admin/resorts', { method: 'POST', body: JSON.stringify({ name: resortName }) });
                 fetchAndRenderAll();
-            } catch (error) { alert(`Lỗi: ${error.message}`); }
+                alert("✅ Tạo resort thành công!");
+            } catch (error) { 
+                alert(`❌ Lỗi: ${error.message}`); 
+            }
         }
     }
 
@@ -206,10 +249,11 @@
         preview.innerHTML = '';
         
         document.getElementById('modal-error-message').textContent = '';
+        document.getElementById('modal-success-message').textContent = '';
         
         if (mode === 'create') {
-            document.getElementById('modal-title').textContent = 'Thêm Phòng Mới';
-            document.getElementById('modal-submit-btn').textContent = 'Thêm Phòng';
+            document.getElementById('modal-title').textContent = '➕ Thêm Phòng Mới';
+            document.getElementById('modal-submit-btn').textContent = '✅ Thêm Phòng';
             document.getElementById('room-id').value = '';
             document.getElementById('resort-id').value = resortId;
         } else if (mode === 'edit' && roomId) { 
@@ -259,14 +303,14 @@
         e.preventDefault();
         const submitBtn = document.getElementById('modal-submit-btn');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Đang xử lý...';
+        submitBtn.textContent = '⏳ Đang xử lý...';
         
         const roomId = document.getElementById('room-id').value;
         const fd = new FormData();
         fd.append('resort_id', document.getElementById('resort-id').value);
         fd.append('room_type_id', document.getElementById('room-type-id').value);
         fd.append('category', document.getElementById('room-category').value);
-        fd.append('num_bed', document.getElementById('num-bed').value);
+        fd.append('num_bed', document.getElementById('num-bed').value.trim());
         fd.append('status', document.getElementById('room-status').value);
         
         fd.append('price_per_night', document.getElementById('room-price').value);
@@ -275,6 +319,7 @@
         fd.append('address', document.getElementById('room-address').value);
         fd.append('description', document.getElementById('room-description').value);
         
+        fd.append('price_per_night', document.getElementById('price-per-night').value);
         const files = document.getElementById('room-images').files;
         Array.from(files).forEach(file => fd.append('images', file));
 
@@ -282,22 +327,30 @@
             const url = currentMode === 'create' ? '/api/admin/rooms' : `/api/admin/rooms/${roomId}`;
             const method = currentMode === 'create' ? 'POST' : 'PUT';
             await apiFetch(url, { method, body: fd });
-            closeRoomModal();
-            fetchAndRenderAll();
+            
+            document.getElementById('modal-success-message').textContent = 
+                currentMode === 'create' ? '✅ Thêm phòng thành công!' : '✅ Cập nhật phòng thành công!';
+            
+            setTimeout(() => {
+                closeRoomModal();
+                fetchAndRenderAll();
+            }, 1000);
         } catch (error) {
-            document.getElementById('modal-error-message').textContent = error.message;
+            document.getElementById('modal-error-message').textContent = '❌ ' + error.message;
         } finally {
             submitBtn.disabled = false;
+            submitBtn.textContent = currentMode === 'create' ? '✅ Thêm Phòng' : '💾 Lưu Thay Đổi';
         }
     });
 
     async function deleteRoom(roomId) {
-        if (confirm('Bạn có chắc chắn muốn xóa phòng này không?')) {
+        if (confirm('⚠️ Bạn có chắc chắn muốn xóa phòng này không?')) {
             try {
                 await apiFetch(`/api/admin/rooms/${roomId}`, { method: 'DELETE' });
+                alert('✅ Xóa phòng thành công!');
                 fetchAndRenderAll();
             } catch (error) {
-                alert(`Lỗi khi xóa phòng: ${error.message}`);
+                alert(`❌ Lỗi khi xóa phòng: ${error.message}`);
             }
         }
     }
@@ -330,8 +383,20 @@
             ROOM_TYPES = await apiFetch('/api/admin/room-types');
             sel.innerHTML = ROOM_TYPES.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
         } catch (err) {
-            sel.innerHTML = '<option value="">Lỗi tải loại phòng</option>';
+            sel.innerHTML = '<option value="">❌ Lỗi tải loại phòng</option>';
         }
+    }
+
+    // Logout handler
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            if (confirm("Bạn có chắc muốn đăng xuất không?")) {
+                localStorage.removeItem("token");
+                alert("Đã đăng xuất!");
+                window.location.href = "http://localhost:5500/login.html";
+            }
+        });
     }
 
     fetchRoomTypes();
