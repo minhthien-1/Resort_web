@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phòng theo Địa Điểm - Resort Booking</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+    }
+
+    /* ====== NAVBAR ====== */
+    .navbar {
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 16px 40px;
+    }
+
+    .navbar-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-logo h1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .back-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* ====== HEADER ====== */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* ====== MAIN CONTENT ====== */
+    .container {
+      max-width: 1400px;
+      margin: 60px auto;
+      padding: 0 40px;
+    }
+
+    .filter-section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .filter-section label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .filter-section label span {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .filter-section input,
+    .filter-section select {
+      padding: 10px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      height: 40px;
+    }
+
+    .filter-section button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .filter-section button:hover {
+      transform: scale(1.05);
+    }
+
+    /* ====== STATS ====== */
+    .stats {
+      margin-bottom: 30px;
+      font-size: 16px;
+      color: #718096;
+      font-weight: 600;
+    }
+
+    /* ====== RESORTS SECTION ====== */
+    .resort-group {
+      margin-bottom: 80px;
+    }
+
+    .resort-group-title {
+      font-size: 26px;
+      color: #2d3748;
+      font-weight: 700;
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #667eea;
+      display: inline-block;
+    }
+
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .room-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .room-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+
+    .room-card-image {
+      width: 100%;
+      height: 200px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .room-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.5s;
+    }
+
+    .room-card:hover .room-card-image img {
+      transform: scale(1.1);
+    }
+
+    .room-card-content {
+      padding: 20px;
+    }
+
+    .room-card-content h3 {
+      font-size: 18px;
+      color: #2d3748;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .room-card-content p {
+      color: #718096;
+      font-size: 14px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .room-price {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #667eea;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #718096;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* ====== FOOTER ====== */
+    footer {
+      background: #1a202c;
+      color: white;
+      text-align: center;
+      padding: 40px;
+      margin-top: 80px;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 768px) {
+      .rooms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-section {
+        flex-direction: column;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+
+      .navbar-container {
+        padding: 12px 20px;
+      }
+
+      .container {
+        padding: 0 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="navbar-container">
+      <a href="home.html" style="text-decoration: none;">
+        <h1>Resort Booking</h1>
+      </a>
+      <button class="back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+        Quay lại
+      </button>
+    </div>
+  </header>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1 id="location-title">Phòng tại Đà Lạt</h1>
+    <p>Khám phá những phòng tuyệt vời tại địa điểm bạn chọn</p>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <section class="container">
+    <!-- FILTER -->
+    <div class="filter-section">
+      <label>
+        <span>Loại phòng</span>
+        <select id="roomType">
+          <option value="">Tất cả loại phòng</option>
+        </select>
+      </label>
+      <button id="filterBtn">
+        <i class="fas fa-filter"></i>
+        Lọc
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <span id="room-count">Tổng cộng: 0 phòng</span>
+    </div>
+
+    <!-- ROOMS -->
+    <div id="room-cards-container"></div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">📭</div>
+      <h2>Không tìm thấy phòng</h2>
+      <p>Hãy thử thay đổi bộ lọc</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 Resort Booking. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const API_BASE = "http://localhost:5500";
+      let allRooms = [];
+      let filteredRooms = [];
+
+      // ===== GET LOCATION FROM URL =====
+      const params = new URLSearchParams(window.location.search);
+      const locationParam = params.get('location') || 'da-lat';
+
+      const locationMap = {
+        'da-lat': 'Đà Lạt',
+        'ha-long': 'Hạ Long',
+        'phu-quoc': 'Phú Quốc',
+        'nha-trang': 'Nha Trang',
+        'da-nang': 'Đà Nẵng',
+        'sapa': 'Sapa',
+        'hoi-an': 'Hội An',
+        'ha-noi': 'Hà Nội'
+      };
+
+      const locationName = locationMap[locationParam] || locationParam;
+      document.getElementById('location-title').textContent = `Phòng tại ${locationName}`;
+
+      // ===== HELPER FUNCTIONS =====
+      function resolveImageUrl(url) {
+        if (!url) return 'https://via.placeholder.com/300x200?text=Room';
+        if (/^https?:\/\//i.test(url)) return url;
+        return API_BASE + '/uploads/' + url;
+      }
+
+      function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND'
+        }).format(price);
+      }
+
+      function getLocationName(key) {
+        return locationMap[key] || key || 'Chưa xác định';
+      }
+
+      // ===== FETCH ROOMS =====
+      async function fetchRooms() {
+        try {
+          const response = await fetch(`${API_BASE}/api/rooms?location=${locationParam}`);
+          if (!response.ok) throw new Error('Network error');
+          allRooms = await response.json();
+          filteredRooms = allRooms;
+          populateRoomTypes();
+          updateStats();
+          renderRooms();
+        } catch (error) {
+          console.error('Error:', error);
+          allRooms = [];
+        }
+      }
+
+      // ===== POPULATE ROOM TYPES =====
+      function populateRoomTypes() {
+        const select = document.getElementById('roomType');
+        const types = [...new Set(allRooms.map(r => r.room_type))];
+        types.forEach(type => {
+          if (type) {
+            const opt = document.createElement('option');
+            opt.value = type;
+            opt.textContent = type;
+            select.appendChild(opt);
+          }
+        });
+      }
+
+      // ===== UPDATE STATS =====
+      function updateStats() {
+        document.getElementById('room-count').textContent = `Tổng cộng: ${filteredRooms.length} phòng`;
+      }
+
+      // ===== GROUP ROOMS BY RESORT =====
+      function groupRoomsByResort(rooms) {
+        const grouped = {};
+        rooms.forEach(room => {
+          const resort = room.resort_name || 'Không xác định';
+          if (!grouped[resort]) grouped[resort] = [];
+          grouped[resort].push(room);
+        });
+        return grouped;
+      }
+
+      // ===== RENDER ROOMS =====
+      function renderRooms() {
+        const container = document.getElementById('room-cards-container');
+        const emptyState = document.getElementById('empty-state');
+        container.innerHTML = '';
+
+        if (!filteredRooms || filteredRooms.length === 0) {
+          container.style.display = 'none';
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        container.style.display = 'block';
+        emptyState.style.display = 'none';
+
+        const grouped = groupRoomsByResort(filteredRooms);
+
+        Object.entries(grouped).forEach(([resortName, rooms]) => {
+          const title = document.createElement('h3');
+          title.className = 'resort-group-title';
+          title.textContent = `🏨 ${resortName}`;
+          container.appendChild(title);
+
+          const grid = document.createElement('div');
+          grid.className = 'rooms-grid';
+
+          rooms.forEach(room => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            card.style.cursor = 'pointer';
+            card.onclick = () => window.location.href = `resort_detail.html?id=${room.id}`;
+
+            const imageUrl = resolveImageUrl(room.images?.[0]);
+
+            card.innerHTML = `
+              <div class="room-card-image">
+                <img src="${imageUrl}" alt="${room.room_type}" onerror="this.src='https://via.placeholder.com/300x200?text=Room'">
+              </div>
+              <div class="room-card-content">
+                <h3>${room.room_type}</h3>
+                <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
+                <p><i class="fas fa-door-open"></i> ${room.num_bed || 'Chưa xác định'}</p>
+                <div class="room-price">${formatPrice(room.price_per_night)}/đêm</div>
+              </div>
+            `;
+
+            grid.appendChild(card);
+          });
+
+          container.appendChild(grid);
+        });
+      }
+
+      // ===== FILTER =====
+      document.getElementById('filterBtn').onclick = () => {
+        const roomType = document.getElementById('roomType').value;
+
+        filteredRooms = allRooms.filter(room => {
+          return !roomType || room.room_type === roomType;
+        });
+
+        updateStats();
+        renderRooms();
+      };
+
+      // ===== INIT =====
+      await fetchRooms();
+    });
+  </script>
+</body>
+</html>
