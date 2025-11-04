@@ -293,7 +293,7 @@ app.get("/api/rooms", async (req, res) => {
   try {
     const { location, room_type } = req.query;
     let sql = `SELECT r.id, res.name AS resort_name, r.room_type_id, rt.name AS room_type, 
-                      COALESCE(rd.price_per_night, rt.price_per_night) AS price_per_night,
+                      rd.price_per_night,
                       rt.capacity, rd.images_url AS images, r.location, rd.description, rd.features, rd.num_bed
                FROM rooms r 
                JOIN room_types rt ON r.room_type_id = rt.id
@@ -339,13 +339,14 @@ app.get("/api/rooms/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { rows } = await pool.query(
-      `SELECT r.id, res.name AS resort_name, r.location, r.category, 
-              rt.name AS room_type, rt.price_per_night, rt.capacity, 
-              COALESCE(rd.description, 'Chưa có mô tả') AS description,
-              COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
-              COALESCE(rd.images_url, ARRAY[]::text[]) AS images,
-              COALESCE(rd.price_per_night, rt.price_per_night) AS price_per_night,
-              rd.num_bed
+      // ...
+      `SELECT r.id, res.name AS resort_name, r.location, r.category, r.address,
+               rt.name AS room_type, rt.capacity, 
+               COALESCE(rd.description, 'Chưa có mô tả') AS description,
+               COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
+               COALESCE(rd.images_url, ARRAY[]::text[]) AS images,
+               rd.price_per_night,
+               rd.num_bed
        FROM rooms r 
        JOIN room_types rt ON r.room_type_id = rt.id
        JOIN resorts res ON r.resort_id = res.id
@@ -403,7 +404,7 @@ app.get("/api/reviews/:roomId", async (req, res) => {
 app.get("/api/admin/room-types", authorize(["admin", "staff"]), async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, price_per_night, capacity FROM room_types WHERE is_active = true ORDER BY price_per_night"
+      "SELECT id, name, capacity FROM room_types WHERE is_active = true ORDER BY name"
     );
     res.json(result.rows);
   } catch (error) {
@@ -433,11 +434,10 @@ app.get("/api/admin/rooms", authorize(["admin", "staff"]), async (req, res) => {
           r.resort_id,
           r.room_type_id,
           rt.name AS room_type, 
-          rt.price_per_night, 
-          COALESCE(rd.price_per_night, rt.price_per_night) AS actual_price,
+          rd.price_per_night,
           rd.description, 
           rd.features, 
-          rd.images_url AS images, 
+          rd.images_url AS images,
           r.status, 
           r.category, 
           r.location, 
@@ -460,9 +460,10 @@ app.get("/api/admin/rooms/:id", authorize(["admin", "staff"]), async (req, res) 
   try {
     const { id } = req.params;
     const { rows } = await pool.query(
-      `SELECT r.id, r.resort_id, r.room_type_id, rt.name AS room_type, rt.price_per_night,
+      `SELECT r.id, r.resort_id, r.room_type_id, rt.name AS room_type,
               r.status, r.category, r.location, r.address, rd.description, rd.features,
-              rd.images_url AS images, rd.num_bed, COALESCE(rd.price_per_night, rt.price_per_night) AS actual_price
+// [!code-word:price_per_night]
+              rd.images_url AS images, rd.num_bed, rd.price_per_night
        FROM rooms r JOIN room_types rt ON r.room_type_id = rt.id
        LEFT JOIN room_details rd ON rd.room_id = r.id WHERE r.id = $1`,
       [id]

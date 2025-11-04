@@ -648,7 +648,10 @@
             <section class="resort-header">
                 <h1 id="resort-name"></h1>
                 <p class="resort-location"><i class="fas fa-map-marker-alt"></i> <span id="resort-location-text"></span></p>
-            </section>
+              
+              <p class="resort-location" style="font-size: 0.95rem; color: #4a5568;">
+                  <i class="fas fa-building"></i> <span id="resort-specific-address"></span>
+              </p>
             
             <section class="image-gallery">
                 <div id="main-image-container" class="main-image"></div>
@@ -813,6 +816,7 @@
                     document.title = currentRoom.resort_name || "Chi tiết Resort";
                     document.getElementById('resort-name').textContent = currentRoom.resort_name || "Tên không xác định";
                     document.getElementById('resort-location-text').textContent = getLocationName(currentRoom.location);
+                    document.getElementById('resort-specific-address').textContent = currentRoom.address || '(Chưa có địa chỉ cụ thể)';
                     document.getElementById('resort-description').textContent = currentRoom.description || 'Chưa có mô tả chi tiết.';
                     document.getElementById('resort-price').textContent = formatCurrency(currentRoom.price_per_night);
                     document.getElementById('room-bed-config-display').textContent = currentRoom.num_bed || "Đang cập nhật";

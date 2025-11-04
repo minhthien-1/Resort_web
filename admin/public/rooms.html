@@ -32,9 +32,9 @@
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-4">
                 <button onclick="window.history.back()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors" aria-label="Quay lại trang trước">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
                 <h1 class="text-2xl font-bold">🏨 Quản Lý Resort & Phòng</h1>
             </div>
@@ -52,46 +52,50 @@
             <form id="room-form">
                 <input type="hidden" id="room-id" />
                 <input type="hidden" id="resort-id" />
-                
-                <!-- Hàng 1: Loại phòng & Giá -->
-                <div class="form-row">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Loại phòng *</label>
-                        <select id="room-type-id" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" required onchange="onRoomTypeChange()"></select>
-
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Giá/đêm (VNĐ) *</label>
-                        <input id="price-per-night" type="number" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" placeholder="500000" required />
-                    </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Loại phòng</label>
+                    <select id="room-type-id" class="w-full border rounded px-3 py-2" required></select>
                 </div>
-
-                <!-- Hàng 2: Loại hình & Trạng thái -->
-                <div class="form-row">
+                
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Giá mỗi đêm (VND)</label>
+                        <input id="room-price" type="number" min="0" class="w-full border rounded px-3 py-2" placeholder="Ví dụ: 1500000" required />
+                    </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Loại hình lưu trú</label>
-                        <select id="room-category" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500">
-                            <option value="standard">🏢 Khách sạn/Tiêu chuẩn</option>
-                            <option value="apartment">🏠 Căn hộ</option>
-                            <option value="villa">🏡 Biệt thự</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Trạng thái</label>
-                        <select id="room-status" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500">
-                            <option value="available">✅ Sẵn có</option>
-                            <option value="maintenance">🔧 Bảo trì</option>
+                        <select id="room-category" class="w-full border rounded px-3 py-2">
+                            <option value="standard">Khách sạn/Tiêu chuẩn</option>
+                            <option value="apartment">Căn hộ</option>
+                            <option value="villa">Biệt thự</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Hàng 3: Cấu hình giường (INPUT TỰ DO) -->
-                <div class="form-row full">
+                <div class="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                        <label class="block text-sm font-medium mb-1">🛏️ Cấu hình giường *</label>
-                        <input id="num-bed" type="text" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 bed-input" placeholder="VD: 1 giường đôi, 2 giường đơn, 1 giường đôi + 1 ghế tình yêu" required />
-                        <p class="bed-input-hint">💡 Nhập tự do để mô tả cấu hình giường chi tiết</p>
+                        <label class="block text-sm font-medium mb-1">Cấu hình giường</label>
+                        <select id="num-bed" class="w-full border rounded px-3 py-2">
+                            <option value="1 giường đơn">1 Giường Đơn</option>
+                            <option value="1 giường đôi">1 Giường Đôi</option>
+                            <option value="2 giường đơn">2 Giường Đơn</option>
+                            <option value="2 giường đôi">2 Giường Đôi</option>
+                        </select>
                     </div>
+                     <div>
+                        <label class="block text-sm font-medium mb-1">Trạng thái</label>
+                        <select id="room-status" class="w-full border rounded px-3 py-2">
+                            <option value="available">Sẵn có</option>
+                            <option value="maintenance">Bảo trì</option>
+                        </select>
+                    </div>
+                </div>
+               
+                <div class="mb-3">
+                    <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
+                    <input id="room-images" type="file" accept="image/*" multiple class="w-full" />
+                    <p class="text-xs text-gray-500 mt-1">Các ảnh xem trước (mới) bên dưới. Khi sửa, upload ảnh mới sẽ **thay thế toàn bộ** ảnh cũ.</p>
+                    <div id="image-preview" class="flex flex-wrap mt-2"></div>
                 </div>
 
                 <!-- Hàng 4: Vị trí & Địa chỉ -->
@@ -151,17 +155,10 @@
     let ROOM_TYPES = [];
     let currentMode = 'create'; 
 
-    // ✅ THÊM: Hàm tự động update giá khi chọn room_type
-    function onRoomTypeChange() {
-        const roomTypeId = document.getElementById('room-type-id').value;
-        const priceInput = document.getElementById('price-per-night');
-        
-        if (roomTypeId && currentMode === 'create') {
-            const roomType = ROOM_TYPES.find(t => t.id === roomTypeId);
-            if (roomType) {
-                priceInput.value = roomType.price_per_night;
-            }
-        }
+    function formatCurrency(value) {
+        if (!value || isNaN(value)) return '-';
+        const numValue = parseFloat(value);
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(numValue);
     }
 
     async function apiFetch(url, opts = {}) {
@@ -186,7 +183,7 @@
                 apiFetch('/api/admin/rooms')
             ]);
             
-            ALL_ROOMS = rooms;
+            ALL_ROOMS = rooms; 
             container.innerHTML = '';
             if (!resorts.length) {
                 container.innerHTML = `<p class="text-center text-gray-500">Chưa có resort nào. Hãy tạo một resort mới!</p>`;
@@ -203,37 +200,20 @@
                     </div>
                     <div class="table-responsive">
                         <table class="w-full text-sm">
-                            <thead>
-                                <tr class="text-left text-gray-600 border-b-2 border-gray-200">
-                                    <th class="p-2 font-semibold">Hạng phòng</th>
-                                    <th class="p-2 font-semibold">Giá/đêm</th>
-                                    <th class="p-2 font-semibold">Loại hình</th>
-                                    <th class="p-2 font-semibold">🛏️ Giường</th>
-                                    <th class="p-2 font-semibold">Trạng thái</th>
-                                    <th class="p-2 font-semibold">Thao tác</th>
-                                </tr>
-                            </thead>
+                            <thead><tr class="text-left text-gray-500"><th class="p-2">Hạng phòng</th><th class="p-2">Giá</th><th class="p-2">Số giường</th><th class="p-2">Trạng thái</th><th class="p-2">Thao tác</th></tr></thead>
                             <tbody>
-                                ${resortRooms.length ? resortRooms.map(room => {
-                                    const roomType = ROOM_TYPES.find(t => t.id === room.room_type_id);
-                                    const price = room.actual_price ? Number(room.actual_price).toLocaleString('vi-VN') : '0';
-
-                                    const statusClass = room.status === 'available' ? 'status-available' : 'status-maintenance';
-                                    const statusText = room.status === 'available' ? '✅ Sẵn có' : '🔧 Bảo trì';
-                                    return `
-                                        <tr class="border-t border-gray-200 hover:bg-gray-50">
-                                            <td class="p-2 font-medium">${room.room_type}</td>
-                                            <td class="p-2"><span class="price-badge">${price} đ</span></td>
-                                            <td class="p-2">${room.category || 'standard'}</td>
-                                            <td class="p-2 text-gray-700">${room.num_bed || '-'}</td>
-                                            <td class="p-2"><span class="status-badge ${statusClass}">${statusText}</span></td>
-                                            <td class="p-2 space-x-2">
-                                                <button class="text-blue-600 hover:underline font-medium" onclick='openRoomModal("edit", ${room.resort_id}, ${JSON.stringify(room)})'>✏️ Sửa</button>
-                                                <button class="text-red-600 hover:underline font-medium" onclick="deleteRoom('${room.id}')">🗑️ Xóa</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('') : `<tr><td colspan="6" class="text-center p-4 text-gray-500">Resort này chưa có phòng.</td></tr>`}
+                                ${resortRooms.length ? resortRooms.map(room => `
+                                    <tr class="border-t">
+                                        <td class="p-2 font-medium">${room.room_type}</td>
+                                        <td class="p-2">${formatCurrency(room.price_per_night)}</td> 
+                                        <td class="p-2">${room.num_bed || '-'}</td>
+                                        <td class="p-2">${room.status}</td>
+                                        <td class="p-2">
+                                            <button class="text-blue-600 hover:underline" onclick='openRoomModal("edit", ${room.resort_id}, "${room.id}")'>Sửa</button>
+                                            <button class="text-red-600 hover:underline ml-2" onclick="deleteRoom('${room.id}')">Xóa</button>
+                                        </td>
+                                    </tr>
+                                `).join('') : `<tr><td colspan="5" class="text-center p-4 text-gray-500">Resort này chưa có phòng.</td></tr>`}
                             </tbody>
                         </table>
                     </div>
@@ -258,12 +238,16 @@
         }
     }
 
-    function openRoomModal(mode, resortId, roomData = null) {
+    function openRoomModal(mode, resortId, roomId = null) {
         currentMode = mode;
         const modal = document.getElementById('room-modal');
         const form = document.getElementById('room-form');
         form.reset();
-        document.getElementById('image-preview').innerHTML = '';
+        
+        // Luôn luôn dọn dẹp preview khi mở modal
+        const preview = document.getElementById('image-preview');
+        preview.innerHTML = '';
+        
         document.getElementById('modal-error-message').textContent = '';
         document.getElementById('modal-success-message').textContent = '';
         
@@ -272,26 +256,39 @@
             document.getElementById('modal-submit-btn').textContent = '✅ Thêm Phòng';
             document.getElementById('room-id').value = '';
             document.getElementById('resort-id').value = resortId;
-            document.getElementById('price-per-night').value = '';
-            document.getElementById('num-bed').value = '';
-        } else if (mode === 'edit' && roomData) {
-            document.getElementById('modal-title').textContent = `✏️ Sửa Phòng: ${roomData.room_type}`;
-            document.getElementById('modal-submit-btn').textContent = '💾 Lưu Thay Đổi';
+        } else if (mode === 'edit' && roomId) { 
+            
+            const roomData = ALL_ROOMS.find(room => room.id == roomId); 
+            if (!roomData) {
+                alert("Lỗi: Không tìm thấy dữ liệu phòng!");
+                return;
+            }
+
+            document.getElementById('modal-title').textContent = `Sửa Phòng: ${roomData.room_type}`;
+            document.getElementById('modal-submit-btn').textContent = 'Lưu Thay Đổi';
             document.getElementById('room-id').value = roomData.id;
             document.getElementById('resort-id').value = resortId;
             document.getElementById('room-type-id').value = roomData.room_type_id;
-            document.getElementById('room-category').value = roomData.category || 'standard';
-            document.getElementById('num-bed').value = roomData.num_bed || '';
-            document.getElementById('room-status').value = roomData.status || 'available';
-            document.getElementById('room-location').value = roomData.location || '';
+            document.getElementById('room-category').value = roomData.category;
+            document.getElementById('num-bed').value = roomData.num_bed;
+            document.getElementById('room-status').value = roomData.status;
+            document.getElementById('room-price').value = roomData.price_per_night || '';
+            document.getElementById('room-location').value = roomData.location;
             document.getElementById('room-address').value = roomData.address || '';
             document.getElementById('room-description').value = roomData.description || '';
-            
-            // Hiển thị giá từ room_type
-            const roomType = ROOM_TYPES.find(t => t.id === roomData.room_type_id);
-            // ✅ THÊM: Load giá từ room_details (actual_price) khi edit
-            document.getElementById('price-per-night').value = roomData.actual_price || roomData.price_per_night || '';
 
+            // ===== 📍 THAY ĐỔI 2: HIỂN THỊ ẢNH CŨ =====
+            // Backend trả về `images` (là `images_url` trong DB)
+            if (roomData.images && Array.isArray(roomData.images)) {
+                roomData.images.forEach(imageName => {
+                    const div = document.createElement('div');
+                    div.className = 'image-preview-item';
+                    // Backend của bạn phục vụ file từ /uploads
+                    div.innerHTML = `<img src="/uploads/${imageName}" alt="Ảnh hiện tại">`;
+                    preview.appendChild(div);
+                });
+            }
+            // ==============================================
         }
         
         modal.classList.remove('hidden');
@@ -315,6 +312,9 @@
         fd.append('category', document.getElementById('room-category').value);
         fd.append('num_bed', document.getElementById('num-bed').value.trim());
         fd.append('status', document.getElementById('room-status').value);
+        
+        fd.append('price_per_night', document.getElementById('room-price').value);
+
         fd.append('location', document.getElementById('room-location').value);
         fd.append('address', document.getElementById('room-address').value);
         fd.append('description', document.getElementById('room-description').value);
@@ -355,16 +355,22 @@
         }
     }
     
+    // Hàm này CHỈ hiển thị ảnh MỚI CHỌN (từ input file)
     document.getElementById('room-images').addEventListener('change', function(e) {
+        // Chúng ta KHÔNG xóa ảnh cũ khi chọn ảnh mới, để người dùng thấy cả 2
+        // const preview = document.getElementById('image-preview');
+        // preview.innerHTML = ''; // <-- Dòng này đã bị xóa trong hàm `openRoomModal`
+        
         const preview = document.getElementById('image-preview');
-        preview.innerHTML = '';
+
         Array.from(e.target.files).forEach(file => {
             if (!file.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = ev => {
                 const div = document.createElement('div');
                 div.className = 'image-preview-item';
-                div.innerHTML = `<img src="${ev.target.result}" alt="preview"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
+                // Thêm 'remove-image' cho ảnh MỚI
+                div.innerHTML = `<img src="${ev.target.result}"><div class="remove-image" onclick="this.parentElement.remove()">×</div>`;
                 preview.appendChild(div);
             };
             reader.readAsDataURL(file);
