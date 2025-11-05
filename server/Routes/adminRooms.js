@@ -105,3 +105,25 @@ router.delete("/rooms/:id", async (req, res) => {
 });
 
 export default router;
+
+
+//Thêm thông báo
+router.post("/add", async (req, res) => {
+  try {
+    const result = await addRoom(req.body);
+    return res.status(200).json({ message: "Thêm phòng thành công", data: result });
+  } catch (e) {
+    return res.status(500).json({ message: "Thêm phòng thất bại", error: e.message });
+  }
+});
+
+//Thêm thông báo xoá phòng
+router.delete("/delete/:id", async (req, res) => {
+
+  try {
+    await deleteRoom(req.params.id);
+    return res.status(200).json({ message: "Xóa phòng thành công" });
+  } catch (e) {
+    return res.status(500).json({ message: "Xóa phòng thất bại" });
+  }
+});

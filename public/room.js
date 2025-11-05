@@ -49,3 +49,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     roomContainer.innerHTML = `<p>Lỗi tải thông tin resort.</p>`;
   }
 });
+
+//Thêm thông báo
+async function updateRoom(id, roomData) {
+  const res = await fetch(`/admin/rooms/update/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(roomData),
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    Swal.fire({ icon: "success", title: data.message });
+  } else {
+    Swal.fire({ icon: "error", title: data.message });
+  }
+}
+
+//Thêm thông báo xoá phòng
+async function deleteRoom(id) {
+  const res = await fetch(`/admin/rooms/delete/${id}`, {
+    method: "DELETE",
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    Swal.fire({ icon: "success", text: data.message });
+  } else {
+    Swal.fire({ icon: "error", text: data.message });
+  }
+}
+
+//Thêm thông báo đặt phòng
+async function bookRoom(info) {
+  const res = await fetch("/bookings/book", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(info),
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    Swal.fire({ icon: "success", text: data.message });
+  } else {
+    Swal.fire({ icon: "error", text: data.message });
+  }
+}
+
