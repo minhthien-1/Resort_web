@@ -662,7 +662,7 @@ app.post("/api/bookings", authorize(['guest', 'staff', 'admin']), async (req, re
   }
 });
 
-// ===== API LẤY LỊCH SỬ ĐẶT PHÒNG =====
+// ===== API LẤY LỊCH SỬ ĐẶT PHÒNG (FIX) =====
 app.get("/api/my-bookings", authorize(['guest']), async (req, res) => {
   const { userId } = req.user;
 
@@ -675,10 +675,11 @@ app.get("/api/my-bookings", authorize(['guest']), async (req, res) => {
         b.check_out,
         b.total_amount,
         b.status,
-        r.resort_name,
+        res.name AS resort_name,
         rd.images_url
       FROM bookings b
       JOIN rooms r ON b.room_id = r.id
+      JOIN resorts res ON r.resort_id = res.id
       LEFT JOIN room_details rd ON r.id = rd.room_id
       WHERE b.user_id = $1
       ORDER BY b.created_at DESC;
@@ -691,6 +692,7 @@ app.get("/api/my-bookings", authorize(['guest']), async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy lịch sử đặt phòng." });
   }
 });
+
 
 // ===== API HỦY ĐẶT PHÒNG =====
 app.put("/api/bookings/:id/cancel", authorize(['guest']), async (req, res) => {
