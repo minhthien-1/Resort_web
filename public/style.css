@@ -13,24 +13,27 @@ body {
   align-items: center;
   min-height: 100vh;
   background: #000;
+  overflow: hidden;
 }
 
 /* === SECTION BACKGROUND === */
 section {
-  position: relative;
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   width: 100%;
+  height: 100%;
   padding: 20px;
   overflow: hidden;
+  top: 0;
+  left: 0;
 }
 
-/* Overlay background image */
 section::before {
   content: '';
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -38,15 +41,26 @@ section::before {
   background: url('login-bg.jpg') no-repeat;
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
   opacity: 0.5;
+  z-index: -2;
+}
+
+section::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
   z-index: -1;
 }
 
-/* === LOGIN & REGISTER BOX === */
 .login-box,
 .register-box {
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
   background: transparent;
   border: 2px solid rgba(255, 255, 255, .5);
   border-radius: 20px;
@@ -54,38 +68,56 @@ section::before {
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(55px);
-  padding: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  position: relative;
 }
 
-/* Make forms centered and responsive */
 .login-box form,
 .register-box form {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-height: 100vh;
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
-/* === HEADINGS === */
+.login-box form::-webkit-scrollbar,
+.register-box form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.login-box form::-webkit-scrollbar-track,
+.register-box form::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.login-box form::-webkit-scrollbar-thumb,
+.register-box form::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
 h2 {
   font-size: 2em;
   color: #fff;
   text-align: center;
+  margin-bottom: 30px;
+  font-weight: 600;
 }
 
-/* === INPUT BOX === */
 .input-box {
   position: relative;
   width: 100%;
-  max-width: 310px;
-  margin: 25px auto;
+  margin: 20px 0;
   border-bottom: 2px solid #fff;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .input-box label {
@@ -111,7 +143,6 @@ h2 {
   padding: 0 35px 0 5px;
 }
 
-/* Floating label animation */
 .input-box input:focus ~ label,
 .input-box input:valid ~ label,
 .input-box input:not(:placeholder-shown) ~ label {
@@ -121,92 +152,180 @@ h2 {
   color: #fff;
 }
 
-/* Icon styling */
 .input-box .icon {
   position: absolute;
   right: 10px;
   color: #fff;
   font-size: 1.2em;
   line-height: 57px;
+  pointer-events: none;
 }
 
-/* === REMEMBER & FORGOT === */
 .remember-forgot {
-  margin: -15px 0 15px;
+  margin: 10px 0 20px;
   font-size: .9em;
   color: #fff;
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.remember-forgot label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .remember-forgot label input {
-  margin-right: 3px;
+  margin: 0;
+  cursor: pointer;
 }
 
 .remember-forgot a {
   color: #fff;
   text-decoration: none;
+  transition: 0.3s;
 }
 
 .remember-forgot a:hover {
   text-decoration: underline;
+  opacity: 0.8;
 }
 
-/* === BUTTONS === */
+/* === NÚT ĐĂNG NHẬP (NÚT TRẮNG BÌNH THƯỜNG) === */
 button {
   width: 100%;
-  max-width: 310px;
-  height: 40px;
+  height: 50px;
   background: #fff;
   border: none;
   outline: none;
   border-radius: 40px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 1.05em;
   color: #000;
-  font-weight: 500;
-  margin: 10px auto 0 auto;
+  font-weight: 600;
+  margin: 15px 0;
   display: block;
+  transition: 0.3s;
+  padding: 0;
+  line-height: 50px;
 }
 
-/* === REGISTER LINK === */
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* === NÚT QUAY LẠI (NÚT BORDER TRẮNG) === */
+.back-button {
+  width: 100% !important;
+  height: 50px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+  outline: none !important;
+  border-radius: 40px !important;
+  cursor: pointer !important;
+  font-size: 1.05em !important;
+  font-weight: 600 !important;
+  margin: 15px 0 !important;
+  display: block !important;
+  transition: 0.3s !important;
+  padding: 0 !important;
+  line-height: 50px !important;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2) !important;
+}
+
+.back-button:active {
+  transform: translateY(0) !important;
+}
+
+/* === NÚT ĐĂNG KÝ - TO HƠN NHƯ NÚT ĐĂNG NHẬP === */
+.register-box button[type="submit"] {
+  width: 100% !important;
+  height: 52px !important;
+  background: #fff !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 40px !important;
+  cursor: pointer !important;
+  font-size: 1.08em !important;
+  color: #000 !important;
+  font-weight: 600 !important;
+  margin: 18px 0 !important;
+  display: block !important;
+  transition: 0.3s !important;
+  padding: 0 !important;
+  line-height: 52px !important;
+}
+
+.register-box button[type="submit"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2) !important;
+}
+
+.register-box button[type="submit"]:active {
+  transform: translateY(0) !important;
+}
+
+.register-box .back-button {
+  width: 100% !important;
+  height: 50px !important;
+  font-size: 1.05em !important;
+  margin: 15px 0 !important;
+  line-height: 50px !important;
+  padding: 0 !important;
+}
+
 .register-link {
   font-size: .9em;
   color: #fff;
   text-align: center;
-  margin: 25px 0 10px;
+  margin: 20px 0 0;
+}
+
+.register-link p {
+  margin: 0;
 }
 
 .register-link p a {
   color: #fff;
   text-decoration: none;
   font-weight: 600;
+  transition: 0.3s;
 }
 
 .register-link p a:hover {
   text-decoration: underline;
+  opacity: 0.8;
 }
 
-/* === OPTIONAL NAME ROW === */
 .name-row {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   width: 100%;
-  max-width: 300px;
   justify-content: center;
 }
 
 .name-row .input-box {
   flex: 1;
-  width: auto;
+  margin: 20px 0;
 }
 
-/* === LOGOUT ITEM === */
 .nav__item--logout {
   display: none;
 }
 
-/* === FIX CHROME AUTOFILL === */
 input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 30px transparent inset !important;
   -webkit-text-fill-color: #fff !important;
@@ -221,19 +340,95 @@ input:-webkit-autofill ~ label {
   color: #fff;
 }
 
-/* === RESPONSIVE ADJUSTMENTS === */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .login-box,
+  .register-box {
+    width: 95%;
+    max-width: 100%;
+    padding: 30px 20px;
+  }
+
   h2 {
-    font-size: 1.6em;
+    font-size: 1.8em;
+    margin-bottom: 20px;
   }
 
   .input-box {
+    margin: 15px 0;
+  }
+
+  button {
+    height: 48px;
+    font-size: 1em;
+    line-height: 48px;
+  }
+
+  .register-box button[type="submit"],
+  .register-box .back-button {
+    height: 48px !important;
+    font-size: 1em !important;
+    line-height: 48px !important;
+    margin: 15px 0 !important;
+  }
+
+  .remember-forgot {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.85em;
+  }
+}
+
+@media (max-width: 480px) {
+  section {
+    padding: 10px;
+  }
+
+  .login-box,
+  .register-box {
     width: 100%;
-    margin: 20px 0;
+    padding: 25px 15px;
+    border-radius: 15px;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+  }
+
+  .input-box {
+    margin: 12px 0;
+  }
+
+  .input-box input {
+    font-size: 16px;
   }
 
   button {
     height: 45px;
     font-size: 0.95em;
+    margin: 10px 0;
+    line-height: 45px;
+  }
+
+  .register-box button[type="submit"],
+  .register-box .back-button {
+    height: 45px !important;
+    font-size: 0.95em !important;
+    margin: 12px 0 !important;
+    line-height: 45px !important;
+  }
+
+  .remember-forgot {
+    margin: 8px 0 15px;
+    font-size: 0.8em;
+  }
+
+  .register-link {
+    font-size: 0.8em;
+    margin: 15px 0 0;
+  }
+
+  .name-row {
+    gap: 10px;
   }
 }

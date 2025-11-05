@@ -23,18 +23,42 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
+// ===== AUTH MANAGEMENT ===== ✅ THÊM PHẦN NÀY
+function updateNavbar() {
+  const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
+  
+  const authButtons = document.getElementById('auth-buttons');
+  const userSection = document.getElementById('user-section');
+  const usernameDisplay = document.getElementById('username-display');
+  
+  if (token && username) {
+    if (authButtons) authButtons.classList.add('hide');
+    if (userSection) userSection.classList.add('show');
+    if (usernameDisplay) usernameDisplay.textContent = username;
+  } else {
+    if (authButtons) authButtons.classList.remove('hide');
+    if (userSection) userSection.classList.remove('show');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  updateNavbar();
+  window.location.href = '/';
+}
+// ===== END AUTH MANAGEMENT =====
+
 // 🏝️ Tạo card resort (clickable)
 function createResortCard(resort) {
   // ✅ FIX: Xử lý images là array
   let imgSrc = 'assets/default.jpg';
   
   if (resort.images) {
-    // Nếu images là array
     if (Array.isArray(resort.images)) {
       imgSrc = resort.images[0] ? `/uploads/${resort.images[0]}` : 'assets/default.jpg';
-    }
-    // Nếu images là string
-    else if (typeof resort.images === 'string' && resort.images.trim()) {
+    } else if (typeof resort.images === 'string' && resort.images.trim()) {
       const firstImage = resort.images.split(',')[0].trim();
       imgSrc = `/uploads/${firstImage}`;
     }
@@ -56,7 +80,6 @@ function createResortCard(resort) {
     </div>
   `;
 }
-
 
 // 📦 Lấy danh sách resort từ API
 async function fetchResorts(params = {}) {
@@ -138,6 +161,18 @@ async function populateRoomTypeSelect() {
 
 // 🚀 Khi load trang
 document.addEventListener('DOMContentLoaded', () => {
+  // ✅ THÊM DÒ ĐÂY - Cập nhật navbar
+  updateNavbar();
+  
+  // ✅ THÊM DÒ ĐÂY - Gán sự kiện cho nút đăng xuất
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      logout();
+    });
+  }
+
   renderResorts();
 
   if (window.flatpickr) {
