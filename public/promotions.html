@@ -4,93 +4,229 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Khuyến mãi - Resort Booking</title>
-  <link rel="stylesheet" href="../public/promotions.css">
-    <link rel="stylesheet" href="../public/home.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="promotions.css">
 </head>
-
 <body>
+  <!-- NAVBAR -->
   <header class="navbar">
     <div class="navbar-container">
-    <div class="navbar-logo">
-      <a href="home.html" style="text-decoration: none; color: inherit;"><h1>Resort Booking</h1></href>
-    </div>
+      <div class="navbar-logo">
+        <a href="home.html" style="text-decoration: none;"><h1>Resort Booking</h1></a>
+      </div>
+      <nav class="navbar-menu">
+        <a href="home.html">Trang chủ</a>
+        <a href="promotions.html" class="active">Khuyến mãi</a>
+        <a href="supports/support.html">Hỗ trợ</a>
+        <a href="#">Hợp tác</a>
+        <a href="my_bookings.html">Đặt chỗ</a>
+        
+        <!-- Auth buttons -->
+        <div id="auth-buttons">
+          <a href="login.html" class="btn-login">Đăng nhập</a>
+          <a href="register.html" class="btn-register">Đăng ký</a>
+        </div>
 
-    <div class="navbar-menu">
-      <nav>
-        <a href="../public/home.html">Trang chủ</a>
-        <a href="../public/promotions.html">Khuyến mãi</a>
-        <a href="../public/supports/support.html">Hỗ trợ</a>
-        <a href="#">Hợp tác với chúng tôi</a>
-        <a href="#">Đặt chỗ của tôi</a>
+        <!-- User section -->
+        <div id="user-section">
+          <a href="profile.html" class="user-profile-link">
+            <i class="fas fa-user-circle user-icon"></i>
+            <span id="username-display"></span>
+          </a>
+          <button id="logout-btn" class="btn-logout">Đăng xuất</button>
+        </div>
       </nav>
     </div>
-
-    <div class="login-menu">
-      <nav class="login-register">
-        <a href="login.html" class="btn-login">Đăng nhập</a>
-        <a href="../register.html" class="btn-register">Đăng ký</a>
-      </nav>
-    </div>
-  </div>
   </header>
 
-  <!-- ===== Banner ===== -->
+  <!-- BANNER -->
   <section class="promo-banner">
-    <h2>Khuyến mãi hấp dẫn dành riêng cho bạn</h2>
-    <p>Tiết kiệm nhiều hơn khi đặt phòng cùng Resort Booking</p>
-  </section>browser
+    <div class="banner-content">
+      <h2>🎉 Khuyến mãi hấp dẫn dành riêng cho bạn</h2>
+      <p>Tiết kiệm nhiều hơn khi đặt phòng cùng Resort Booking</p>
+    </div>
+  </section>
 
-  <!-- ===== Bộ lọc tìm kiếm ===== -->
+  <!-- FILTER -->
   <section class="promo-filter">
-    <input type="text" placeholder="Tìm khuyến mãi theo địa điểm hoặc từ khóa...">
-    <select>
-      <option>Tất cả</option>
-      <option>Giảm giá phòng</option>
-      <option>Combo nghỉ dưỡng</option>
-      <option>Ưu đãi cuối tuần</option>
-    </select>
-    <button class="filter-btn"><i class="fa fa-search"></i> Tìm kiếm</button>
-  </section>
-
-  <!-- ===== Danh sách khuyến mãi ===== -->
-  <section class="promo-list">
-    <div class="promo-card">
-      <img src="Assets/Resort Images/PhuQuoc.avif" alt="Phú Quốc">
-      <div class="promo-content">
-        <h3>Giảm 30% tại Vinpearl Phú Quốc</h3>
-        <p>Đặt phòng từ 3 đêm trở lên, nhận ưu đãi 30% và buffet miễn phí.</p>
-        <button>Xem chi tiết</button>
-      </div>
-    </div>
-
-    <div class="promo-card">
-      <img src="Assets/Resort Images/DaNang.avif" alt="Đà Nẵng">
-      <div class="promo-content">
-        <h3>Ưu đãi Fusion Resort Đà Nẵng</h3>
-        <p>Tặng gói spa 60 phút cho mỗi khách lưu trú từ 2 đêm trở lên.</p>
-        <button>Xem chi tiết</button>
-      </div>
-    </div>
-
-    <div class="promo-card">
-      <img src="Assets/Resort Images/NhaTrang.jpg" alt="Nha Trang">
-      <div class="promo-content">
-        <h3>Combo nghỉ dưỡng Nha Trang chỉ từ 1.999.000đ</h3>
-        <p>Giá trọn gói bao gồm 2 đêm nghỉ, ăn sáng và tour tham quan biển.</p>
-        <button>Xem chi tiết</button>
-      </div>
+    <div class="filter-container">
+      <input type="text" id="searchInput" placeholder="Tìm khuyến mãi theo mã hoặc tên...">
+      <select id="filterType">
+        <option value="">Tất cả</option>
+        <option value="percentage">Giảm theo %</option>
+        <option value="fixed">Giảm cố định</option>
+      </select>
+      <button class="filter-btn" id="searchBtn">
+        <i class="fas fa-search"></i> Tìm kiếm
+      </button>
     </div>
   </section>
 
-  <!-- ===== Gợi ý thêm ===== -->
-  <section class="promo-extra">
-    <h2>Khám phá thêm ưu đãi</h2>
-    <p>Cập nhật liên tục các chương trình khuyến mãi hot nhất từ Resort Booking</p>
+  <!-- VOUCHERS LIST -->
+  <section class="promo-list" id="promo-container">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải khuyến mãi...
+    </div>
   </section>
 
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="empty-state" style="display: none;">
+    <i class="fas fa-gift"></i>
+    <h3>Không tìm thấy khuyến mãi</h3>
+    <p>Hãy thử tìm kiếm với từ khóa khác</p>
+  </div>
+
+  <!-- FOOTER -->
   <footer>
-    <p>© 2025 Resort Booking. All rights reserved.</p>
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="#">Chính sách bảo mật</a>
+        <span>|</span>
+        <a href="#">Điều khoản sử dụng</a>
+        <span>|</span>
+        <a href="supports/support.html">Liên hệ</a>
+      </div>
+      <div class="footer-social">
+        <p>Theo dõi chúng tôi</p>
+        <div class="social-icons">
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2504/2504989.png" alt="Telegram"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046126.png" alt="TikTok"></a>
+        </div>
+      </div>
+      <p>&copy; 2025 <span>Resort Booking</span>. All rights reserved.</p>
+    </div>
   </footer>
+
+  <script>
+    const API_BASE = "http://localhost:5500";
+    let allVouchers = [];
+
+    // Auth management
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const username = localStorage.getItem('username');
+      const authButtons = document.getElementById('auth-buttons');
+      const userSection = document.getElementById('user-section');
+      const usernameDisplay = document.getElementById('username-display');
+
+      if (token && username) {
+        authButtons.classList.add('hidden');
+        userSection.classList.add('active');
+        usernameDisplay.textContent = username;
+      } else {
+        authButtons.classList.remove('hidden');
+        userSection.classList.remove('active');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      updateNavbar();
+      window.location.href = 'home.html';
+    }
+
+    // Fetch vouchers from API
+    async function fetchVouchers() {
+      const container = document.getElementById('promo-container');
+      const emptyState = document.getElementById('empty-state');
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/discounts`);
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        allVouchers = await response.json();
+        renderVouchers(allVouchers);
+      } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Không thể tải dữ liệu khuyến mãi</div>';
+      }
+    }
+
+    function renderVouchers(vouchers) {
+      const container = document.getElementById('promo-container');
+      const emptyState = document.getElementById('empty-state');
+      
+      container.innerHTML = '';
+      
+      if (!vouchers || vouchers.length === 0) {
+        emptyState.style.display = 'flex';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      vouchers.forEach(voucher => {
+        const validUntil = new Date(voucher.valid_until).toLocaleDateString('vi-VN');
+        const discountText = voucher.discount_type === 'percentage' 
+          ? `Giảm ${voucher.value}%` 
+          : `Giảm ${voucher.value.toLocaleString('vi-VN')}đ`;
+        
+        const card = document.createElement('div');
+        card.className = 'promo-card';
+        card.innerHTML = `
+          <div class="promo-badge">${discountText}</div>
+          <div class="promo-content">
+            <div class="voucher-code">${voucher.code}</div>
+            <h3>${voucher.name}</h3>
+            <p class="promo-desc">${voucher.description || 'Ưu đãi đặc biệt'}</p>
+            <div class="promo-footer">
+              <span class="promo-expire"><i class="far fa-calendar"></i> Hạn: ${validUntil}</span>
+              <button class="copy-btn" onclick="copyCode('${voucher.code}')">
+                <i class="far fa-copy"></i> Sao chép
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function copyCode(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        alert(`Đã sao chép mã: ${code}`);
+      }).catch(err => {
+        console.error('Error:', err);
+      });
+    }
+
+    function filterVouchers() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const filterType = document.getElementById('filterType').value;
+      
+      let filtered = allVouchers.filter(v => {
+        const matchSearch = !searchTerm || 
+                          v.code.toLowerCase().includes(searchTerm) ||
+                          v.name.toLowerCase().includes(searchTerm) ||
+                          (v.description && v.description.toLowerCase().includes(searchTerm));
+        const matchType = !filterType || v.discount_type === filterType;
+        return matchSearch && matchType;
+      });
+      
+      renderVouchers(filtered);
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNavbar();
+      fetchVouchers();
+      
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          logout();
+        });
+      }
+      
+      document.getElementById('searchBtn').addEventListener('click', filterVouchers);
+      document.getElementById('searchInput').addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') filterVouchers();
+      });
+      document.getElementById('filterType').addEventListener('change', filterVouchers);
+    });
+  </script>
 </body>
 </html>
