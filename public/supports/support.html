@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hỗ trợ khách hàng – Resort Booking</title>
-  <link rel="stylesheet" href="../home.css" />
-    <link rel="stylesheet" href="support.css" />
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="support.css" />
 </head>
 <body>
+  <!-- NAVBAR GIỐNG TRANG CHỦ -->
   <header class="navbar">
     <div class="navbar-container">
       <div class="navbar-logo">
@@ -16,18 +16,26 @@
       </div>
       <nav class="navbar-menu">
         <a href="../home.html">Trang chủ</a>
-        <a href="../supports/support.html" class="active">Hỗ trợ</a>
         <a href="../promotions.html">Khuyến mãi</a>
-        <a href="">Hợp tác với chúng tôi</a>
-        <a href="">Đặt chỗ của tôi</a>
-      </nav>
+        <a href="support.html" class="active">Hỗ trợ</a>
+        <a href="">Hợp tác</a>
+        <a href="../my_bookings.html">Đặt chỗ</a>
+        
+        <!-- Phần hiển thị khi chưa đăng nhập -->
+        <div id="auth-buttons">
+          <a href="../login.html" class="btn-login">Đăng nhập</a>
+          <a href="../register.html" class="btn-register">Đăng ký</a>
+        </div>
 
-      <div class="login-menu">
-      <nav class="login-register">
-        <a href="login.html" class="btn-login">Đăng nhập</a>
-        <a href="register.html" class="btn-register">Đăng ký</a>
+        <!-- Phần hiển thị khi đã đăng nhập -->
+        <div id="user-section">
+          <a href="../profile.html" class="user-profile-link" id="profile-link">
+            <i class="fas fa-user-circle user-icon"></i>
+            <span id="username-display"></span>
+          </a>
+          <button id="logout-btn" class="btn-logout">Đăng xuất</button>
+        </div>
       </nav>
-    </div>
     </div>
   </header>
 
@@ -40,130 +48,113 @@
       <li>Chat trực tuyến: <a href="#">Bắt đầu trò chuyện</a></li>
     </ul>
 
-    
     <h2>Câu hỏi thường gặp</h2>
 
     <div class="faq">
-  <div class="faq-item">
-    <p class="faq-question"><strong>Làm thế nào để đặt phòng?</strong></p>
-    <div class="faq-answer" style="display:none;">
-      <strong>Bước 1: Truy cập website<br></strong>
-        Vào trang chủ Resort Booking tại địa chỉ: www.resortbooking.vn<br>
-      
-      <br><strong>Bước 2: Tìm kiếm phòng<br></strong>
-        - Nhập địa điểm hoặc tên resort mà Quý khách muốn nghỉ dưỡng.<br>
-        - Chọn ngày nhận phòng và ngày trả phòng.<br>  
-        - Chọn số lượng khách và phòng cần đặt.<br>
-        - Nhấn nút "Tìm kiếm" để xem danh sách các resort phù hợp.<br>
-      <br>
-      <strong>Bước 3: Chọn phòng<br></strong> 
-        - Xem thông tin chi tiết từng loại phòng: hình ảnh, tiện nghi, giá phòng, chính sách hủy,…<br>
-        - Nhấn “Đặt ngay” hoặc “Chọn phòng này” cho loại phòng Quý khách muốn đặt.<br>
-      <br>
-      <strong>Bước 4: Nhập thông tin khách hàng<br></strong>
-        - Điền đầy đủ thông tin người đặt: Họ tên, số điện thoại, email liên hệ.<br>
-        - Nếu đặt giúp người khác, vui lòng ghi rõ thông tin khách lưu trú.<br>
-      <br>
-      <strong>Bước 5: Xác nhận và thanh toán<br></strong>
-        - Kiểm tra lại thông tin đặt phòng.<br>
-        - Chọn phương thức thanh toán:<br>
-        - Thanh toán online (thẻ ngân hàng, ví điện tử, QR Pay)<br>
-        - Thanh toán khi nhận phòng (nếu resort hỗ trợ)<br>
-        - Nhấn “Xác nhận đặt phòng” để hoàn tất.<br>
-      <br>
-      <strong>Bước 6: Nhận xác nhận đặt phòng<br></strong>
-        - Sau khi hoàn tất, Quý khách sẽ nhận được email hoặc tin nhắn xác nhận đặt phòng kèm mã đơn hàng.<br>
-        - Vui lòng kiểm tra kỹ thông tin trước khi đến nhận phòng.<br>
+      <div class="faq-item">
+        <p class="faq-question"><strong>Làm thế nào để đặt phòng?</strong></p>
+        <div class="faq-answer" style="display:none;">
+          <strong>Bước 1: Truy cập website<br></strong>
+          Vào trang chủ Resort Booking tại địa chỉ: www.resortbooking.vn<br>
+          
+          <br><strong>Bước 2: Tìm kiếm phòng<br></strong>
+          - Nhập địa điểm hoặc tên resort mà Quý khách muốn nghỉ dưỡng.<br>
+          - Chọn ngày nhận phòng và ngày trả phòng.<br>  
+          - Chọn số lượng khách và phòng cần đặt.<br>
+          - Nhấn nút "Tìm kiếm" để xem danh sách các resort phù hợp.<br>
+          <br>
+          <strong>Bước 3: Chọn phòng<br></strong> 
+          - Xem thông tin chi tiết từng loại phòng: hình ảnh, tiện nghi, giá phòng, chính sách hủy,…<br>
+          - Nhấn "Đặt ngay" hoặc "Chọn phòng này" cho loại phòng Quý khách muốn đặt.<br>
+          <br>
+          <strong>Bước 4: Nhập thông tin khách hàng<br></strong>
+          - Điền đầy đủ thông tin người đặt: Họ tên, số điện thoại, email liên hệ.<br>
+          - Nếu đặt giúp người khác, vui lòng ghi rõ thông tin khách lưu trú.<br>
+          <br>
+          <strong>Bước 5: Xác nhận và thanh toán<br></strong>
+          - Kiểm tra lại thông tin đặt phòng.<br>
+          - Chọn phương thức thanh toán:<br>
+          - Thanh toán online (thẻ ngân hàng, ví điện tử, QR Pay)<br>
+          - Thanh toán khi nhận phòng (nếu resort hỗ trợ)<br>
+          - Nhấn "Xác nhận đặt phòng" để hoàn tất.<br>
+          <br>
+          <strong>Bước 6: Nhận xác nhận đặt phòng<br></strong>
+          - Sau khi hoàn tất, Quý khách sẽ nhận được email hoặc tin nhắn xác nhận đặt phòng kèm mã đơn hàng.<br>
+          - Vui lòng kiểm tra kỹ thông tin trước khi đến nhận phòng.<br>
+        </div>
+      </div>
 
-    </div>
-  </div>
-  <div class="faq-item">
-    <p class="faq-question"><strong>Tôi muốn hủy đặt phòng thì làm thế nào?</strong></p>
-    <div class="faq-answer" style="display:none;">
-      <strong>Cách 1: Hủy trực tiếp trên website</strong><br>
+      <div class="faq-item">
+        <p class="faq-question"><strong>Tôi muốn hủy đặt phòng thì làm thế nào?</strong></p>
+        <div class="faq-answer" style="display:none;">
+          <strong>Cách 1: Hủy trực tiếp trên website</strong><br>
+          <br>1.Truy cập trang www.resortbooking.vn<br>
+          2.Đăng nhập vào tài khoản cá nhân đã dùng để đặt phòng<br>
+          3.Chọn mục "Đơn đặt phòng của tôi" hoặc "Quản lý đặt phòng"<br>
+          4.Tìm đơn đặt phòng cần hủy → Nhấn "Hủy đặt phòng"<br>
+          5.Kiểm tra chính sách hủy của resort (có thể mất phí hoặc không hoàn tiền nếu hủy muộn)<br>
+          6.Xác nhận hủy → Hệ thống sẽ gửi email xác nhận hủy phòng đến Quý khách<br>
+          <br><strong>Cách 2: Hủy qua email hoặc hotline hỗ trợ</strong><br>
+          <br>*Nếu Quý khách không thể hủy trực tuyến, vui lòng liên hệ:<br>
+          📞 Hotline hỗ trợ: 1900 9999<br>
+          📧 Email: support@resortbooking.vn<br>
+          *Khi liên hệ, vui lòng cung cấp mã đặt phòng hoặc thông tin người đặt để nhân viên hỗ trợ hủy nhanh chóng.<br>
+        </div>
+      </div>
 
-      <br>1.Truy cập trang www.resortbooking.vn<br>
-      2.Đăng nhập vào tài khoản cá nhân đã dùng để đặt phòng<br>
-      3.Chọn mục “Đơn đặt phòng của tôi” hoặc “Quản lý đặt phòng”<br>
-      4.Tìm đơn đặt phòng cần hủy → Nhấn “Hủy đặt phòng”<br>
-      5.Kiểm tra chính sách hủy của resort (có thể mất phí hoặc không hoàn tiền nếu hủy muộn)<br>
-      6.Xác nhận hủy → Hệ thống sẽ gửi email xác nhận hủy phòng đến Quý khách<br>
+      <div class="faq-item">
+        <p class="faq-question"><strong>Tôi có thể thanh toán bằng những hình thức nào?</strong></p>
+        <div class="faq-answer" style="display:none;">
+          Để mang lại sự tiện lợi và linh hoạt cho Quý khách, Resort Booking hỗ trợ nhiều hình thức thanh toán khác nhau. Quý khách có thể lựa chọn phương thức phù hợp nhất khi đặt phòng:<br>
+          <br>
+          <strong>1. Thanh toán online (trực tuyến)<br></strong>
+          Thanh toán nhanh chóng và an toàn ngay trên website thông qua các phương thức sau:<br>
+          <br>
+          - Thẻ ngân hàng nội địa (ATM) – qua cổng thanh toán Napas, VietQR, hoặc Internet Banking.<br>
+          - Thẻ quốc tế (Visa, MasterCard, JCB) – chấp nhận mọi loại thẻ được phát hành toàn cầu.<br>
+          - Ví điện tử – như Momo, ZaloPay, ShopeePay, VNPay, Viettel Money,…<br>
+          - Quét mã QR – thanh toán nhanh bằng ứng dụng ngân hàng hoặc ví điện tử.<br>
+          <br>
+          💡 Khi thanh toán thành công, hệ thống sẽ gửi email xác nhận đặt phòng ngay lập tức.<br>
+          <strong>2. Thanh toán chuyển khoản ngân hàng<br></strong>
+          <br>
+          - Quý khách có thể chuyển khoản trực tiếp vào tài khoản của Resort Booking theo thông tin hiển thị sau khi đặt phòng.<br>
+          <br>
+          *Lưu ý: Ghi rõ mã đặt phòng trong nội dung chuyển khoản để dễ dàng xác nhận.<br>
+          <br>
+          <strong>3. Thanh toán tại resort (khi nhận phòng)<br></strong>
+          <br>
+          - Một số resort/hotel hỗ trợ hình thức thanh toán trực tiếp tại quầy lễ tân bằng tiền mặt hoặc thẻ.<br>
+          <br>
+          ⚠ Hình thức này chỉ áp dụng với đơn đặt phòng có ghi rõ "Thanh toán tại nơi lưu trú".
+        </div>
+      </div>
 
-      <br><strong>Cách 2: Hủy qua email hoặc hotline hỗ trợ</strong><br>
-      <br>*Nếu Quý khách không thể hủy trực tuyến, vui lòng liên hệ:<br>
-      📞 Hotline hỗ trợ: 1900 9999<br>
-      📧 Email: support@resortbooking.vn<br>
-      *Khi liên hệ, vui lòng cung cấp mã đặt phòng hoặc thông tin người đặt để nhân viên hỗ trợ hủy nhanh chóng.<br>
-    
-    </div>
-  </div>
-  <div class="faq-item">
-    <p class="faq-question"><strong>Tôi có thể thanh toán bằng những hình thức nào?</strong></p>
-    <div class="faq-answer" style="display:none;">
-        Để mang lại sự tiện lợi và linh hoạt cho Quý khách, Resort Booking hỗ trợ nhiều hình thức thanh toán khác nhau. Quý khách có thể lựa chọn phương thức phù hợp nhất khi đặt phòng:<br>
-        <br>
-        <strong>1. Thanh toán online (trực tuyến)<br></strong>
-        Thanh toán nhanh chóng và an toàn ngay trên website thông qua các phương thức sau:<br>
-        <br>
-        - Thẻ ngân hàng nội địa (ATM) – qua cổng thanh toán Napas, VietQR, hoặc Internet Banking.<br>
-        - Thẻ quốc tế (Visa, MasterCard, JCB) – chấp nhận mọi loại thẻ được phát hành toàn cầu.<br>
-        - Ví điện tử – như Momo, ZaloPay, ShopeePay, VNPay, Viettel Money,…<br>
-        - Quét mã QR – thanh toán nhanh bằng ứng dụng ngân hàng hoặc ví điện tử.<br>
-        <br>
-        💡 Khi thanh toán thành công, hệ thống sẽ gửi email xác nhận đặt phòng ngay lập tức.<br>
-
-        <strong>2. Thanh toán chuyển khoản ngân hàng<br></strong>
-        <br>
-        - Quý khách có thể chuyển khoản trực tiếp vào tài khoản của Resort Booking theo thông tin hiển thị sau khi đặt phòng.<br>
-        <br>
-        *Lưu ý: Ghi rõ mã đặt phòng trong nội dung chuyển khoản để dễ dàng xác nhận.<br>
-        <br>
-        <strong>3. Thanh toán tại resort (khi nhận phòng)<br></strong>
-        <br>
-        - Một số resort/hotel hỗ trợ hình thức thanh toán trực tiếp tại quầy lễ tân bằng tiền mặt hoặc thẻ.<br>
-        <br>
-        ⚠ Hình thức này chỉ áp dụng với đơn đặt phòng có ghi rõ “Thanh toán tại nơi lưu trú”.
-    </div>
-  </div>
-  <div class="faq-item">
-    <p class="faq-question"><strong>Cách thay đổi lịch đặt vé</strong></p>
-    <div class="faq-answer" style="display:none;">
+      <div class="faq-item">
+        <p class="faq-question"><strong>Cách thay đổi lịch đặt vé</strong></p>
+        <div class="faq-answer" style="display:none;">
           <strong>Cách 1: Thay đổi trực tiếp trên website</strong><br>
-        <br>
-        1.Truy cập www.resortbooking.vn<br>
-        2.Đăng nhập vào tài khoản cá nhân (sử dụng email/số điện thoại đã đặt phòng).<br>
-        3.Vào mục “Đơn đặt phòng của tôi” hoặc “Quản lý đặt phòng”.<br>
-        4.Chọn đơn đặt phòng muốn thay đổi → Nhấn “Chỉnh sửa lịch đặt” hoặc “Yêu cầu thay đổi ngày”.<br>
-        5.Chọn ngày nhận phòng và trả phòng mới, sau đó nhấn “Gửi yêu cầu”.<br>
-        6.Hệ thống sẽ kiểm tra tình trạng phòng trống và gửi xác nhận thay đổi qua email hoặc SMS.<br>
-        <br>
-
-        💡 Nếu resort còn phòng trống, thay đổi sẽ được xác nhận ngay. Trong trường hợp hết phòng, hệ thống sẽ đề xuất resort hoặc loại phòng tương tự.<br>
-
-        <br><strong>Cách 2: Liên hệ bộ phận hỗ trợ</strong><br>
-        <br>
-        Nếu Quý khách gặp khó khăn khi thao tác trên web, vui lòng liên hệ để được hỗ trợ trực tiếp:<br>
-
-        📞 Hotline: 1900 9999<br>
-
-        📧 Email: support@resortbooking.vn<br>
-        <br>
-        Khi liên hệ, vui lòng cung cấp mã đặt phòng và ngày muốn thay đổi, nhân viên của chúng tôi sẽ hỗ trợ nhanh nhất có thể.
-              
+          <br>
+          1.Truy cập www.resortbooking.vn<br>
+          2.Đăng nhập vào tài khoản cá nhân (sử dụng email/số điện thoại đã đặt phòng).<br>
+          3.Vào mục "Đơn đặt phòng của tôi" hoặc "Quản lý đặt phòng".<br>
+          4.Chọn đơn đặt phòng muốn thay đổi → Nhấn "Chỉnh sửa lịch đặt" hoặc "Yêu cầu thay đổi ngày".<br>
+          5.Chọn ngày nhận phòng và trả phòng mới, sau đó nhấn "Gửi yêu cầu".<br>
+          6.Hệ thống sẽ kiểm tra tình trạng phòng trống và gửi xác nhận thay đổi qua email hoặc SMS.<br>
+          <br>
+          💡 Nếu resort còn phòng trống, thay đổi sẽ được xác nhận ngay. Trong trường hợp hết phòng, hệ thống sẽ đề xuất resort hoặc loại phòng tương tự.<br>
+          <br><strong>Cách 2: Liên hệ bộ phận hỗ trợ</strong><br>
+          <br>
+          Nếu Quý khách gặp khó khăn khi thao tác trên web, vui lòng liên hệ để được hỗ trợ trực tiếp:<br>
+          📞 Hotline: 1900 9999<br>
+          📧 Email: support@resortbooking.vn<br>
+          <br>
+          Khi liên hệ, vui lòng cung cấp mã đặt phòng và ngày muốn thay đổi, nhân viên của chúng tôi sẽ hỗ trợ nhanh nhất có thể.
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-
-<script>
-  document.querySelectorAll('.faq-question').forEach(function(q) {
-    q.addEventListener('click', function() {
-      const answer = this.nextElementSibling;
-      answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
-    });
-  });
-</script>
   </main>
+
   <footer>
     <div class="footer-container">
       <div class="footer-links">
@@ -176,15 +167,64 @@
       <div class="footer-social">
         <p>Theo dõi chúng tôi</p>
         <div class="social-icons">
-          <a href="#"><img src="../Assets/Icon Images/facebook.png" alt="Facebook"></a>
-          <a href="#"><img src="../Assets/Icon Images/instagram.png" alt="Instagram"></a>
-          <a href="#"><img src="../Assets/Icon Images/communication.png" alt="Telegram"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2504/2504989.png" alt="Telegram"></a>
           <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046126.png" alt="TikTok"></a>
         </div>
       </div>
-      <br/>
-      <p>© 2025 <span>Resort Booking</span>. All rights reserved.</p>
+      <p>&copy; 2025 <span>Resort Booking</span>. All rights reserved.</p>
     </div>
   </footer>
+
+  <script>
+    // FAQ Toggle
+    document.querySelectorAll('.faq-question').forEach(function(q) {
+      q.addEventListener('click', function() {
+        const answer = this.nextElementSibling;
+        answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+
+    // Auth Management (giống home.html)
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const username = localStorage.getItem('username');
+
+      const authButtons = document.getElementById('auth-buttons');
+      const userSection = document.getElementById('user-section');
+      const usernameDisplay = document.getElementById('username-display');
+
+      if (token && username) {
+        if (authButtons) authButtons.classList.add('hidden');
+        if (userSection) {
+          userSection.classList.add('active');
+          if (usernameDisplay) usernameDisplay.textContent = username;
+        }
+      } else {
+        if (authButtons) authButtons.classList.remove('hidden');
+        if (userSection) userSection.classList.remove('active');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      updateNavbar();
+      window.location.href = '../home.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNavbar();
+
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          logout();
+        });
+      }
+    });
+  </script>
 </body>
 </html>

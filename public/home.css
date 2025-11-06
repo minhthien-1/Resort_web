@@ -1,77 +1,24 @@
-/* ====== Thanh Navbar ====== */
-body {
+* {
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #fff; /* Thêm màu nền cho body */
+  padding: 0;
+  box-sizing: border-box;
 }
 
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+}
+
+/* ====== NAVBAR ĐỒNG BỘ - MÀU TÍM ====== */
 .navbar {
-  background-color: #00aaff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
   position: fixed;
   width: 100%;
   top: 0;
   left: 0;
   z-index: 1000;
-}
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-/* make the link wrap look and behave like a card */
-.resort-link {
-  display: block;
-  text-decoration: none;
-  color: inherit;            /* keep text color */
-  outline: none;
-}
-
-.resort-link:focus .resort-card,
-.resort-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-}
-
-/* existing card rules (if not present already) */
-.resort-card {
-  cursor: pointer;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #fff;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.resort-card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  display: block;
-}
-
-/* ensure links don't show default focus outline that breaks visuals;
-   still keep accessibility by providing a visible focus style (above) */
-.resort-link:focus {
-  outline: none;
-}
-
-.user-name {
-  font-weight: 600;
-  color: #fff; /* Đổi màu cho dễ nhìn trên nền xanh */
-}
-
-.btn-logout {
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.btn-logout:hover {
-  background-color: #e43d3f;
+  border-bottom: 1px solid rgba(123, 104, 238, 0.1);
 }
 
 .navbar-container {
@@ -84,658 +31,682 @@ body {
 }
 
 .navbar-logo h1 {
-  color: white;
+  color: #7b68ee;
   font-size: 24px;
   font-weight: bold;
   margin: 0;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.navbar-logo h1:hover {
+  transform: scale(1.05);
+  color: #6554d5;
 }
 
 .navbar-menu {
   display: flex;
-  align-items: center;
   gap: 25px;
+  align-items: center;
 }
 
 .navbar-menu a {
-  color: white;
   text-decoration: none;
+  color: #333;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  padding: 8px 16px;
+  border-radius: 8px;
 }
 
 .navbar-menu a:hover {
-  color: #ffe082;
+  background: rgba(123, 104, 238, 0.1);
+  color: #7b68ee;
 }
 
-.navbar-menu .btn-login {
-  background-color: #4cc3ff;
-  color: black;
+.navbar-menu a.active {
+  background: rgba(123, 104, 238, 0.15);
+  font-weight: 600;
+  color: #7b68ee;
+}
+
+.btn-login, .btn-register {
   padding: 6px 14px;
   border-radius: 6px;
   font-weight: 600;
-}
-
-.navbar-menu .btn-register {
-  background-color: white;
-  color: #009fe3;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.navbar-menu .btn-register:hover {
-  background-color: #e0f7ff;
-}
-
-/* ====== Phần Form Tìm Kiếm ====== */
-#dateRange {
-  width: 250px;
-}
-
-.search-container {
-  background-image: url('Assets/Icon Images/background.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: white;
-  padding-top: 150px; /* Giảm padding cho cân đối */
-  padding-bottom: 60px;
-  text-align: center;
-}
-
-.resort_type {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin: 20px 0 25px;
-}
-
-.type-btn {
-  padding: 10px 22px;
-  font-size: 15px;
-  font-weight: bolder;
-  border: 1.5px solid #ffffff;
-  border-radius: 25px;
-  background-color: transparent;
-  color: #ffffff;
   cursor: pointer;
-  transition: all 0.3s ease;
+  border: none;
+  transition: 0.3s;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.type-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+.btn-login {
+  background-color: #9b8ef0;
+  color: #fff;
 }
 
-.type-btn.active {
-  background-color: #ffffff;
-  color: #007bff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+.btn-login:hover {
+  background-color: #8a7de8;
 }
 
-.search-header {
-  margin-bottom: 30px;
+.btn-register {
+  background: white;
+  color: #7b68ee;
+  border: 2px solid #7b68ee;
+}
+
+.btn-register:hover {
+  background: #f5f3ff;
+}
+
+/* ====== AUTH BUTTONS & USER SECTION ====== */
+#auth-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#auth-buttons.hidden {
+  display: none !important;
+}
+
+#user-section {
+  display: none;
+  align-items: center;
+  gap: 15px;
+}
+
+#user-section.active {
+  display: flex !important;
+}
+
+/* ===== USER PROFILE LINK (clickable) ===== */
+.user-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+  text-decoration: none;
+  color: #7b68ee;
+}
+
+.user-profile-link:hover {
+  background: rgba(123, 104, 238, 0.1);
+}
+
+.user-icon {
+  font-size: 24px;
+  color: #7b68ee;
+}
+
+#username-display {
+  font-weight: 600;
+  color: #7b68ee;
+  font-size: 15px;
+  min-width: 80px;
+}
+
+.btn-logout {
+  background-color: #ff4d4f;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-logout:hover {
+  background-color: #e43d3f;
+  transform: translateY(-2px);
+}
+
+/* ====== SEARCH CONTAINER ====== */
+.search-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 120px 20px 60px;
+  text-align: center;
+  margin-top: 60px;
 }
 
 .search-header h2 {
-  font-size: 28px;
-  margin-bottom: 5px;
+  font-size: 40px;
+  margin-bottom: 10px;
+  font-weight: 800;
 }
 
 .search-header p {
-  margin-top: 0;
   font-size: 16px;
-  color: #dce9ff;
-}
-
-.resorts {
-    max-width: 1200px; /* Tăng độ rộng để chứa 3 cột thoải mái */
-    margin: 40px auto; /* Thêm margin trên dưới */
-    padding: 0 20px; /* Thêm padding trái phải */
+  opacity: 0.9;
+  margin-bottom: 30px;
 }
 
 .search-form {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1000px;
+  gap: 12px;
+  max-width: 900px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 .search-form label {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  color: white;
+  gap: 6px;
+  flex: 1;
+}
+
+.search-form label span {
+  font-size: 12px;
+  text-align: left;
   font-weight: 600;
-  font-size: 16px;
 }
 
 .search-form input,
 .search-form select {
-  margin-top: 6px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  width: 220px;
-}
-
-.search-form button {
-  background-color: #ff8c00;
-  color: white;
-  font-weight: bold;
+  padding: 12px 16px;
   border: none;
   border-radius: 8px;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: 0.2s;
-  height: 52px;
-  margin-top: 26px;
-  align-self: center;
-}
-
-.search-form button:hover {
-  background-color: #ff9f33;
-}
-
-@media (max-width: 768px) {
-  .search-form {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-/* --- MÃ ƯU ĐÃI --- */
-.promo-codes {
-  position: relative;
-  overflow: hidden;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px 40px;
-  text-align: left;
-  box-sizing: border-box;
-}
-
-.promo-codes h2 {
-  font-size: 24px;
-  color: #004a99;
-  font-weight: 700;
-  margin-bottom: 30px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.promo-grid {
-  display: flex;
-  gap: 20px;
-  overflow: auto; /* Cho phép cuộn trên mobile */
-  scroll-behavior: smooth;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.promo-grid::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-
-
-.promo-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  padding: 20px;
-  flex: 0 0 340px;
-  min-width: 340px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.2s;
-}
-
-.promo-card:hover {
-  transform: translateY(-5px);
-}
-
-.promo-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.promo-icon {
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.promo-desc {
   font-size: 14px;
-  color: #555;
-  margin-bottom: 15px;
+  height: 48px;
 }
 
-.promo-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid #eee;
-  padding-top: 10px;
-}
-
-.promo-code {
-  background: #eef6ff;
-  color: #004a99;
-  font-weight: bold;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.copy-btn {
-  background: #0071eb;
+.search-btn-icon {
+  background: #f5576c;
   color: white;
   border: none;
-  padding: 6px 14px;
+  width: 48px;
+  height: 48px;
   border-radius: 8px;
-  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.copy-btn:hover {
-  background: #005fcc;
-}
-
-.promo-arrow {
-  position: absolute;
-  top: 55%;
-  transform: translateY(-50%);
-  background-color: white;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 10;
+  margin-top: 28px;
+  transition: 0.3s;
 }
 
-.promo-arrow:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.promo-arrow.left { left: 0; }
-.promo-arrow.right { right: 0; }
-.promo-arrow i { font-size: 18px; }
-
-@media (max-width: 1200px) {
-  .promo-arrow { display: none; }
-}
-
-/* --- ƯU ĐÃI NỔI BẬT & CÁC LƯỚI PHÒNG KHÁC--- */
-.deals-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  background: #f9fafb;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.deals-section h2 {
-  font-size: 26px;
-  margin-bottom: 30px;
-}
-
-/* BỘ QUY TẮC CHO LƯỚI HIỂN THỊ PHÒNG
-  Được áp dụng cho #room-cards-container và #dealsGrid 
-*/
-.resort-grid {
-  display: grid;
-  /* Đây là dòng quan trọng: tạo ra 3 cột */
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 24px; /* Khoảng cách giữa các thẻ phòng */
-}
-
-/* Điều chỉnh cho màn hình nhỏ hơn (Responsive) */
-@media (max-width: 1024px) {
-  .resort-grid {
-    /* Hiển thị 2 cột trên tablet */
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 767px) {
-  .resort-grid {
-    /* Hiển thị 1 cột trên điện thoại */
-    grid-template-columns: 1fr;
-  }
-}
-
-/* --- STYLE CHUNG CHO CARD PHÒNG --- */
-.resort-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  text-align: left;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.resort-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-}
-
-.resort-card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.resort-info {
-  padding: 16px;
-}
-
-.resort-info h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #333;
-  font-weight: 600;
-}
-
-.resort-info p {
-    margin: 4px 0;
-    color: #666;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-}
-
-.resort-info .price {
-  margin-top: 12px;
-  font-weight: 600;
-}
-
-.resort-info .price span {
-  color: #e44d26;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.fa-map-marker-alt {
-  color: #e44d26;
-  margin-right: 6px;
-  font-size: 13px;
-}
-/* --- ĐIỂM ĐẾN PHỔ BIẾN --- */
-.popular-destinations {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.destination-grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.destination-card {
-  width: 200px;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.destination-card:hover {
+.search-btn-icon:hover {
   transform: scale(1.05);
 }
 
-.destination-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-}
-
-/* --- WHY CHOOSE US --- */
-.why-choose-us {
-  background: #eef6ff;
+/* ====== MAIN CONTENT ====== */
+.container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 60px 20px;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 24px;
+  color: #2d3748;
+  font-weight: 800;
+  margin: 60px 0 40px;
+  display: block;
+  text-align: left;
+}
+
+/* ====== VOUCHERS SECTION ====== */
+.vouchers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 80px;
+}
+
+.voucher-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+  border-left: 4px solid #667eea;
+}
+
+.voucher-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.voucher-code {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  color: #667eea;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  display: inline-block;
+  border: 1px dashed #667eea;
+  font-size: 13px;
+}
+
+.voucher-card h3 {
+  font-size: 15px;
+  color: #2d3748;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.voucher-card p {
+  color: #718096;
+  font-size: 13px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.voucher-expire {
+  color: #f5576c;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ====== DESTINATIONS SECTION ====== */
+.destinations-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-bottom: 80px;
+}
+
+.destination-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.destination-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.destination-card-image {
+  width: 100%;
+  height: 120px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.destination-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.5s;
+}
+
+.destination-card:hover .destination-card-image img {
+  transform: scale(1.1);
+}
+
+.destination-card-name {
+  padding: 12px;
   text-align: center;
-  box-sizing: border-box;
+  font-weight: 700;
+  color: #2d3748;
+  font-size: 14px;
 }
 
-.why-choose-us .reasons {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 40px;
+/* ====== RESORTS SECTION ====== */
+.resorts {
+  margin-bottom: 60px;
 }
 
-.reason {
-  max-width: 250px;
-  text-align: center;
+.resort-group {
+  margin-bottom: 80px;
 }
 
-.reason img {
-  width: 60px;
-  height: 60px;
+.resort-group-title {
+  font-size: 24px;
+  color: #2d3748;
+  font-weight: 700;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #667eea;
+  display: block;
+  text-align: left;
+  width: 100%;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.room-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.room-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.room-card-image {
+  width: 100%;
+  height: 200px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.room-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.5s;
+}
+
+.room-card:hover .room-card-image img {
+  transform: scale(1.1);
+}
+
+.room-card-content {
+  padding: 18px;
+}
+
+.room-card-content h3 {
+  font-size: 16px;
+  color: #2d3748;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
-/* --- FOOTER --- */
-footer {
-  background-color: #003d91;
-  color: #ffffff;
+.room-card-content p {
+  color: #718096;
+  font-size: 13px;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.room-price {
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #667eea;
+}
+
+/* ====== PAGINATION ====== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 50px;
+}
+
+.page-btn {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.page-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.page-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+/* ====== WHY CHOOSE US SECTION ====== */
+.why-choose-us {
+  background: white;
+  padding: 80px 20px;
+  margin: 80px 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.why-choose-us h2 {
+  font-size: 32px;
+  color: #2d3748;
+  font-weight: 800;
   text-align: center;
-  padding: 30px 10px;
-  font-size: 15px;
-  border-top: 2px solid #007bff;
+  margin-bottom: 60px;
+}
+
+.reasons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reason {
+  text-align: center;
+  padding: 30px;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.reason:hover {
+  background: #f9fafb;
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.reason img {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.2));
+}
+
+.reason h4 {
+  font-size: 18px;
+  color: #2d3748;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.reason p {
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ====== FOOTER ====== */
+footer {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 20px 20px;
+  margin-top: 80px;
 }
 
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-footer p {
-  margin: 0;
-  font-weight: 400;
-  color: #e0ecff;
-}
-
-footer p span {
-  color: #ffffff;
-  font-weight: 600;
+  text-align: center;
 }
 
 .footer-links {
-  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
 }
 
 .footer-links a {
-  color: #e0ecff;
+  color: white;
   text-decoration: none;
-  margin: 0 5px;
-  transition: color 0.3s;
-  font-size: 14px;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
 .footer-links a:hover {
-  color: #ffffff;
+  opacity: 0.8;
 }
 
 .footer-links span {
-  color: #88b7ff;
+  opacity: 0.5;
 }
 
-/* Phần mạng xã hội */
 .footer-social {
-  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 .footer-social p {
-  font-weight: 500;
-  color: #ffffff;
-  margin-bottom: 10px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 .social-icons a {
-  display: inline-block;
-  margin: 0 8px;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.social-icons img {
-  width: 28px;
-  height: 28px;
-  filter: brightness(0) invert(1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  transition: all 0.3s;
 }
 
 .social-icons a:hover {
-  transform: scale(1.15);
-  opacity: 0.85;
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-4px);
 }
 
-/* Hiệu ứng hover nhẹ toàn footer */
-footer:hover {
-  background-color: #0049b0;
-  transition: background-color 0.3s ease;
+.social-icons img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
-/* Responsive Footer */
-@media (max-width: 768px) {
-  footer {
-    font-size: 13px;
-    padding: 20px 5px;
-  }
-  .footer-links {
-    font-size: 12px;
-  }
-  .social-icons img {
-    width: 24px;
-    height: 24px;
-  }
-}
-/* Thêm vào cuối file */
-
-/* Style cho resort cards */
-.resort-card {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
-
-.resort-card:hover {
-  transform: translateY(-5px);
-}
-
-.resort-card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.resort-info {
-  padding: 15px;
-}
-
-.resort-info h3 {
-  margin: 0 0 10px;
-  font-size: 1.2em;
-  color: #333;
-}
-
-.resort-info p {
-  margin: 5px 0;
-  color: #666;
-}
-
-.resort-info .price {
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.resort-info .price span {
-  color: #e44d26;
-  font-size: 1.1em;
-}
-
-.fa-map-marker-alt {
-  color: #e44d26;
-  margin-right: 5px;
-}
-
-/* --- CSS PHÂN TRANG --- */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 40px;
-  gap: 8px;
-}
-
-.page-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #ffffff;
-  color: #555;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.page-btn:hover {
-  border-color: #ff7f50;
-  color: #ff7f50;
-  transform: translateY(-2px);
-}
-
-.page-btn:disabled {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.page-btn.active {
-  background: linear-gradient(90deg, #ff8c66, #ff7f50);
-  color: #fff;
-  border-color: #ff7f50;
-  box-shadow: 0 4px 8px rgba(255, 127, 80, 0.3);
-}
-
-.page-btn i {
+footer p {
   font-size: 14px;
+  opacity: 0.9;
+  margin-top: 20px;
 }
 
+footer span {
+  font-weight: 700;
+}
 
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .rooms-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .destinations-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .vouchers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reasons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 968px) {
+  .navbar-container {
+    padding: 10px 20px;
+  }
+
+  .navbar-menu {
+    gap: 15px;
+    font-size: 14px;
+  }
+
+  .navbar-logo h1 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .destinations-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .vouchers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-header h2 {
+    font-size: 28px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .reasons {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .why-choose-us h2 {
+    font-size: 24px;
+    margin-bottom: 40px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .navbar-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #auth-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-login,
+  .btn-register {
+    width: 100%;
+    text-align: center;
+  }
+}
