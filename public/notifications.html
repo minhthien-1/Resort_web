@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thông báo của tôi</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #667eea;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.notifications-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #2d3748;
+}
+
+.mark-read-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.notifications-list li {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 15px 10px;
+  transition: 0.3s;
+}
+
+.notifications-list li.unread {
+  background: #f0f4ff;
+}
+
+.notifications-list li:last-child {
+  border-bottom: none;
+}
+
+.notifications-list h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #2d3748;
+}
+
+.notifications-list p {
+  margin: 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.notifications-list .date {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 6px;
+}
+
+.empty-message {
+  text-align: center;
+  color: #718096;
+  padding: 40px 0;
+  font-size: 16px;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #667eea;
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Thông báo của tôi</h1>
+</header>
+
+<div class="container">
+  <div class="notifications-header">
+    <h2>Danh sách thông báo</h2>
+    <button class="mark-read-btn" id="markAllReadBtn">Đánh dấu tất cả đã đọc</button>
+  </div>
+  
+  <ul class="notifications-list" id="notificationsList">
+    <!-- JS sẽ render thông báo ở đây -->
+  </ul>
+
+  <p class="empty-message" id="emptyMessage" style="display: none;">Bạn chưa có thông báo nào.</p>
+
+  <a href="home.html" class="back-btn"><i class="fas fa-arrow-left"></i> Quay lại trang chủ</a>
+</div>
+
+<script>
+const API_BASE = "http://localhost:5500"; // Thay bằng API của bạn
+const notificationsList = document.getElementById("notificationsList");
+const emptyMessage = document.getElementById("emptyMessage");
+const markAllReadBtn = document.getElementById("markAllReadBtn");
+
+let notifications = [];
+
+// Load thông báo từ API
+async function loadNotifications() {
+  try {
+    const token = localStorage.getItem("token"); // nếu cần auth
+    const res = await fetch(`${API_BASE}/notifications`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const data = await res.json();
+    notifications = data.items || [];
+    renderNotifications();
+  } catch (err) {
+    console.error("Lỗi load notifications:", err);
+  }
+}
+
+// Render danh sách thông báo
+function renderNotifications() {
+  notificationsList.innerHTML = "";
+
+  if (!notifications.length) {
+    emptyMessage.style.display = "block";
+    return;
+  } else {
+    emptyMessage.style.display = "none";
+  }
+
+  notifications.forEach(n => {
+    const li = document.createElement("li");
+    li.className = n.is_read ? "" : "unread";
+    li.innerHTML = `
+      <h3>${n.title}</h3>
+      <p>${n.message}</p>
+      <div class="date">${new Date(n.created_at).toLocaleString('vi-VN')}</div>
+    `;
+    notificationsList.appendChild(li);
+  });
+}
+
+// Đánh dấu tất cả đã đọc
+markAllReadBtn.addEventListener("click", async () => {
+  try {
+    const token = localStorage.getItem("token");
+    await fetch(`${API_BASE}/notifications/mark-all-read`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    notifications.forEach(n => n.is_read = true);
+    renderNotifications();
+  } catch (err) {
+    console.error("Lỗi mark all read:", err);
+  }
+});
+
+// Load khi mở trang
+loadNotifications();
+</script>
+
+</body>
+</html>

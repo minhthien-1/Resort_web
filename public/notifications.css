@@ -1,0 +1,15 @@
+#notifyBox {
+position: absolute;
+top: 60px;
+right: 10px;
+background: white;
+border: 1px solid #ddd;
+width: 320px;
+display: none;
+padding: 10px;
+border-radius: 6px;
+}
+
+#notifyList li.unread {
+font-weight: bold;
+}

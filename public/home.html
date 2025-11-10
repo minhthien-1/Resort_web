@@ -6,6 +6,7 @@
   <title>Resort Booking – Trang chủ</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
   <style>
     * {
       margin: 0;
@@ -451,6 +452,9 @@
         <a href="">Hỗ trợ</a>
         <a href="">Hợp tác</a>
         <a href="my_bookings.html">Đặt chỗ</a>
+        <a href="notifications.html" class="notif-btn">
+            🔔 <span id="notifCount" class="notif-count">0</span>
+        </a>
         <a href="login.html" class="btn-login">Đăng nhập</a>
         <a href="register.html" class="btn-register">Đăng ký</a>
       </nav>
@@ -481,6 +485,7 @@
     </section>
   </div>
 
+
   <!-- MAIN CONTENT -->
   <section class="container">
     <!-- VOUCHERS -->
@@ -495,6 +500,7 @@
     <div id="room-cards-container"></div>
     <div id="pagination-container" class="pagination"></div>
   </section>
+
 
   <!-- FOOTER -->
   <footer>
@@ -757,6 +763,56 @@
       renderCurrentPage();
       renderPagination();
     });
+
+    
+
+   
+
   </script>
+
+  <!-- Notifications Script -->
+  <script>
+    const API_BASE = "http://localhost:5500"; // thay bằng URL API của bạn
+
+    // SỬA: Chỉ cần giữ lại notifCount
+    const notifCount = document.getElementById("notifCount");
+
+    // XÓA BỎ: không cần notifBtn, notifBox, notifList, seeMoreBtn nữa
+    // XÓA BỎ: các event listener cho notifBtn và seeMoreBtn
+
+    // Lấy thông báo từ API (chỉ để CẬP NHẬT SỐ LƯỢNG)
+    async function loadNotifications() {
+      try {
+        const token = localStorage.getItem("token"); // nếu cần auth
+
+        // Tối ưu: Bạn chỉ cần số lượng, nên gọi API nào nhẹ nhất có thể
+        // Nếu API của bạn hỗ trợ, hãy gọi một endpoint chỉ trả về số lượng.
+        // Nếu không, dùng limit=1 cũng được cho nhẹ.
+        const res = await fetch(`${API_BASE}/notifications?limit=1`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        // SỬA: Xóa bỏ phần lặp (forEach) và cập nhật notifList
+
+        // Chỉ cập nhật số chưa đọc
+        notifCount.textContent = data.unreadCount || 0;
+
+      } catch (err) {
+        console.error("Lỗi load notifications:", err);
+      }
+    }
+
+    // Load khi mở trang
+    loadNotifications();
+
+    // Tự refresh mỗi 60s
+    setInterval(loadNotifications, 60000);
+  </script>
+
+  
+
+
+
 </body>
 </html>
