@@ -62,7 +62,7 @@ body {
 
 .btn-logout {
   background-color: #ff4d4f;
-  color: white;
+  color: #fff;
   border: none;
   padding: 5px 10px;
   border-radius: 6px;
@@ -273,6 +273,7 @@ body {
 
 .promo-grid {
   display: flex;
+  padding : 15px 15px;
   gap: 20px;
   overflow: auto; /* Cho phép cuộn trên mobile */
   scroll-behavior: smooth;
@@ -300,6 +301,7 @@ body {
 
 .promo-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.318);
 }
 
 .promo-header {
@@ -355,7 +357,7 @@ body {
 
 .promo-arrow {
   position: absolute;
-  top: 55%;
+  top: 40%;
   transform: translateY(-50%);
   background-color: white;
   border: none;
@@ -375,6 +377,7 @@ body {
   background-color: #007bff;
   color: white;
 }
+
 
 .promo-arrow.left { left: 0; }
 .promo-arrow.right { right: 0; }
@@ -738,4 +741,42 @@ footer:hover {
   font-size: 14px;
 }
 
+/* --- Nút thông báo --- */
+
+.notif-wrapper {
+  position: relative;
+  margin-left: 20px;
+}
+
+.notif-btn {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: #333;
+  font-size: 24px; 
+  padding: 4px;
+}
+
+.notif-btn:hover {
+  color: #000;
+  opacity: 0.8;
+}
+
+.notif-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  line-height: 18px;
+  text-align: center;
+  transform: translate(40%, -40%);
+  user-select: none;
+}
 
