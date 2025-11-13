@@ -5,44 +5,51 @@ import pool from '../test-db.js';
 const router = express.Router();
 
 // ===== LOGIN =====
-router.post('/login', async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password, full_name, phone } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password required' });
+    if (!username || !email || !password || !full_name) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const result = await pool.query(
-      'SELECT id, username, password_hash, role FROM users WHERE username = $1',
-      [username]
-    );
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'User not found' });
-    }
+    // ✅ INSERT với full_name:
+    const query = `
+      INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active)
+      VALUES ($1, $2, $3, $4, $5, $6, true)
+      RETURNING id, username, email, full_name, phone, role
+    `;
 
-    const user = result.rows[0];
-    if (user.password_hash !== password) {
-      return res.status(401).json({ error: 'Invalid password' });
-    }
+    const result = await pool.query(query, [
+      username,
+      email,
+      hashedPassword,
+      full_name,  // ← THÊM full_name
+      phone || null,
+      'guest'
+    ]);
 
+    const newUser = result.rows[0];
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: newUser.id, username: newUser.username, role: newUser.role },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '7d' }
     );
 
-    res.status(200).json({
+    res.status(201).json({
       status: true,
-      message: 'Login successful',
+      message: 'Register successful',
       token: token,
-      user: { id: user.id, username: user.username, role: user.role }
+      user: newUser  // ← Trả về full_name
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // ===== REGISTER =====
 router.post('/register', async (req, res) => {
