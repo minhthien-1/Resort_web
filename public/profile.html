@@ -567,7 +567,7 @@ async function loadUserProfile() {
 
         console.log('📥 API Response:', result);
 
-        if (result.id && result.data) {
+        if (result.id) {
             currentUser = result;
             
             // Cập nhật localStorage
