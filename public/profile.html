@@ -562,7 +562,7 @@ async function loadUserProfile() {
     try {
         console.log('📡 Đang tải profile từ API:', `${API_BASE_URL}/users/${currentUserId}`);
         
-        const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`);
+        const response = await fetch(`${API_BASE_URL}/api/users/${currentUserId}`);
         const result = await response.json();
 
         console.log('📥 API Response:', result);
@@ -678,7 +678,7 @@ async function loadUserProfile() {
         submitBtn.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/users/${currentUserId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -736,7 +736,7 @@ async function loadUserProfile() {
         submitBtn.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/users/${currentUserId}/change-password`, {
+            const response = await fetch(`${API_BASE_URL}/api/users/${currentUserId}/change-password`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -772,7 +772,7 @@ async function loadUserProfile() {
         deleteBtn.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/users/${currentUserId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/users/${currentUserId}`, {
                 method: 'DELETE'
             });
 
