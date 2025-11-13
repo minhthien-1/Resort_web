@@ -4,11 +4,17 @@ import pg from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import express from "express";
+import cors from "cors";
+import pg from "pg";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import fs from "fs";
 import multer from "multer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import authRouter from './Routes/auth.js';
 dotenv.config();
 
 const { Pool } = pg;
@@ -17,15 +23,9 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-pool.query("SELECT NOW()", (err, result) => {
-  if (err) {
-    console.error("❌ Lỗi kết nối database:", err.message);
-  } else {
-    console.log("✅ Kết nối Neon database thành công!");
-  }
-});
 
 const app = express();
+app.use('/api/auth', authRouter);  // ← Thêm route
 app.use(cors({
   origin: "http://localhost:5500",
   credentials: true,
