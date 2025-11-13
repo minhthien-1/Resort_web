@@ -1,6 +1,6 @@
 let vouchers = [];
 let currentEditId = null;
-const API_URL = "http://localhost:5500/api/discounts";
+const API_URL = "https://api-resort.onrender.com/api/discounts";
 const token = localStorage.getItem("token");
 
 if (!token) {
