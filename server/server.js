@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import pg from "pg";
-import pg from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
