@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Thanh Toán Giả Lập</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-400px w-full">
+            <h1 class="text-2xl font-bold mb-6 text-center">💳 Cổng Thanh Toán Giả Lập</h1>
+            
+            <div id="payment-info" class="bg-blue-50 p-4 rounded-lg mb-6">
+                <p><strong>Booking ID:</strong> <span id="booking-id">-</span></p>
+                <p><strong>Số tiền:</strong> <span id="amount">-</span> VNĐ</p>
+            </div>
+
+            <div class="space-y-3">
+                <input type="text" placeholder="Số thẻ" value="4111111111111111" class="w-full p-3 border rounded" disabled>
+                <input type="text" placeholder="Tên chủ thẻ" value="TEST USER" class="w-full p-3 border rounded" disabled>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" placeholder="MM/YY" value="12/25" class="p-3 border rounded" disabled>
+                    <input type="text" placeholder="CVV" value="123" class="p-3 border rounded" disabled>
+                </div>
+            </div>
+
+            <div class="mt-6 space-y-3">
+                <button onclick="processPayment(true)" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded">
+                    ✅ Thanh Toán Thành Công
+                </button>
+                <button onclick="processPayment(false)" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded">
+                    ❌ Thanh Toán Thất Bại
+                </button>
+            </div>
+
+            <p class="text-gray-500 text-sm text-center mt-4">Đây là cổng thanh toán giả lập để test</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            document.getElementById('booking-id').textContent = params.get('bookingId') || 'N/A';
+            document.getElementById('amount').textContent = ((params.get('amount') || 0) / 100).toLocaleString('vi-VN');
+        });
+
+        function processPayment(isSuccess) {
+            const params = new URLSearchParams(window.location.search);
+            const bookingId = params.get('bookingId');
+            const amount = params.get('amount');
+            
+            const returnUrl = `http://localhost:5500/api/payments/fake/return?status=${isSuccess ? 'success' : 'failed'}&bookingId=${bookingId}&amount=${amount}`;
+            window.location.href = returnUrl;
+        }
+    </script>
+</body>
+</html>
