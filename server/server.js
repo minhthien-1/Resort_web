@@ -835,7 +835,107 @@ app.get("/api/bookings/filter", async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 });
+// API: Tạo booking
+app.post("/api/admin/bookings", async (req, res) => {
+  const { emailOrUsername, fullName, phone, roomId, checkIn, checkOut, status } = req.body;
 
+  // Kiểm tra dữ liệu bắt buộc
+  if (!emailOrUsername || !fullName || !phone || !roomId || !checkIn || !checkOut || !status) {
+    return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+  }
+
+  try {
+    // Kiểm tra user trong DB
+    let userId = null;
+    const { rows: userRows } = await pool.query(
+      "SELECT id FROM users WHERE email = $1 OR username = $1 LIMIT 1",
+      [emailOrUsername]
+    );
+    if (userRows.length > 0) {
+      userId = userRows[0].id;
+    } else {
+      // Nếu không có user, có thể tạo user mới (hoặc bạn có thể bỏ qua tạo người dùng mới)
+      userId = uuidv4();  // Tạo userId ngẫu nhiên
+    }
+
+    // Kiểm tra phòng có sẵn không
+    const { rows: roomRows } = await pool.query(
+      "SELECT id, price_per_night FROM rooms WHERE id = $1 AND status = 'available'",
+      [roomId]
+    );
+    if (roomRows.length === 0) {
+      return res.status(404).json({ error: 'Phòng không tồn tại hoặc đã được đặt' });
+    }
+
+    const room = roomRows[0];
+    const pricePerNight = parseFloat(room.price_per_night);
+
+    // Tính toán tổng tiền
+    const startDate = new Date(checkIn);
+    const endDate = new Date(checkOut);
+    const timeDiff = endDate.getTime() - startDate.getTime();
+    const nights = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+    const totalAmount = nights * pricePerNight;
+
+    // Tạo mã booking
+    const bookingCode = uuidv4().toUpperCase();
+
+    // Lưu booking vào DB
+    const { rows: bookingRows } = await pool.query(
+      `INSERT INTO bookings (user_id, room_id, booking_code, check_in, check_out, nightly_rate, total_amount, status, created_at, updated_at) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()) 
+             RETURNING id, booking_code, total_amount, status`,
+      [userId, roomId, bookingCode, checkIn, checkOut, pricePerNight, totalAmount, status]
+    );
+
+    // Cập nhật trạng thái phòng nếu đã nhận phòng
+    if (status === 'checked_in') {
+      await pool.query("UPDATE rooms SET status = 'occupied' WHERE id = $1", [roomId]);
+    }
+
+    res.status(201).json({
+      message: 'Đặt phòng thành công!',
+      booking: bookingRows[0],
+      newUser: userId !== null,
+      userInfo: {
+        userId,
+        fullName,
+        phone,
+        email: emailOrUsername
+      }
+    });
+  } catch (err) {
+    console.error("❌ Lỗi khi tạo booking:", err);
+    res.status(500).json({ error: 'Lỗi server khi tạo đặt phòng' });
+  }
+});
+// API: Kiểm tra xem user đã tồn tại chưa
+app.get("/api/users/check", async (req, res) => {
+  const { identifier } = req.query;
+
+  if (!identifier) {
+    return res.status(400).json({ error: 'Thiếu thông tin email/username' });
+  }
+
+  try {
+    const sql = `
+            SELECT id, email, username, full_name, phone, role, is_active
+            FROM users 
+            WHERE email = $1 OR username = $1
+            LIMIT 1
+        `;
+    const result = await pool.query(sql, [identifier]);
+
+    if (result.rows.length > 0) {
+      return res.json({ exists: true, user: result.rows[0] });
+    } else {
+      return res.json({ exists: false });
+    }
+  } catch (err) {
+    console.error("❌ Lỗi kiểm tra user:", err);
+    res.status(500).json({ error: "Lỗi server khi kiểm tra user" });
+  }
+});
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`✅ Server đang chạy tại http://localhost:${PORT}`);
