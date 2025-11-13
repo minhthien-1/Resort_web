@@ -8,6 +8,8 @@ import multer from "multer";
 import fs from "fs";
 import pg from "pg";
 import { fileURLToPath } from "url";
+import authRouter from './Routes/auth.js';
+
 
 dotenv.config();
 
@@ -17,15 +19,9 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-pool.query("SELECT NOW()", (err, result) => {
-  if (err) {
-    console.error("❌ Lỗi kết nối database:", err.message);
-  } else {
-    console.log("✅ Kết nối Neon database thành công!");
-  }
-});
 
 const app = express();
+app.use('/api/auth', authRouter);  // ← Thêm route
 app.use(cors({
   origin: "http://localhost:5500",
   credentials: true,
