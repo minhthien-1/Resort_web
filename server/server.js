@@ -338,6 +338,7 @@ app.get("/api/rooms/top-booked", async (req, res) => {
   }
 });
 
+// ✅ GET chi tiết phòng (FIX COALESCE TYPES)
 app.get("/api/rooms/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -345,8 +346,11 @@ app.get("/api/rooms/:id", async (req, res) => {
       `SELECT r.id, res.name AS resort_name, r.location, r.category, r.address,
                rt.name AS room_type, rt.capacity, 
                COALESCE(rd.description, 'Chưa có mô tả') AS description,
-               COALESCE(rd.features, ARRAY['Không có thông tin']) AS features,
-               COALESCE(rd.images_url, ARRAY[]::text[]) AS images,
+               
+               -- ✅ FIX: Cast array về text hoặc lấy dạng JSON
+               COALESCE(rd.features::text, '[]'::text) AS features,
+               COALESCE(rd.images_url::text, '[]'::text) AS images,
+               
                rd.price_per_night,
                rd.num_bed
        FROM rooms r 
@@ -362,28 +366,6 @@ app.get("/api/rooms/:id", async (req, res) => {
     res.json(rows[0]);
   } catch (error) {
     console.error("❌ Lỗi khi lấy chi tiết phòng:", error);
-    res.status(500).json({ error: "Lỗi server" });
-  }
-});
-
-app.post("/api/reviews", async (req, res) => {
-  try {
-    const { room_id, rating, comment, username } = req.body;
-    if (!room_id || !rating || !comment || !username) {
-      return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
-    }
-    const { rows } = await pool.query(
-      `INSERT INTO reviews (room_id, rating, comment, username) VALUES ($1, $2, $3, $4)
-       RETURNING review_id, created_at`,
-      [room_id, rating, comment, username]
-    );
-    res.status(201).json({
-      message: "Đánh giá đã được gửi thành công!",
-      review_id: rows[0].review_id,
-      created_at: rows[0].created_at,
-    });
-  } catch (error) {
-    console.error("❌ Lỗi:", error);
     res.status(500).json({ error: "Lỗi server" });
   }
 });
