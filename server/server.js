@@ -1233,7 +1233,6 @@ app.get("/api/bookings/filter", async (req, res) => {
 });
 
 
-
 const PORT = process.env.PORT || 5500;
 
 app.listen(PORT, () => {
