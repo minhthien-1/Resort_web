@@ -29,11 +29,12 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       }).then(() => {
         // ✅ FIX: Lưu từ data.user:
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.user.id);
-        localStorage.setItem("username", data.user.username);
-        localStorage.setItem("email", data.user.email);
-        localStorage.setItem("role", data.user.role);
-
+        localStorage.setItem("userId", data.user.id);           // ← FIX: data.user.id
+        localStorage.setItem("username", data.user.username);   // ← FIX: data.user.username
+        localStorage.setItem("email", data.user.email);         // ← Giữ nguyên
+        localStorage.setItem("full_name", data.user.full_name || "");  // ← FIX: full_name (không phải fullname)
+        localStorage.setItem("phone", data.user.phone || "");    // ← FIX
+        localStorage.setItem("role", data.user.role);           // ← FIX
         if (data.user.role === "admin" || data.user.role === "staff") {
           window.location.href = "/admin";
         } else {
