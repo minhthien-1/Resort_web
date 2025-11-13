@@ -205,17 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 🔔 Tải số thông báo chưa đọc
-async function loadUnread() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  const res = await fetch("http://localhost:5500/notifications/unread-count", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const data = await res.json();
-  document.getElementById("badge").innerText = data.unread;
-}
-
-loadUnread();
+      // 🔔 Tải số thông báo chưa đọc
+      async function loadUnread() {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch("http://localhost:5500/notifications/unread-count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        document.getElementById("badge").innerText = data.unread;
+      }
+      loadUnread();
