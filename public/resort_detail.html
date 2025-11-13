@@ -734,11 +734,19 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const API_BASE = 'https://api-resort.onrender.com';
+            // ✅ FIX: Xác định API_BASE dựa trên môi trường
+            let API_BASE;
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+              API_BASE = 'http://localhost:5500';
+            } else {
+              API_BASE = 'https://api-resort.onrender.com';
+            }
+            
+            console.log('🌐 API_BASE:', API_BASE); // Debug
 
             let currentRoom = null; 
 
@@ -770,10 +778,42 @@
                 });
             }
 
-            function getQueryParam(param) { const urlParams = new URLSearchParams(window.location.search); return urlParams.get(param); }
-            function formatCurrency(amount) { const numericAmount = parseFloat(amount); if (isNaN(numericAmount)) return "Đang cập nhật"; return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(numericAmount); }
-            function resolveImageUrl(url) { if (!url) return 'Assets/placeholder.jpg'; if (/^https?:\/\//i.test(url)) return url; if (url.startsWith('/')) return API_BASE + url; return API_BASE + '/uploads/' + url; }
-            function getLocationName(key) { const map = { 'da-lat': 'Đà Lạt', 'ha-long': 'Hạ Long', 'phu-quoc': 'Phú Quốc', 'nha-trang': 'Nha Trang', 'da-nang': 'Đà Nẵng', 'sapa': 'Sapa', 'hoi-an': 'Hội An', 'ha-noi': 'Hà Nội', 'sai-gon': 'Sài Gòn' }; return map[key] || key || 'Không xác định'; }
+            function getQueryParam(param) { 
+                const urlParams = new URLSearchParams(window.location.search); 
+                return urlParams.get(param); 
+            }
+            
+            function formatCurrency(amount) { 
+                const numericAmount = parseFloat(amount); 
+                if (isNaN(numericAmount)) return "Đang cập nhật"; 
+                return new Intl.NumberFormat('vi-VN', { 
+                    style: 'currency', 
+                    currency: 'VND' 
+                }).format(numericAmount); 
+            }
+            
+            function resolveImageUrl(url) { 
+                const PLACEHOLDER_SVG = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23e0e0e0%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22Arial%22%3ENo Image%3C/text%3E%3C/svg%3E';
+                if (!url) return PLACEHOLDER_SVG; 
+                if (/^https?:\/\//i.test(url)) return url; 
+                if (url.startsWith('/')) return API_BASE + url; 
+                return API_BASE + '/uploads/' + url; 
+            }
+            
+            function getLocationName(key) { 
+                const map = { 
+                    'da-lat': 'Đà Lạt', 
+                    'ha-long': 'Hạ Long', 
+                    'phu-quoc': 'Phú Quốc', 
+                    'nha-trang': 'Nha Trang', 
+                    'da-nang': 'Đà Nẵng', 
+                    'sapa': 'Sapa', 
+                    'hoi-an': 'Hội An', 
+                    'ha-noi': 'Hà Nội', 
+                    'sai-gon': 'Sài Gòn' 
+                }; 
+                return map[key] || key || 'Không xác định'; 
+            }
 
             async function loadReviews(roomId) {
                 const container = document.getElementById('review-list');
@@ -807,13 +847,23 @@
                 loadingElement.style.display = 'block';
                 contentElement.style.display = 'none';
                 errorElement.style.display = 'none';
-                if (!resortId) { loadingElement.style.display = 'none'; errorElement.textContent = 'Lỗi: Không tìm thấy ID resort.'; errorElement.style.display = 'block'; return; }
+                
+                if (!resortId) { 
+                    loadingElement.style.display = 'none'; 
+                    errorElement.textContent = 'Lỗi: Không tìm thấy ID resort.'; 
+                    errorElement.style.display = 'block'; 
+                    return; 
+                }
 
                 try {
+                    console.log('📍 Fetching from:', `${API_BASE}/api/rooms/${resortId}`);
                     const response = await fetch(`${API_BASE}/api/rooms/${resortId}`);
                     if (!response.ok) throw new Error(`Lỗi server: ${response.statusText}`);
                     currentRoom = await response.json();
                     
+                    console.log("✅ Dữ liệu chi tiết phòng:", currentRoom);
+                    console.log("📸 Images field:", currentRoom.images || currentRoom.images_url);
+
                     document.title = currentRoom.resort_name || "Chi tiết Resort";
                     document.getElementById('resort-name').textContent = currentRoom.resort_name || "Tên không xác định";
                     document.getElementById('resort-location-text').textContent = getLocationName(currentRoom.location);
@@ -835,38 +885,87 @@
                         featuresList.innerHTML = '<li>Chưa có thông tin tiện ích.</li>';
                     }
 
+                    // ✅ FIX: XỬ LÝ ẢNH ĐÚNG
                     const mainImageContainer = document.getElementById('main-image-container');
                     const thumbnailGallery = document.getElementById('thumbnail-gallery');
                     mainImageContainer.innerHTML = '';
                     thumbnailGallery.innerHTML = '';
-                    const images = currentRoom.images || [];
-                    if (images.length > 0) {
+                    
+                    // Lấy dữ liệu ảnh từ 'images' hoặc 'images_url'
+                    const rawImagesData = currentRoom.images || currentRoom.images_url;
+                    let cleanedImageNames = [];
+
+                    console.log('🖼️ Raw images data:', rawImagesData);
+
+                    if (rawImagesData && typeof rawImagesData === 'string') {
+                        let parsedString = rawImagesData;
+                        
+                        // Xử lý nếu nó là chuỗi JSON lồng
+                        if (parsedString.startsWith('"') && parsedString.endsWith('"')) {
+                            try {
+                                parsedString = JSON.parse(parsedString);
+                                console.log('✅ Parsed JSON:', parsedString);
+                            } catch (e) { 
+                                console.error("❌ Lỗi parse JSON:", e); 
+                            }
+                        }
+
+                        // Xử lý chuỗi mảng PostgreSQL
+                        if (parsedString && parsedString.startsWith('{') && parsedString.endsWith('}')) {
+                            cleanedImageNames = parsedString.replace(/[{}"\\]/g, '').split(',').map(s => s.trim()).filter(s => s);
+                            console.log('✅ Parsed PostgreSQL array:', cleanedImageNames);
+                        } else if (parsedString) {
+                            cleanedImageNames = [parsedString.trim()];
+                            console.log('✅ Single string image:', cleanedImageNames);
+                        }
+
+                    } else if (rawImagesData && Array.isArray(rawImagesData)) {
+                        cleanedImageNames = rawImagesData.filter(img => img);
+                        console.log('✅ Already array:', cleanedImageNames);
+                    }
+
+                    // Hiển thị ảnh
+                    if (cleanedImageNames.length > 0 && cleanedImageNames[0]) {
+                        console.log('🖼️ Displaying images:', cleanedImageNames);
+                        
                         const mainImg = document.createElement('img');
-                        mainImg.src = resolveImageUrl(images[0]);
+                        mainImg.src = resolveImageUrl(cleanedImageNames[0]);
                         mainImg.alt = currentRoom.resort_name;
+                        mainImg.onerror = function() {
+                            console.error('❌ Main image failed to load:', this.src);
+                            this.src = resolveImageUrl(null);
+                        };
                         mainImageContainer.appendChild(mainImg);
-                        images.forEach((imgUrl, index) => {
+
+                        cleanedImageNames.forEach((imgUrl, index) => {
+                            if (!imgUrl) return;
                             const thumbImg = document.createElement('img');
-                            thumbImg.src = resolveImageUrl(imgUrl);
+                            const resolvedUrl = resolveImageUrl(imgUrl);
+                            thumbImg.src = resolvedUrl;
                             thumbImg.className = index === 0 ? 'active' : '';
+                            thumbImg.onerror = function() {
+                                console.error('❌ Thumbnail failed to load:', this.src);
+                            };
                             thumbImg.onclick = () => {
-                                mainImg.src = resolveImageUrl(imgUrl);
+                                mainImg.src = resolvedUrl;
                                 document.querySelectorAll('.thumbnail-gallery img').forEach(i => i.classList.remove('active'));
                                 thumbImg.classList.add('active');
                             };
                             thumbnailGallery.appendChild(thumbImg);
                         });
                     } else {
-                        mainImageContainer.innerHTML = `<img src="Assets/placeholder.jpg" alt="Placeholder">`;
+                        console.warn('⚠️ No images found, showing placeholder');
+                        mainImageContainer.innerHTML = `<img src="${resolveImageUrl(null)}" alt="Placeholder">`;
                     }
 
                     let checkoutPicker = flatpickr("#check-out", { dateFormat: "d/m/Y", locale: "vn", minDate: new Date().fp_incr(1) });
                     flatpickr("#check-in", { dateFormat: "d/m/Y", locale: "vn", minDate: "today", onChange: function(selectedDates) { if (selectedDates[0]) { checkoutPicker.set('minDate', new Date(selectedDates[0]).fp_incr(1)); } } });
+                    
                     await loadReviews(resortId);
                     loadingElement.style.display = 'none';
                     contentElement.style.display = 'block';
                 } catch (error) {
-                    console.error("Lỗi khi tải chi tiết resort:", error);
+                    console.error("❌ Lỗi khi tải chi tiết resort:", error);
                     loadingElement.style.display = 'none';
                     errorElement.textContent = `Không thể tải dữ liệu resort. Lỗi: ${error.message}`;
                     errorElement.style.display = 'block';
@@ -892,9 +991,17 @@
                     return;
                 }
                 const bookingDetails = {
-                    resortId: currentRoom.id, resortName: currentRoom.resort_name, roomCategory: currentRoom.category, capacity: currentRoom.capacity,
-                    pricePerNight: currentRoom.price_per_night, checkIn: checkInDate, checkOut: checkOutDate, userFullName: localStorage.getItem('full_name') || 'N/A',
-                    userPhone: localStorage.getItem('phone') || 'Chưa có', userEmail: localStorage.getItem('email') || 'N/A', num_bed: currentRoom.num_bed
+                    resortId: currentRoom.id, 
+                    resortName: currentRoom.resort_name, 
+                    roomCategory: currentRoom.category, 
+                    capacity: currentRoom.capacity,
+                    pricePerNight: currentRoom.price_per_night, 
+                    checkIn: checkInDate, 
+                    checkOut: checkOutDate, 
+                    userFullName: localStorage.getItem('full_name') || 'N/A',
+                    userPhone: localStorage.getItem('phone') || 'Chưa có', 
+                    userEmail: localStorage.getItem('email') || 'N/A', 
+                    num_bed: currentRoom.num_bed
                 };
                 sessionStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
                 window.location.href = 'payment.html';
@@ -906,14 +1013,17 @@
                 const roomId = getQueryParam('id');
                 const ratingSelect = document.getElementById('rating-select');
                 const selectedRating = parseInt(ratingSelect.value);
+                
                 if (isNaN(selectedRating)) {
                     alert('Vui lòng chọn số sao đánh giá.');
                     return;
                 }
+                
                 const loggedInUsername = localStorage.getItem('username') || "Khách ẩn danh";
                 const submitButton = e.target.querySelector('.submit-btn');
                 submitButton.textContent = 'Đang gửi...';
                 submitButton.disabled = true;
+                
                 try {
                     const res = await fetch(`${API_BASE}/api/reviews`, {
                         method: 'POST',

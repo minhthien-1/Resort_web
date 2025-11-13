@@ -91,12 +91,7 @@
                     </div>
                 </div>
                
-                <div class="mb-3">
-                    <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
-                    <input id="room-images" type="file" accept="image/*" multiple class="w-full" />
-                    <p class="text-xs text-gray-500 mt-1">Các ảnh xem trước (mới) bên dưới. Khi sửa, upload ảnh mới sẽ **thay thế toàn bộ** ảnh cũ.</p>
-                    <div id="image-preview" class="flex flex-wrap mt-2"></div>
-                </div>
+               
 
                 <!-- Hàng 4: Vị trí & Địa chỉ -->
                 <div class="form-row">
@@ -130,13 +125,18 @@
                 </div>
 
                 <!-- Hàng 6: Hình ảnh -->
-                <div class="form-row full">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
-                        <input id="room-images" type="file" accept="image/*" multiple class="w-full border border-gray-300 rounded px-3 py-2" />
-                        <div id="image-preview" class="flex flex-wrap mt-2"></div>
-                    </div>
-                </div>
+              <div class="form-row full">
+    <div>
+        <label class="block text-sm font-medium mb-1">Hình ảnh phòng</label>
+        <input id="room-images" type="file" ... />
+        <div id="image-preview" class="flex flex-wrap mt-2"></div>
+
+        <p id="image-upload-hint" class="hidden text-sm text-amber-600 mt-2">
+            ⚠️ **Lưu ý:** Tải lên ảnh mới sẽ **xóa và thay thế** toàn bộ ảnh cũ.
+        </p>
+
+    </div>
+</div>
 
                 <!-- Nút hành động -->
                 <div class="flex justify-end items-center space-x-3 mt-6">
@@ -150,7 +150,18 @@
     </div>
 
     <script>
-    const API_BASE = 'https://api-resort.onrender.com';
+    let API_BASE; // Dùng 'let' thay vì 'const'
+    
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // 1. MÔI TRƯỜNG LOCAL
+      // (Khi bạn chạy file .html từ máy của bạn)
+      API_BASE = 'http://localhost:5500'; // Đây là backend server.js trên máy của bạn
+    } else {
+      // 2. MÔI TRƯỜNG PRODUCTION
+      // (Khi bạn đã deploy code lên mạng)
+      API_BASE = 'https://api-resort.onrender.com'; // Đây là backend trên OnRender
+    }
+    
     let ALL_ROOMS = [];
     let ROOM_TYPES = [];
     let currentMode = 'create'; 
@@ -247,7 +258,7 @@
         // Luôn luôn dọn dẹp preview khi mở modal
         const preview = document.getElementById('image-preview');
         preview.innerHTML = '';
-        
+        const hint = document.getElementById('image-upload-hint');
         document.getElementById('modal-error-message').textContent = '';
         document.getElementById('modal-success-message').textContent = '';
         
@@ -256,10 +267,13 @@
             document.getElementById('modal-submit-btn').textContent = '✅ Thêm Phòng';
             document.getElementById('room-id').value = '';
             document.getElementById('resort-id').value = resortId;
+            hint.classList.add('hidden');
         } else if (mode === 'edit' && roomId) { 
             
             const roomData = ALL_ROOMS.find(room => room.id == roomId); 
+            console.log("Dữ liệu phòng đang sửa:", roomData);
             if (!roomData) {
+                
                 alert("Lỗi: Không tìm thấy dữ liệu phòng!");
                 return;
             }
@@ -277,18 +291,35 @@
             document.getElementById('room-address').value = roomData.address || '';
             document.getElementById('room-description').value = roomData.description || '';
 
-            // ===== 📍 THAY ĐỔI 2: HIỂN THỊ ẢNH CŨ =====
-            // Backend trả về `images` (là `images_url` trong DB)
-            if (roomData.images && Array.isArray(roomData.images)) {
-                roomData.images.forEach(imageName => {
-                    const div = document.createElement('div');
-                    div.className = 'image-preview-item';
-                    // Backend của bạn phục vụ file từ /uploads
-                    div.innerHTML = `<img src="/uploads/${imageName}" alt="Ảnh hiện tại">`;
-                    preview.appendChild(div);
-                });
-            }
-            // ==============================================
+            // ===== 📍 THAY ĐỔI 2: HIỂN THỊ ẢNH CŨ (ĐÃ SỬA LỖI JSON) =====
+            if (roomData.images && Array.isArray(roomData.images) && roomData.images.length > 0) {
+                let imageNames = []; // Mảng sạch để chứa tên file
+
+                // Kiểm tra xem dữ liệu có bị lồng (corrupted) không
+                if (roomData.images[0].startsWith('[')) {
+                    // Dữ liệu bị lồng: ["[\"file.jpg\"]"]
+                    try {
+                        // Chúng ta parse cái chuỗi bên trong
+                        imageNames = JSON.parse(roomData.images[0]);
+                    } catch (e) {
+                        console.error("Không thể parse JSON lồng:", e);
+                        imageNames = [];
+                    }
+                } else {
+                    // Dữ liệu sạch: ["file.jpg"]
+                    imageNames = roomData.images;
+                }
+
+                // Bây giờ, imageNames là một mảng sạch: ['1763....jpg']
+                imageNames.forEach(imageName => { 
+                    const div = document.createElement('div');
+                    div.className = 'image-preview-item';
+                    // Sử dụng tên file sạch
+                    div.innerHTML = `<img src="/uploads/${imageName}" alt="Ảnh hiện tại">`;
+                    preview.appendChild(div);
+                });
+            }
+            // ==========================================================
         }
         
         modal.classList.remove('hidden');
@@ -312,14 +343,10 @@
         fd.append('category', document.getElementById('room-category').value);
         fd.append('num_bed', document.getElementById('num-bed').value.trim());
         fd.append('status', document.getElementById('room-status').value);
-        
-        fd.append('price_per_night', document.getElementById('room-price').value);
-
         fd.append('location', document.getElementById('room-location').value);
         fd.append('address', document.getElementById('room-address').value);
         fd.append('description', document.getElementById('room-description').value);
-        
-        fd.append('price_per_night', document.getElementById('price-per-night').value);
+        fd.append('price_per_night', document.getElementById('room-price').value);
         const files = document.getElementById('room-images').files;
         Array.from(files).forEach(file => fd.append('images', file));
 
@@ -378,14 +405,18 @@
     });
 
     async function fetchRoomTypes() {
-        const sel = document.getElementById('room-type-id');
-        try {
-            ROOM_TYPES = await apiFetch('/api/admin/room-types');
-            sel.innerHTML = ROOM_TYPES.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-        } catch (err) {
-            sel.innerHTML = '<option value="">❌ Lỗi tải loại phòng</option>';
-        }
-    }
+    const sel = document.getElementById('room-type-id');
+    try {
+        ROOM_TYPES = await apiFetch('/api/admin/room-types');
+        
+        // DÒNG NÀY SẼ CHO CHÚNG TA BIẾT SỰ THẬT
+        console.log("Dữ liệu API trả về:", ROOM_TYPES); 
+
+        sel.innerHTML = ROOM_TYPES.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    } catch (err) {
+        sel.innerHTML = '<option value="">❌ Lỗi tải loại phòng</option>';
+    }
+}
 
     // Logout handler
     const logoutBtn = document.getElementById("logoutBtn");

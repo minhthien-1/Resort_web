@@ -1,16 +1,20 @@
-import dotenv from "dotenv";
 import express from "express";
-import path from "path";
 import cors from "cors";
+import pg from "pg";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import express from "express";
+import cors from "cors";
+import pg from "pg";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+import multer from "multer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import multer from "multer";
-import fs from "fs";
-import pg from "pg";
-import { fileURLToPath } from "url";
 import authRouter from './Routes/auth.js';
-
-
 dotenv.config();
 
 const { Pool } = pg;
@@ -59,6 +63,14 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use("/admin", express.static(path.join(__dirname, "../admin/public")));
 app.use("/uploads", express.static(UPLOAD_DIR));
 
+// Hàm xóa file ảnh
+const deleteFile = (filename) => {
+  const filePath = path.join(UPLOAD_DIR, filename);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    console.log(`✅ Đã xóa file: ${filename}`);
+  }
+};
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/home.html"));
@@ -336,7 +348,6 @@ app.get("/api/rooms/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { rows } = await pool.query(
-      // ...
       `SELECT r.id, res.name AS resort_name, r.location, r.category, r.address,
                rt.name AS room_type, rt.capacity, 
                COALESCE(rd.description, 'Chưa có mô tả') AS description,
@@ -459,7 +470,6 @@ app.get("/api/admin/rooms/:id", authorize(["admin", "staff"]), async (req, res) 
     const { rows } = await pool.query(
       `SELECT r.id, r.resort_id, r.room_type_id, rt.name AS room_type,
               r.status, r.category, r.location, r.address, rd.description, rd.features,
-// [!code-word:price_per_night]
               rd.images_url AS images, rd.num_bed, rd.price_per_night
        FROM rooms r JOIN room_types rt ON r.room_type_id = rt.id
        LEFT JOIN room_details rd ON rd.room_id = r.id WHERE r.id = $1`,
@@ -506,6 +516,10 @@ app.post("/api/admin/rooms", authorize(["admin", "staff"]), upload.array('images
       res.status(201).json({ message: "Thêm phòng thành công" });
     } catch (dbErr) {
       await client.query("ROLLBACK");
+      // 📍 Xóa ảnh đã tải lên nếu lỗi DB
+      if (imageNames.length > 0) {
+        imageNames.forEach(imageName => deleteFile(imageName));
+      }
       throw dbErr;
     } finally {
       client.release();
@@ -516,21 +530,36 @@ app.post("/api/admin/rooms", authorize(["admin", "staff"]), upload.array('images
   }
 });
 
-// ✅ PUT cập nhật phòng (LƯU GIÁ VÀO room_details)
+// ✅ PUT cập nhật phòng (Tự động xóa ảnh cũ khi có ảnh mới)
 app.put("/api/admin/rooms/:id", authorize(["admin", "staff"]), upload.array('images'), async (req, res) => {
   try {
     const { id } = req.params;
     const { resort_id, room_type_id, status, category, location, address, description, num_bed, price_per_night } = req.body;
     
-    const imageNames = (req.files && req.files.length > 0) ? req.files.map(f => f.filename) : [];
+    // 1. Lấy danh sách tên file MỚI (nếu có)
+    const newImageNames = (req.files && req.files.length > 0) ? req.files.map(f => f.filename) : [];
+    
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
 
+      // 📍 LOGIC XÓA ẢNH CŨ
+      if (newImageNames.length > 0) {
+        const oldDetailResult = await client.query(
+          "SELECT images_url FROM room_details WHERE room_id = $1",
+          [id]
+        );
+        const oldImages = oldDetailResult.rows[0]?.images_url || [];
+        if (Array.isArray(oldImages) && oldImages.length > 0) {
+          oldImages.forEach(imageName => deleteFile(imageName));
+        }
+      }
+
+      // 2. Cập nhật bảng 'rooms'
       const updateResult = await client.query(
         `UPDATE rooms SET 
-            resort_id=$1, room_type_id=$2, status=$3, category=$4, 
-            location=$5, address=$6, updated_at=NOW()
+           resort_id=$1, room_type_id=$2, status=$3, category=$4, 
+           location=$5, address=$6, updated_at=NOW()
          WHERE id=$7 RETURNING id`,
         [resort_id, room_type_id, status, category, location, address, id]
       );
@@ -540,26 +569,27 @@ app.put("/api/admin/rooms/:id", authorize(["admin", "staff"]), upload.array('ima
         return res.status(404).json({ error: "Không tìm thấy phòng" });
       }
 
+      // 3. Cập nhật/Thêm mới bảng 'room_details'
       const existingDetail = await client.query("SELECT id FROM room_details WHERE room_id=$1", [id]);
       
       if (existingDetail.rows.length > 0) {
-        // ✅ CẬP NHẬT room_details (LƯU GIÁ)
-        let updateQuery = 'UPDATE room_details SET description = $1, num_bed = $2, price_per_night = $3, updated_at = NOW()';
-        const params = [description || '', num_bed || '', parseFloat(price_per_night) || 0];
-        
-        if (imageNames.length > 0) {
-          params.push(imageNames);
-          updateQuery += `, images_url = $${params.length}`;
-        }
-        params.push(id);
-        updateQuery += ` WHERE room_id = $${params.length}`;
-        await client.query(updateQuery, params);
+        // Cập nhật
+        const updateImages = newImageNames.length > 0 ? newImageNames : null;
+        await client.query(
+          `UPDATE room_details SET 
+             description=$1, features=$2, num_bed=$3, price_per_night=$4, 
+             updated_at=NOW() ${updateImages ? ', images_url=$5' : ''}
+           WHERE room_id=$${updateImages ? '6' : '5'}`,
+          updateImages 
+            ? [description || "", [], num_bed || '', parseFloat(price_per_night) || 0, updateImages, id]
+            : [description || "", [], num_bed || '', parseFloat(price_per_night) || 0, id]
+        );
       } else {
-        // ✅ THÊM room_details MỚI (LƯU GIÁ)
+        // Thêm mới
         await client.query(
           `INSERT INTO room_details (room_id, description, features, images_url, num_bed, price_per_night, created_at) 
            VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
-          [id, description || "", [], imageNames, num_bed || '', parseFloat(price_per_night) || 0]
+          [id, description || "", [], newImageNames, num_bed || '', parseFloat(price_per_night) || 0]
         );
       }
 
@@ -567,6 +597,10 @@ app.put("/api/admin/rooms/:id", authorize(["admin", "staff"]), upload.array('ima
       res.json({ message: "Cập nhật phòng thành công" });
     } catch (dbErr) {
       await client.query("ROLLBACK");
+      // Nếu lỗi DB, xóa file VỪA MỚI UPLOAD
+      if (newImageNames.length > 0) {
+        newImageNames.forEach(imageName => deleteFile(imageName));
+      }
       throw dbErr;
     } finally {
       client.release();
@@ -577,7 +611,7 @@ app.put("/api/admin/rooms/:id", authorize(["admin", "staff"]), upload.array('ima
   }
 });
 
-// ===== API XÓA PHÒNG =====
+// ===== API XÓA PHÒNG (Tự động xóa file ảnh liên quan) =====
 app.delete("/api/admin/rooms/:id", authorize(['admin', 'staff']), async (req, res) => {
   const { id } = req.params;
   const client = await pool.connect(); 
@@ -585,6 +619,7 @@ app.delete("/api/admin/rooms/:id", authorize(['admin', 'staff']), async (req, re
   try {
     await client.query('BEGIN');
 
+    // 1. Kiểm tra booking
     const bookingCheck = await client.query(
       'SELECT id FROM bookings WHERE room_id = $1 LIMIT 1', 
       [id]
@@ -597,6 +632,14 @@ app.delete("/api/admin/rooms/:id", authorize(['admin', 'staff']), async (req, re
       });
     }
 
+    // 2. 📍 LẤY DANH SÁCH ẢNH CẦN XÓA
+    const detailResult = await client.query(
+        "SELECT images_url FROM room_details WHERE room_id = $1",
+        [id]
+    );
+    const imagesToDelete = detailResult.rows[0]?.images_url || [];
+
+    // 3. Xóa phòng (Giả sử DB có 'ON DELETE CASCADE')
     const deleteResult = await client.query(
       'DELETE FROM rooms WHERE id = $1 RETURNING id', 
       [id]
@@ -607,9 +650,17 @@ app.delete("/api/admin/rooms/:id", authorize(['admin', 'staff']), async (req, re
       return res.status(404).json({ error: "Không tìm thấy phòng để xóa." });
     }
 
+    // 4. Commit DB
     await client.query('COMMIT');
+
+    // 5. 📍 XÓA FILE (làm sau khi commit thành công)
+    if (Array.isArray(imagesToDelete) && imagesToDelete.length > 0) {
+      console.log(`[DELETE /rooms/${id}] Đã xóa phòng khỏi DB, đang xóa ${imagesToDelete.length} file...`);
+      imagesToDelete.forEach(imageName => deleteFile(imageName));
+    }
+    
     res.status(200).json({ 
-      message: "Xóa phòng thành công!", 
+      message: "Xóa phòng (và các ảnh liên quan) thành công!", 
       deletedRoomId: deleteResult.rows[0].id 
     });
 
@@ -659,7 +710,7 @@ app.post("/api/bookings", authorize(['guest', 'staff', 'admin']), async (req, re
   }
 });
 
-// ===== API LẤY LỊCH SỬ ĐẶT PHÒNG (FIX) =====
+// ===== API LẤY LỊCH SỬ ĐẶT PHÒNG =====
 app.get("/api/my-bookings", authorize(['guest']), async (req, res) => {
   const { userId } = req.user;
 
@@ -689,7 +740,6 @@ app.get("/api/my-bookings", authorize(['guest']), async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy lịch sử đặt phòng." });
   }
 });
-
 
 // ===== API HỦY ĐẶT PHÒNG =====
 app.put("/api/bookings/:id/cancel", authorize(['guest']), async (req, res) => {
@@ -831,11 +881,11 @@ app.get("/api/bookings/filter", async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 });
-// API: Tạo booking
+
+// API: Tạo booking từ admin
 app.post("/api/admin/bookings", async (req, res) => {
   const { emailOrUsername, fullName, phone, roomId, checkIn, checkOut, status } = req.body;
 
-  // Kiểm tra dữ liệu bắt buộc
   if (!emailOrUsername || !fullName || !phone || !roomId || !checkIn || !checkOut || !status) {
     return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
   }
@@ -847,24 +897,33 @@ app.post("/api/admin/bookings", async (req, res) => {
       "SELECT id FROM users WHERE email = $1 OR username = $1 LIMIT 1",
       [emailOrUsername]
     );
+    
     if (userRows.length > 0) {
       userId = userRows[0].id;
     } else {
-      // Nếu không có user, có thể tạo user mới (hoặc bạn có thể bỏ qua tạo người dùng mới)
-      userId = uuidv4();  // Tạo userId ngẫu nhiên
+      // Tạo user mới
+      const defaultPassword = await bcrypt.hash(phone, 10);
+      const { rows: newUserRows } = await pool.query(
+        `INSERT INTO users (username, email, password_hash, full_name, phone, role, is_active, created_at)
+         VALUES ($1, $2, $3, $4, $5, 'guest', true, NOW())
+         RETURNING id`,
+        [emailOrUsername, emailOrUsername, defaultPassword, fullName, phone]
+      );
+      userId = newUserRows[0].id;
     }
 
     // Kiểm tra phòng có sẵn không
     const { rows: roomRows } = await pool.query(
-      "SELECT id, price_per_night FROM rooms WHERE id = $1 AND status = 'available'",
+      "SELECT r.id, rd.price_per_night FROM rooms r LEFT JOIN room_details rd ON r.id = rd.room_id WHERE r.id = $1 AND r.status = 'available'",
       [roomId]
     );
+    
     if (roomRows.length === 0) {
       return res.status(404).json({ error: 'Phòng không tồn tại hoặc đã được đặt' });
     }
 
     const room = roomRows[0];
-    const pricePerNight = parseFloat(room.price_per_night);
+    const pricePerNight = parseFloat(room.price_per_night) || 0;
 
     // Tính toán tổng tiền
     const startDate = new Date(checkIn);
@@ -873,14 +932,13 @@ app.post("/api/admin/bookings", async (req, res) => {
     const nights = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
     const totalAmount = nights * pricePerNight;
 
-    // Tạo mã booking
-    const bookingCode = uuidv4().toUpperCase();
+    const bookingCode = `ADMIN-${Math.random().toString(36).slice(2, 9).toUpperCase()}`;
 
     // Lưu booking vào DB
     const { rows: bookingRows } = await pool.query(
       `INSERT INTO bookings (user_id, room_id, booking_code, check_in, check_out, nightly_rate, total_amount, status, created_at, updated_at) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()) 
-             RETURNING id, booking_code, total_amount, status`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()) 
+       RETURNING id, booking_code, total_amount, status`,
       [userId, roomId, bookingCode, checkIn, checkOut, pricePerNight, totalAmount, status]
     );
 
@@ -892,7 +950,7 @@ app.post("/api/admin/bookings", async (req, res) => {
     res.status(201).json({
       message: 'Đặt phòng thành công!',
       booking: bookingRows[0],
-      newUser: userId !== null,
+      newUser: userRows.length === 0,
       userInfo: {
         userId,
         fullName,
@@ -905,6 +963,7 @@ app.post("/api/admin/bookings", async (req, res) => {
     res.status(500).json({ error: 'Lỗi server khi tạo đặt phòng' });
   }
 });
+
 // API: Kiểm tra xem user đã tồn tại chưa
 app.get("/api/users/check", async (req, res) => {
   const { identifier } = req.query;
@@ -915,23 +974,24 @@ app.get("/api/users/check", async (req, res) => {
 
   try {
     const sql = `
-            SELECT id, email, username, full_name, phone, role, is_active
-            FROM users 
-            WHERE email = $1 OR username = $1
-            LIMIT 1
-        `;
+      SELECT id, email, username, full_name, phone, role, is_active
+      FROM users 
+      WHERE email = $1 OR username = $1
+      LIMIT 1
+    `;
     const result = await pool.query(sql, [identifier]);
 
     if (result.rows.length > 0) {
-      return res.json({ exists: true, user: result.rows[0] });
+      res.json({ exists: true, user: result.rows[0] });
     } else {
-      return res.json({ exists: false });
+      res.json({ exists: false });
     }
   } catch (err) {
     console.error("❌ Lỗi kiểm tra user:", err);
     res.status(500).json({ error: "Lỗi server khi kiểm tra user" });
   }
 });
+
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`✅ Server đang chạy tại http://localhost:${PORT}`);
