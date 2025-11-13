@@ -9,6 +9,47 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        
+        .payment-method {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: #5B4C9F;
+            background-color: #f9f7ff;
+        }
+        
+        .payment-method input[type="radio"] {
+            margin-right: 12px;
+        }
+        
+        .payment-method.selected {
+            border-color: #5B4C9F;
+            background-color: #f0ecff;
+        }
+        
+        .payment-method label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .payment-method-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -22,7 +63,36 @@
             <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm">
                 <h2 class="text-2xl font-bold mb-6">Bạn muốn thanh toán thế nào?</h2>
                 
-                <div class="text-gray-500 mb-8">(Khu vực cho các lựa chọn thanh toán)</div>
+                <!-- ===== PAYMENT METHODS ===== -->
+                <div class="space-y-4">
+                    <!-- VNPay Payment -->
+                    <div class="payment-method" id="vnpay-method">
+                        <input type="radio" name="payment" id="vnpay" value="vnpay" checked>
+                        <label for="vnpay">
+                            <div class="payment-method-icon">
+                                <i class="fas fa-credit-card" style="color: #1f1f1f;"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-lg">VNPay</p>
+                                <p class="text-sm text-gray-500">Thanh toán trực tuyến qua VNPay</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Direct Payment -->
+                    <div class="payment-method" id="direct-method">
+                        <input type="radio" name="payment" id="direct" value="direct">
+                        <label for="direct">
+                            <div class="payment-method-icon">
+                                <i class="fas fa-money-bill" style="color: #10b981;"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-lg">Thanh Toán Tại Quầy</p>
+                                <p class="text-sm text-gray-500">Thanh toán khi nhận phòng</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
 
                 <div class="mt-8 pt-6 border-t flex justify-between items-center">
                     <span class="font-semibold text-lg">Tổng giá tiền</span>
@@ -105,10 +175,7 @@
             document.getElementById('summary-resort-name').textContent = booking.resortName;
             document.getElementById('summary-checkin-date').textContent = booking.checkIn;
             document.getElementById('summary-checkout-date').textContent = booking.checkOut;
-            
-            // ✅ SỬA Ở ĐÂY: Hiển thị num_bed thay vì loại phòng
             document.getElementById('summary-room-type').textContent = `(1x) ${booking.num_bed || 'Chưa xác định'}`;
-            
             document.getElementById('summary-capacity').textContent = booking.capacity;
             document.getElementById('summary-guest-name').textContent = booking.userFullName;
             document.getElementById('summary-contact-name').textContent = booking.userFullName;
@@ -116,6 +183,21 @@
             document.getElementById('summary-contact-email').textContent = booking.userEmail;
             document.getElementById('total-price').textContent = formatCurrency(totalPrice);
 
+            // ===== PAYMENT METHOD SELECTION =====
+            const paymentRadios = document.querySelectorAll('input[name="payment"]');
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.querySelectorAll('.payment-method').forEach(method => {
+                        method.classList.remove('selected');
+                    });
+                    e.target.closest('.payment-method').classList.add('selected');
+                });
+            });
+
+            // Set initial selected state
+            document.getElementById('vnpay-method').classList.add('selected');
+
+            // ===== PAYMENT BUTTON =====
             const paymentButton = document.getElementById('confirm-payment-btn');
             paymentButton.addEventListener('click', async () => {
                 const token = localStorage.getItem('token');
@@ -125,36 +207,97 @@
                     return;
                 }
 
+                const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
                 paymentButton.disabled = true;
                 paymentButton.textContent = 'Đang xử lý...';
 
                 try {
-                    const response = await fetch('https://api-resort.onrender.com/api/bookings', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            roomId: booking.resortId,
-                            checkIn: booking.checkIn,
-                            checkOut: booking.checkOut,
-                            pricePerNight: booking.pricePerNight
-                        })
-                    });
+                    if (paymentMethod === 'vnpay') {
+                        // VNPay Payment
+                        const bookingResponse = await fetch('https://api-resort.onrender.com/api/bookings', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                roomId: booking.resortId,
+                                checkIn: booking.checkIn,
+                                checkOut: booking.checkOut,
+                                pricePerNight: booking.pricePerNight,
+                                totalPrice: totalPrice
+                            })
+                        });
 
-                    const result = await response.json();
+                        const bookingResult = await bookingResponse.json();
 
-                    if (!response.ok) {
-                        throw new Error(result.error || 'Có lỗi xảy ra, vui lòng thử lại.');
+                        if (!bookingResponse.ok) {
+                            throw new Error(bookingResult.error || 'Tạo booking thất bại');
+                        }
+
+                        const bookingId = bookingResult.booking.id || bookingResult.booking.booking_code;
+
+                        // Tạo URL thanh toán VNPay
+                        const paymentResponse = await fetch('https://api-resort.onrender.com/api/payments/fake/create', {
+
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                bookingId: bookingId,
+                                amount: totalPrice,
+                                orderInfo: `Thanh toán booking #${bookingId}`,
+                                userFullName: booking.userFullName
+                            })
+                        });
+
+                        const paymentData = await paymentResponse.json();
+
+                        if (!paymentResponse.ok) {
+                            throw new Error(paymentData.error || 'Tạo URL thanh toán thất bại');
+                        }
+
+                        // Redirect tới VNPay
+                        if (paymentData.paymentUrl) {
+                            window.location.href = paymentData.paymentUrl;
+                        } else {
+                            throw new Error('Không nhận được URL thanh toán');
+                        }
+
+                    } else if (paymentMethod === 'direct') {
+                        // Direct Payment
+                        const response = await fetch('https://api-resort.onrender.com/api/bookings', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                roomId: booking.resortId,
+                                checkIn: booking.checkIn,
+                                checkOut: booking.checkOut,
+                                pricePerNight: booking.pricePerNight,
+                                totalPrice: totalPrice
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Có lỗi xảy ra, vui lòng thử lại.');
+                        }
+
+                        alert(`✅ Đặt phòng thành công! Mã đặt phòng của bạn là: ${result.booking.booking_code}\n\nVui lòng thanh toán tại quầy khi nhận phòng.`);
+                        sessionStorage.removeItem('bookingDetails');
+                        window.location.href = 'home.html';
                     }
 
-                    alert(`Đặt phòng thành công! Mã đặt phòng của bạn là: ${result.booking.booking_code}`);
-                    sessionStorage.removeItem('bookingDetails');
-                    window.location.href = 'home.html';
-
                 } catch (error) {
-                    alert(`Lỗi: ${error.message}`);
+                    console.error('Payment Error:', error);
+                    alert(`❌ Lỗi: ${error.message}`);
                     paymentButton.disabled = false;
                     paymentButton.textContent = 'Thanh toán ngay';
                 }
