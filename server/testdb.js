@@ -9,7 +9,7 @@ const pool = new Pool({
 async function testConnection() {
   try {
     const res = await pool.query("SELECT NOW()");
-    console.log("✅ Kết nối Neon thành công:", res.rows[0].now);
+    console.log("", res.rows[0].now);
   } catch (err) {
     console.error("❌ Lỗi kết nối DB:", err);
   } finally {
