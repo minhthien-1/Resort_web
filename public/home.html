@@ -130,7 +130,19 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+  
   <script>
+    let API_BASE; // Dùng 'let' thay vì 'const'
+    
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // 1. MÔI TRƯỜNG LOCAL
+      // (Khi bạn chạy file .html từ máy của bạn)
+      API_BASE = 'http://localhost:5500'; // Đây là backend server.js trên máy của bạn
+    } else {
+      // 2. MÔI TRƯỜNG PRODUCTION
+      // (Khi bạn đã deploy code lên mạng)
+      API_BASE = 'https://api-resort.onrender.com'; // Đây là backend trên OnRender
+    }
     // ===== AUTH MANAGEMENT (NEW) =====
     function updateNavbar() {
       const token = localStorage.getItem('token');
@@ -159,280 +171,305 @@
       window.location.href = '/';
     }
 
-    // ===== ORIGINAL CODE (KEPT INTACT) =====
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Update navbar khi trang load
-      updateNavbar();
+   <!-- ...existing code... -->
 
-      const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          logout();
-        });
-      }
+      // ===== ORIGINAL CODE (KEPT INTACT) =====
+      document.addEventListener('DOMContentLoaded', async () => {
+        // Update navbar khi trang load
+        updateNavbar();
 
-      let allRooms = [];
-      let currentPage = 1;
-      const itemsPerPage = 6;
-      const API_BASE = 'https://api-resort.onrender.com';
-
-      const PLACEHOLDER_SVG = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23e0e0e0%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22Arial%22%3ENo Image%3C/text%3E%3C/svg%3E';
-
-      function resolveImageUrl(url) {
-        if (!url) return PLACEHOLDER_SVG;
-        if (/^https?:\/\//i.test(url)) return url;
-        return API_BASE + '/uploads/' + url;
-      }
-
-      function formatPrice(price) {
-        return new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND'
-        }).format(price);
-      }
-
-      function getLocationName(key) {
-        const map = {
-          'da-lat': 'Đà Lạt',
-          'ha-long': 'Hạ Long',
-          'phu-quoc': 'Phú Quốc',
-          'nha-trang': 'Nha Trang',
-          'da-nang': 'Đà Nẵng',
-          'sapa': 'Sapa',
-          'hoi-an': 'Hội An',
-          'ha-noi': 'Hà Nội'
-        };
-        return map[key] || key || 'Chưa xác định';
-      }
-
-      // ===== FETCH VOUCHERS =====
-      async function fetchVouchers() {
-        try {
-          const response = await fetch(`${API_BASE}/api/discounts`);
-          if (response.ok) {
-            const vouchers = await response.json();
-            renderVouchers(vouchers);
-          }
-        } catch (error) {
-          console.log('Vouchers API not available');
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+          });
         }
-      }
 
-      function renderVouchers(vouchers) {
-        const container = document.getElementById('vouchers-container');
-        container.innerHTML = '';
+        let allRooms = [];
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        const PLACEHOLDER_SVG = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23e0e0e0%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22Arial%22%3ENo Image%3C/text%3E%3C/svg%3E';
 
-        if (!vouchers || vouchers.length === 0) return;
-
-        vouchers.slice(0, 4).forEach(voucher => {
-          const card = document.createElement('div');
-          card.className = 'voucher-card';
+        // ✅ FIX: Xử lý đúng URL ảnh
+        function resolveImageUrl(url) {
+          if (!url) return PLACEHOLDER_SVG;
           
-          const validUntil = new Date(voucher.valid_until).toLocaleDateString('vi-VN');
-          const discountText = voucher.discount_type === 'percentage' 
-            ? `Giảm ${voucher.value}%` 
-            : `Giảm ${voucher.value}đ`;
+          // Nếu là full URL (http:// hoặc https://)
+          if (/^https?:\/\//i.test(url)) return url;
           
-          card.innerHTML = `
-            <div class="voucher-code">${voucher.code}</div>
-            <h3>${voucher.name}</h3>
-            <p>${voucher.description}</p>
-            <p style="margin-top: 8px; font-size: 13px; color: #667eea; font-weight: 600;">${discountText}</p>
-            <div class="voucher-expire">Hạn: ${validUntil}</div>
-          `;
-          container.appendChild(card);
-        });
-      }
+          // Nếu đã có '/uploads/' thì không thêm nữa
+          if (url.startsWith('/uploads/')) return API_BASE + url;
+          
+          // Ngược lại thêm '/uploads/'
+          return API_BASE + '/uploads/' + url;
+        }
 
-      // ===== EXTRACT & RENDER DESTINATIONS =====
-      function renderDestinations(rooms) {
-        const container = document.getElementById('destinations-container');
-        container.innerHTML = '';
+        function formatPrice(price) {
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+          }).format(price);
+        }
 
-        const locations = [...new Set(rooms.map(r => r.location))];
-        const locationMap = {
-          'da-lat': 'Đà Lạt',
-          'ha-long': 'Hạ Long',
-          'phu-quoc': 'Phú Quốc',
-          'nha-trang': 'Nha Trang',
-          'da-nang': 'Đà Nẵng',
-          'sapa': 'Sapa',
-          'hoi-an': 'Hội An',
-          'ha-noi': 'Hà Nội'
-        };
+        function getLocationName(key) {
+          const map = {
+            'da-lat': 'Đà Lạt',
+            'ha-long': 'Hạ Long',
+            'phu-quoc': 'Phú Quốc',
+            'nha-trang': 'Nha Trang',
+            'da-nang': 'Đà Nẵng',
+            'sapa': 'Sapa',
+            'hoi-an': 'Hội An',
+            'ha-noi': 'Hà Nội'
+          };
+          return map[key] || key || 'Chưa xác định';
+        }
 
-        locations.forEach(loc => {
-          if (!loc) return;
-          const card = document.createElement('a');
-          card.className = 'destination-card';
-          card.href = `destinations.html?location=${loc}`;
+        // ===== FETCH VOUCHERS =====
+        async function fetchVouchers() {
+          try {
+            const response = await fetch(`${API_BASE}/api/discounts`);
+            if (response.ok) {
+              const vouchers = await response.json();
+              renderVouchers(vouchers);
+            }
+          } catch (error) {
+            console.log('Vouchers API not available');
+          }
+        }
 
-          const imgUrls = {
-            'da-lat': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=150&fit=crop',
-            'ha-long': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=300&h=150&fit=crop',
-            'phu-quoc': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=150&fit=crop',
-            'nha-trang': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=150&fit=crop',
-            'da-nang': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=300&h=150&fit=crop',
-            'sapa': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=150&fit=crop',
-            'hoi-an': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=150&fit=crop',
-            'ha-noi': 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=300&h=150&fit=crop'
+        function renderVouchers(vouchers) {
+          const container = document.getElementById('vouchers-container');
+          container.innerHTML = '';
+
+          if (!vouchers || vouchers.length === 0) return;
+
+          vouchers.slice(0, 4).forEach(voucher => {
+            const card = document.createElement('div');
+            card.className = 'voucher-card';
+            
+            const validUntil = new Date(voucher.valid_until).toLocaleDateString('vi-VN');
+            const discountText = voucher.discount_type === 'percentage' 
+              ? `Giảm ${voucher.value}%` 
+              : `Giảm ${voucher.value}đ`;
+            
+            card.innerHTML = `
+              <div class="voucher-code">${voucher.code}</div>
+              <h3>${voucher.name}</h3>
+              <p>${voucher.description}</p>
+              <p style="margin-top: 8px; font-size: 13px; color: #667eea; font-weight: 600;">${discountText}</p>
+              <div class="voucher-expire">Hạn: ${validUntil}</div>
+            `;
+            container.appendChild(card);
+          });
+        }
+
+        // ===== EXTRACT & RENDER DESTINATIONS =====
+        function renderDestinations(rooms) {
+          const container = document.getElementById('destinations-container');
+          container.innerHTML = '';
+
+          const locations = [...new Set(rooms.map(r => r.location))];
+          const locationMap = {
+            'da-lat': 'Đà Lạt',
+            'ha-long': 'Hạ Long',
+            'phu-quoc': 'Phú Quốc',
+            'nha-trang': 'Nha Trang',
+            'da-nang': 'Đà Nẵng',
+            'sapa': 'Sapa',
+            'hoi-an': 'Hội An',
+            'ha-noi': 'Hà Nội'
           };
 
-          card.innerHTML = `
-            <div class="destination-card-image">
-              <img src="${imgUrls[loc] || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22150%22%3E%3Crect fill=%22%23e0e0e0%22 width=%22300%22 height=%22150%22/%3E%3C/svg%3E'}" alt="${locationMap[loc] || loc}">
-            </div>
-            <div class="destination-card-name">${locationMap[loc] || loc}</div>
-          `;
-          container.appendChild(card);
-        });
-      }
+          locations.forEach(loc => {
+            if (!loc) return;
+            const card = document.createElement('a');
+            card.className = 'destination-card';
+            card.href = `destinations.html?location=${loc}`;
 
-      // ===== GROUP ROOMS BY RESORT =====
-      function groupRoomsByResort(rooms) {
-        const grouped = {};
-        rooms.forEach(room => {
-          const resort = room.resort_name || 'Không xác định';
-          if (!grouped[resort]) grouped[resort] = [];
-          grouped[resort].push(room);
-        });
-        return grouped;
-      }
-
-      // ===== RENDER ROOMS =====
-      function renderRooms(roomsToDisplay) {
-        const container = document.getElementById('room-cards-container');
-        container.innerHTML = '';
-
-        if (!roomsToDisplay || roomsToDisplay.length === 0) {
-          container.innerHTML = '<p style="text-align:center; padding:40px; color:#718096;">Không tìm thấy phòng phù hợp</p>';
-          return;
-        }
-
-        const grouped = groupRoomsByResort(roomsToDisplay);
-
-        Object.entries(grouped).forEach(([resortName, rooms]) => {
-          const title = document.createElement('h3');
-          title.className = 'resort-group-title';
-          title.textContent = `🏨 ${resortName}`;
-          container.appendChild(title);
-
-          const grid = document.createElement('div');
-          grid.className = 'rooms-grid';
-
-          rooms.forEach(room => {
-            const card = document.createElement('div');
-            card.className = 'room-card';
-            card.style.cursor = 'pointer';
-            card.onclick = () => window.location.href = `resort_detail.html?id=${room.id}`;
-
-            const imageUrl = resolveImageUrl(room.images?.[0]);
+            const imgUrls = {
+              'da-lat': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=150&fit=crop',
+              'ha-long': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=300&h=150&fit=crop',
+              'phu-quoc': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=150&fit=crop',
+              'nha-trang': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=150&fit=crop',
+              'da-nang': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=300&h=150&fit=crop',
+              'sapa': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=150&fit=crop',
+              'hoi-an': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=150&fit=crop',
+              'ha-noi': 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=300&h=150&fit=crop'
+            };
 
             card.innerHTML = `
-              <div class="room-card-image">
-                <img src="${imageUrl}" alt="${room.room_type}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23e0e0e0%22 width=%22300%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22Arial%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+              <div class="destination-card-image">
+                <img src="${imgUrls[loc] || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22150%22%3E%3Crect fill=%22%23e0e0e0%22 width=%22300%22 height=%22150%22/%3E%3C/svg%3E'}" alt="${locationMap[loc] || loc}">
               </div>
-
-              <div class="room-card-content">
-                <h3>${room.room_type}</h3>
-                <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
-                <p><i class="fas fa-door-open"></i> ${room.num_bed || 'Chưa xác định'}</p>
-                <div class="room-price">${formatPrice(room.price_per_night)}/đêm</div>
-              </div>
+              <div class="destination-card-name">${locationMap[loc] || loc}</div>
             `;
+            container.appendChild(card);
+          });
+        }
 
-            grid.appendChild(card);
+        // ===== GROUP ROOMS BY RESORT =====
+        function groupRoomsByResort(rooms) {
+          const grouped = {};
+          rooms.forEach(room => {
+            const resort = room.resort_name || 'Không xác định';
+            if (!grouped[resort]) grouped[resort] = [];
+            grouped[resort].push(room);
+          });
+          return grouped;
+        }
+
+        // ===== RENDER ROOMS =====
+        function renderRooms(roomsToDisplay) {
+          const container = document.getElementById('room-cards-container');
+          container.innerHTML = '';
+
+          if (!roomsToDisplay || roomsToDisplay.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:40px; color:#718096;">Không tìm thấy phòng phù hợp</p>';
+            return;
+          }
+
+          const grouped = groupRoomsByResort(roomsToDisplay);
+
+          Object.entries(grouped).forEach(([resortName, rooms]) => {
+            const title = document.createElement('h3');
+            title.className = 'resort-group-title';
+            title.textContent = `🏨 ${resortName}`;
+            container.appendChild(title);
+
+            const grid = document.createElement('div');
+            grid.className = 'rooms-grid';
+
+            rooms.forEach(room => {
+              const card = document.createElement('div');
+              card.className = 'room-card';
+              card.style.cursor = 'pointer';
+              card.onclick = () => window.location.href = `resort_detail.html?id=${room.id}`;
+
+             // ✅ SỬA LỖI HIỂN THỊ ẢNH (Xử lý chuỗi PostgreSQL)
+              let imageName = null; // Tên file sạch
+
+              if (room.images && Array.isArray(room.images) && room.images.length > 0) {
+                // Trường hợp 1: Dữ liệu sạch (đã sửa ở admin) -> ["file.jpg"]
+                imageName = room.images[0];
+              } 
+              else if (room.images && typeof room.images === 'string' && room.images.startsWith('{')) {
+                // Trường hợp 2: Dữ liệu chuỗi PostgreSQL -> "{\"file.jpg\",\"file2.jpg\"}"
+                // Chúng ta sẽ lấy tên file đầu tiên
+                const firstImage = room.images.replace(/[{}"\\]/g, '').split(',')[0];
+                imageName = firstImage;
+              }
+
+              // Chỉ gọi resolveImageUrl với tên file sạch (hoặc null)
+              const imageUrl = resolveImageUrl(imageName);
+                            card.innerHTML = `
+                <div class="room-card-image">
+                  <img src="${imageUrl}" alt="${room.room_type}" 
+                      onerror="this.src='${PLACEHOLDER_SVG}'">
+                </div>
+
+                <div class="room-card-content">
+                  <h3>${room.room_type}</h3>
+                  <p><i class="fas fa-map-marker-alt"></i> ${getLocationName(room.location)}</p>
+                  <p><i class="fas fa-door-open"></i> ${room.num_bed || 'Chưa xác định'} giường</p>
+                  <div class="room-price">${formatPrice(room.price_per_night)}/đêm</div>
+                </div>
+              `;
+
+              grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+          });
+        }
+        // ===== FETCH DATA =====
+        async function fetchRooms() {
+          try {
+            const response = await fetch(`${API_BASE}/api/rooms`);
+            if (!response.ok) throw new Error('Network error');
+            allRooms = await response.json();
+            
+            // 📍 DEBUG: Log dữ liệu trả về
+            console.log('✅ Rooms fetched:', allRooms);
+            console.log('First room images:', allRooms[0]?.images);
+            
+            populateRoomTypes();
+            renderDestinations(allRooms);
+          } catch (error) {
+            console.error('Error:', error);
+            allRooms = [];
+          }
+        }
+
+        function populateRoomTypes() {
+          const select = document.getElementById('roomType');
+          const types = [...new Set(allRooms.map(r => r.room_type))];
+          types.forEach(type => {
+            if (type) {
+              const opt = document.createElement('option');
+              opt.value = type;
+              opt.textContent = type;
+              select.appendChild(opt);
+            }
+          });
+        }
+
+        // ===== PAGINATION =====
+        function renderPagination() {
+          const container = document.getElementById('pagination-container');
+          container.innerHTML = '';
+          const total = Math.ceil(allRooms.length / itemsPerPage);
+
+          if (total <= 1) return;
+
+          for (let i = 1; i <= total; i++) {
+            const btn = document.createElement('button');
+            btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.onclick = () => {
+              currentPage = i;
+              const start = (i - 1) * itemsPerPage;
+              renderRooms(allRooms.slice(start, start + itemsPerPage));
+              renderPagination();
+              window.scrollTo({ top: 300, behavior: 'smooth' });
+            };
+            container.appendChild(btn);
+          }
+        }
+
+        function renderCurrentPage() {
+          const start = (currentPage - 1) * itemsPerPage;
+          renderRooms(allRooms.slice(start, start + itemsPerPage));
+        }
+
+        // ===== SEARCH =====
+        document.getElementById('searchBtn').onclick = () => {
+          const location = document.getElementById('location').value.toLowerCase();
+          const type = document.getElementById('roomType').value;
+
+          const filtered = allRooms.filter(room => {
+            const matchLoc = !location || 
+                            getLocationName(room.location).toLowerCase().includes(location) ||
+                            (room.resort_name && room.resort_name.toLowerCase().includes(location));
+            const matchType = !type || room.room_type === type;
+            return matchLoc && matchType;
           });
 
-          container.appendChild(grid);
-        });
-      }
+          document.getElementById('pagination-container').innerHTML = '';
+          renderRooms(filtered);
+        };
 
-      // ===== FETCH DATA =====
-      async function fetchRooms() {
-        try {
-          const response = await fetch(`${API_BASE}/api/rooms`);
-          if (!response.ok) throw new Error('Network error');
-          allRooms = await response.json();
-          populateRoomTypes();
-          renderDestinations(allRooms);
-        } catch (error) {
-          console.error('Error:', error);
-          allRooms = [];
-        }
-      }
-
-      function populateRoomTypes() {
-        const select = document.getElementById('roomType');
-        const types = [...new Set(allRooms.map(r => r.room_type))];
-        types.forEach(type => {
-          if (type) {
-            const opt = document.createElement('option');
-            opt.value = type;
-            opt.textContent = type;
-            select.appendChild(opt);
-          }
-        });
-      }
-
-      // ===== PAGINATION =====
-      function renderPagination() {
-        const container = document.getElementById('pagination-container');
-        container.innerHTML = '';
-        const total = Math.ceil(allRooms.length / itemsPerPage);
-
-        if (total <= 1) return;
-
-        for (let i = 1; i <= total; i++) {
-          const btn = document.createElement('button');
-          btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-          btn.textContent = i;
-          btn.onclick = () => {
-            currentPage = i;
-            const start = (i - 1) * itemsPerPage;
-            renderRooms(allRooms.slice(start, start + itemsPerPage));
-            renderPagination();
-            window.scrollTo({ top: 300, behavior: 'smooth' });
-          };
-          container.appendChild(btn);
-        }
-      }
-
-      function renderCurrentPage() {
-        const start = (currentPage - 1) * itemsPerPage;
-        renderRooms(allRooms.slice(start, start + itemsPerPage));
-      }
-
-      // ===== SEARCH =====
-      document.getElementById('searchBtn').onclick = () => {
-        const location = document.getElementById('location').value.toLowerCase();
-        const type = document.getElementById('roomType').value;
-
-        const filtered = allRooms.filter(room => {
-          const matchLoc = !location || 
-                          getLocationName(room.location).toLowerCase().includes(location) ||
-                          (room.resort_name && room.resort_name.toLowerCase().includes(location));
-          const matchType = !type || room.room_type === type;
-          return matchLoc && matchType;
-        });
-
-        document.getElementById('pagination-container').innerHTML = '';
-        renderRooms(filtered);
-      };
-
-      // ===== INIT =====
-      await fetchRooms();
-      await fetchVouchers();
-      renderCurrentPage();
-      renderPagination();
-    });
+        // ===== INIT =====
+        await fetchRooms();
+        await fetchVouchers();
+        renderCurrentPage();
+        renderPagination();
+      });
   </script>
 
     <!-- Notifications Script -->
   <script>
-    const API_BASE = "http://localhost:5500"; // Thay bằng URL API của bạn
-
     // Lấy phần tử hiển thị số thông báo chưa đọc
     const notifCount = document.getElementById("notifCount");
 
