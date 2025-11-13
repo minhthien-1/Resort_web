@@ -12,7 +12,7 @@
   }
 
   try {
-    const response = await fetch("http://localhost:5500/auth/login", {
+    const response = await fetch("https://api-resort.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -68,7 +68,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    const response = await fetch("http://localhost:5500/auth/login", {
+    const response = await fetch("https://api-resort.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

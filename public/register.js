@@ -111,7 +111,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 
   try {
     // Gửi yêu cầu đến server
-    const res = await fetch("http://localhost:5500/auth/register", {
+    const res = await fetch("https://api-resort.onrender.com/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
