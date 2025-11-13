@@ -560,15 +560,15 @@ function initializeUser() {
 // Load user profile từ API
 async function loadUserProfile() {
     try {
-        console.log('📡 Đang tải profile từ API:', `${API_BASE_URL}/users/${currentUserId}`);
+        console.log('📡 Đang tải profile từ API:', `${API_BASE_URL}/api/users/${currentUserId}`);
         
         const response = await fetch(`${API_BASE_URL}/api/users/${currentUserId}`);
         const result = await response.json();
 
         console.log('📥 API Response:', result);
 
-        if (result.status && result.data) {
-            currentUser = result.data;
+        if (result.id && result.data) {
+            currentUser = result;
             
             // Cập nhật localStorage
             localStorage.setItem('email', currentUser.email);
