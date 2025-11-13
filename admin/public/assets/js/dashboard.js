@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (confirm("Bạn có chắc muốn đăng xuất không?")) {
             localStorage.removeItem("token");
             alert("Đã đăng xuất!");
-            window.location.href = "http://localhost:5500/login.html";
+            window.location.href = "https://resort-web.onrender.com/login.html";
         }
     });
 });
@@ -228,6 +228,6 @@ function handleLogout() {
     if (confirm("Bạn có chắc muốn đăng xuất không?")) {
         localStorage.removeItem("token");
         alert("Đã đăng xuất!");
-        window.location.href = "http://localhost:5500/login.html";
+        window.location.href = "https://resort-web.onrender.com/login.html";
     }
 }
