@@ -215,6 +215,10 @@
                 try {
                     if (paymentMethod === 'vnpay') {
                         // VNPay Payment
+                        console.log('🔍 Booking Data:', booking);
+                        console.log('🔍 Total Price:', totalPrice);
+                        console.log('🔍 Token:', token);
+
                         const bookingResponse = await fetch('https://api-resort.onrender.com/api/bookings', {
                             method: 'POST',
                             headers: {
@@ -230,17 +234,19 @@
                             })
                         });
 
+                        console.log('📡 Booking Response Status:', bookingResponse.status);
                         const bookingResult = await bookingResponse.json();
+                        console.log('📡 Booking Result:', bookingResult);
 
                         if (!bookingResponse.ok) {
-                            throw new Error(bookingResult.error || 'Tạo booking thất bại');
+                            throw new Error(bookingResult.error || `API Error: ${bookingResponse.status}`);
                         }
 
-                        const bookingId = bookingResult.booking.id || bookingResult.booking.booking_code;
+                        const bookingId = bookingResult.booking?.id || bookingResult.booking?.booking_code;
+                        console.log('✅ Booking ID:', bookingId);
 
                         // Tạo URL thanh toán VNPay
                         const paymentResponse = await fetch('https://api-resort.onrender.com/api/payments/fake/create', {
-
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -296,7 +302,7 @@
                     }
 
                 } catch (error) {
-                    console.error('Payment Error:', error);
+                    console.error('❌ Payment Error:', error);
                     alert(`❌ Lỗi: ${error.message}`);
                     paymentButton.disabled = false;
                     paymentButton.textContent = 'Thanh toán ngay';
