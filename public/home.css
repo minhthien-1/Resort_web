@@ -779,4 +779,40 @@ footer:hover {
       transform: translate(40%, -40%);
       user-select: none;
     }
+        .notif-wrapper {
+          position: relative;
+          margin-left: 20px;
+        }
+
+        .notif-btn {
+          position: relative;
+          display: inline-block;
+          text-decoration: none;
+          color: #333;
+          font-size: 24px; 
+          padding: 4px;
+        }
+
+        .notif-btn:hover {
+          color: #000;
+          opacity: 0.8;
+        }
+
+        .notif-count {
+          position: absolute;
+          top: 0;
+          right: 0;
+          background-color: red;
+          color: white;
+          font-family: Arial, sans-serif;
+          font-size: 12px;
+          font-weight: bold;
+          min-width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          line-height: 18px;
+          text-align: center;
+          transform: translate(40%, -40%);
+          user-select: none;
+        }
 

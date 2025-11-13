@@ -455,6 +455,9 @@
             <a href="notifications.html" class="notif-btn">
                 🔔 <span id="notifCount" class="notif-count">0</span>
             </a>
+          <a href="notifications.html" class="notif-btn">
+                  🔔 <span id="notifCount" class="notif-count">0</span>
+          </a>
         <a href="login.html" class="btn-login">Đăng nhập</a>
         <a href="register.html" class="btn-register">Đăng ký</a>
       </nav>
@@ -773,12 +776,21 @@
           <!-- Notifications Script -->
           <script>
             const API_BASE = "http://localhost:5500"; // thay bằng URL API của bạn
+  <!-- Notifications Script -->
+    <script>
+       const API_BASE = "http://localhost:5500"; // thay bằng URL API của bạn
 
             // SỬA: Chỉ cần giữ lại notifCount
             const notifCount = document.getElementById("notifCount");
+      // SỬA: Chỉ cần giữ lại notifCount
+       const notifCount = document.getElementById("notifCount");
 
             // XÓA BỎ: không cần notifBtn, notifBox, notifList, seeMoreBtn nữa
             // XÓA BỎ: các event listener cho notifBtn và seeMoreBtn
+      // Lấy thông báo từ API (chỉ để CẬP NHẬT SỐ LƯỢNG)
+      async function loadNotifications() {
+      try {
+      const token = localStorage.getItem("token"); // nếu cần auth
 
             // Lấy thông báo từ API (chỉ để CẬP NHẬT SỐ LƯỢNG)
             async function loadNotifications() {
@@ -792,23 +804,34 @@
                   headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await res.json();
+            
+        const res = await fetch(`${API_BASE}/notifications?limit=1`, {
+          headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await res.json();
                 
                 // SỬA: Xóa bỏ phần lặp (forEach) và cập nhật notifList
 
                 // Chỉ cập nhật số chưa đọc
                 notifCount.textContent = data.unreadCount || 0;
+              notifCount.textContent = data.unreadCount || 0;
 
               } catch (err) {
+          } catch (err) {
                 console.error("Lỗi load notifications:", err);
               }
             }
+          }
 
             // Load khi mở trang
             loadNotifications();
+          loadNotifications();
 
             // Tự refresh mỗi 60s
             setInterval(loadNotifications, 60000);
           </script>
+          setInterval(loadNotifications, 60000);
+    </script>
 
   
 
